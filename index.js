@@ -28,6 +28,11 @@ JComponent.register('compb', `
   using: ['view'],
 });
 JComponent.register('compa', `
+  <wxs module="m1">
+    var msg = 'hello world';
+    module.exports.message = msg;
+  </wxs>
+  <view>{{m1.message}}</view>
   <view wx:if="{{index !== 0}}">if</view>
   <view wx:elif="{{index === 0}}">elif</view>
   <view wx:else>else</view>

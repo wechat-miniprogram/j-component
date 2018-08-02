@@ -19,44 +19,56 @@ module.exports = function(content, handler) {
     while (content) {
         let isText = true;
 
-        if (content.indexOf('<!--') === 0) {
-            // Comment
-            let index = content.indexOf('-->');
+        if (!stack.last() || stack.last() !== 'wxs') {
+            if (content.indexOf('<!--') === 0) {
+                // Comment
+                let index = content.indexOf('-->');
 
-            if (index >= 0) {
-                content = content.substring(index + 3);
-                isText = false;
+                if (index >= 0) {
+                    content = content.substring(index + 3);
+                    isText = false;
+                }
+
+            } else if (content.indexOf('</') === 0) {
+                // end tag
+                let match = content.match(endTagReg);
+
+                if (match) {
+                    content = content.substring(match[0].length);
+                    match[0].replace(endTagReg, parseEndTag);
+                    isText = false;
+                }
+
+            } else if (content.indexOf('<') === 0) {
+                // start tag
+                let match = content.match(startTagReg);
+
+                if (match) {
+                    content = content.substring(match[0].length);
+                    match[0].replace(startTagReg, parseStartTag);
+                    isText = false;
+                }
             }
 
-        } else if (content.indexOf('</') === 0) {
-            // end tag
-            let match = content.match(endTagReg);
+            if (isText) {
+                let index = content.indexOf('<');
 
-            if (match) {
-                content = content.substring(match[0].length);
-                match[0].replace(endTagReg, parseEndTag);
-                isText = false;
+                let text = index < 0 ? content : content.substring(0, index);
+                content = index < 0 ? '' : content.substring(index);
+
+                handler.text && handler.text(text);
             }
+        } else {
+            content = content.replace(new RegExp(`(.*)<\/${stack.last()}[^>]*>`), (all, text) => {
+                text = text.replace(/<!--(.*?)-->/g, '');
 
-        } else if (content.indexOf('<') === 0) {
-            // start tag
-            let match = content.match(startTagReg);
+                handler.text && handler.text(text);
+                return '';
+            });
 
-            if (match) {
-                content = content.substring(match[0].length);
-                match[0].replace(startTagReg, parseStartTag);
-                isText = false;
-            }
+            parseEndTag('', stack.last());
         }
 
-        if (isText) {
-            let index = content.indexOf('<');
-
-            let text = index < 0 ? content : content.substring(0, index);
-            content = index < 0 ? '' : content.substring(index);
-
-            handler.text && handler.text(text);
-        }
 
         if (content == last) throw new Error(`parse error: ${content}`);
         last = content;

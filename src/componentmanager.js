@@ -75,11 +75,11 @@ class ComponentManager {
     });
 
     if (typeof template === 'string') {
-      template = template.replace(/[\n\r\t]+/g, '').trim();
+      template = template.trim();
       if (template) this.parse(template);
     }
 
-    this.registerToExparser();
+    this.exparserDef = this.registerToExparser();
 
     CACHE[name] = this;
   }
@@ -123,7 +123,6 @@ class ComponentManager {
           type = CONSTANT.TYPE_NATIVE;
         } else {
           type = CONSTANT.TYPE_COMPONENT;
-          tagName = `j-${tagName}`;
           componentManager = ComponentManager.get(tagName);
 
           if (!componentManager) throw new Error(`component ${tagName} not found`);
@@ -204,7 +203,7 @@ class ComponentManager {
         let parent = stack.last();
         parent.appendChild(new Node({
           type: CONSTANT.TYPE_TEXT,
-          content,
+          content: parent.type === CONSTANT.TYPE_WXS ? content : content.replace(/[\n\r\t\s]+/g, ' '),
           parent,
           index: parent.children.length,
           componentManager: this,
@@ -282,7 +281,7 @@ class ComponentManager {
       },
     };
 
-    exparser.registerElement(exparserDef);
+    return exparser.registerElement(exparserDef);
   }
 }
 
