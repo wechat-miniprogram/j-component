@@ -59,12 +59,15 @@ module.exports = function(content, handler) {
                 handler.text && handler.text(text);
             }
         } else {
-            content = content.replace(new RegExp(`(.*)<\/${stack.last()}[^>]*>`), (all, text) => {
-                text = text.replace(/<!--(.*?)-->/g, '');
+            let execRes = (new RegExp(`<\/${stack.last()}[^>]*>`)).exec(content);
+            
+            if (execRes) {
+                let text = content.substring(0, execRes.index);
+                content = content.substring(execRes.index + execRes[0].length);
 
-                handler.text && handler.text(text);
-                return '';
-            });
+                text.replace(/<!--(.*?)-->/g, '');
+                if (text) handler.text && handler.text(text);
+            }
 
             parseEndTag('', stack.last());
         }
@@ -95,7 +98,7 @@ module.exports = function(content, handler) {
                 });
             });
 
-            handler.start(tagName, attrs, unary);
+            handler.start && handler.start(tagName, attrs, unary);
         }
     }
 

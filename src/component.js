@@ -1,5 +1,4 @@
-// const exparser = require('./lib/exparser.min.js');
-const exparser = require('./lib/exparser.debug.js');
+const exparser = require('./lib/exparser.min.js');
 
 class Component {
   constructor(componentManager) {

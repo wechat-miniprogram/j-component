@@ -2,10 +2,11 @@ const CONSTANT = require('./constant');
 const VirtualNode = require('./virtualnode');
 const Expression = require('./expression');
 
-class Node {
+class JNode {
   constructor(options = {}) {
     this.type = options.type;
     this.tagName = options.tagName;
+    this.root = options.root || this; // root node's root is this
     this.parent = options.parent;
     this.index = options.index || 0;
     this.content = options.content && Expression.getExpression(options.content);
@@ -15,6 +16,31 @@ class Node {
     this.children = options.children || [];
     this.generics = options.generics;
     this.componentManager = options.componentManager; // owner component manager instance
+
+    // for root
+    this.data = {};
+
+    // for wxs
+    this.wxsModuleName = '';
+
+    this.checkAttrs();
+  }
+
+  /**
+   * check attrs
+   */
+  checkAttrs() {
+    let type = this.type
+    let attrs = this.attrs
+
+    for (let attr of attrs) {
+      let name = attr.name
+      let value = attr.value
+
+      if (type === CONSTANT.TYPE_WXS && name === 'module') {
+        this.wxsModuleName = value;
+      }
+    }
   }
 
   /**
@@ -32,6 +58,21 @@ class Node {
    */
   appendChild(node) {
     this.children.push(node);
+  }
+
+  /**
+   * set wxs content
+   */
+  setWxsContent(content) {
+    if (!this.wxsModuleName) return;
+
+    let func = new Function('require', 'module', content);
+    let req = () => {}; // require function
+    let mod = { exports: {} }; // modules
+
+    func.call(null, req, mod);
+
+    this.root.data[this.wxsModuleName] = mod.exports; // set in root's data
   }
 
   /**
@@ -106,6 +147,11 @@ class Node {
     let data = options.data = options.data || {};
     let statement = this.statement;
 
+    // check wxs
+    if (this.type === CONSTANT.TYPE_WXS) {
+      return null;
+    }
+
     // check if / elif / else
     if (this.type === CONSTANT.TYPE_IF && (!this.checkIf(data) || !this.checkElif(data) || !this.checkElse(data))) {
       return null;
@@ -166,4 +212,4 @@ class Node {
   }
 }
 
-module.exports = Node;
+module.exports = JNode;

@@ -1,5 +1,4 @@
-// const exparser = require('./lib/exparser.min.js');
-const exparser = require('./lib/exparser.debug.js');
+const exparser = require('./lib/exparser.min.js');
 const CONSTANT = require('./constant');
 
 class VirtualNode {

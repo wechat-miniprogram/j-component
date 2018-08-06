@@ -1,8 +1,7 @@
-// const exparser = require('./lib/exparser.min.js');
-const exparser = require('./lib/exparser.debug.js');
+const exparser = require('./lib/exparser.min.js');
 const parse = require('./parse');
 const CONSTANT = require('./constant');
-const Node = require('./node');
+const JNode = require('./jnode');
 const Expression = require('./expression');
 const _ = require('./utils');
 
@@ -69,7 +68,7 @@ class ComponentManager {
     this.name = name;
     this.definition = definition;
     this.using = [];
-    this.root = new Node({
+    this.root = new JNode({
       type: CONSTANT.TYPE_ROOT,
       componentManager: this,
     });
@@ -97,7 +96,7 @@ class ComponentManager {
   parse(template) {
     let stack = [this.root];
 
-    stack.last = function () {
+    stack.last = function() {
       return this[this.length - 1];
     };
 
@@ -132,19 +131,20 @@ class ComponentManager {
         let { statement, event, normalAttrs } = filterAttrs(attrs);
 
         let parent = stack.last();
-        let node = new Node({
+        let node = new JNode({
           type,
           tagName,
           attrs: normalAttrs,
           event,
           generics: {}, // TODO
           componentManager,
+          root: this.root,
         });
         let appendNode = node;
 
         // for statement
         if (statement.for) {
-          let itemNode = new Node({
+          let itemNode = new JNode({
             type: CONSTANT.TYPE_FORITEM,
             tagName: 'virtual',
             statement: {
@@ -153,16 +153,18 @@ class ComponentManager {
               forKey: statement.forKey,
             },
             children: [node],
+            root: this.root,
           });
           node.setParent(itemNode, 0); // update parent
 
-          let forNode = new Node({
+          let forNode = new JNode({
             type: CONSTANT.TYPE_FOR,
             tagName: 'wx:for',
             statement: {
               for: statement.for,
             },
             children: [itemNode],
+            root: this.root,
           });
           itemNode.setParent(forNode, 0); // update parent
 
@@ -171,7 +173,7 @@ class ComponentManager {
 
         // condition statement
         if (statement.if || statement.elif || statement.else) {
-          let ifNode = new Node({
+          let ifNode = new JNode({
             type: CONSTANT.TYPE_IF,
             tagName: 'wx:if',
             statement: {
@@ -180,6 +182,7 @@ class ComponentManager {
               else: statement.else,
             },
             children: [node],
+            root: this.root,
           });
           node.setParent(ifNode, 0); // update parent
 
@@ -201,13 +204,19 @@ class ComponentManager {
         if (!content) return;
 
         let parent = stack.last();
-        parent.appendChild(new Node({
-          type: CONSTANT.TYPE_TEXT,
-          content: parent.type === CONSTANT.TYPE_WXS ? content : content.replace(/[\n\r\t\s]+/g, ' '),
-          parent,
-          index: parent.children.length,
-          componentManager: this,
-        }));
+        if (parent.type === CONSTANT.TYPE_WXS) {
+          // wxs, transform content to a function
+          parent.setWxsContent(content);
+        } else {
+          parent.appendChild(new JNode({
+            type: CONSTANT.TYPE_TEXT,
+            content: content.replace(/[\n\r\t\s]+/g, ' '),
+            parent,
+            index: parent.children.length,
+            componentManager: this,
+            root: this.root,
+          }));
+        }
       }
     });
 
@@ -250,6 +259,7 @@ class ComponentManager {
       generics: [], // TODO
       template: {
         func: this.root.generate.bind(this.root),
+        data: this.root.data || {},
       },
       properties: definition.properties,
       data: definition.data,
@@ -292,8 +302,8 @@ class TemplateEngine {
     templateEngine._data = initValues;
     templateEngine._generateFunc = behavior.template.func;
     templateEngine._virtualTree = templateEngine._generateFunc({
-      data: templateEngine._data
-    });
+      data: Object.assign({}, templateEngine._data, behavior.template.data)
+    }); // generate a virtual tree
 
     return templateEngine;
   }
