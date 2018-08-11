@@ -32,7 +32,7 @@ JComponent.register('compa', `
     var msg = 'hello world';
     module.exports.message = msg;
   </wxs>
-  <view>{{m1.message}}</view>
+  <view class="wxs" style="{{styleObject.style}}">{{m1.message}}</view>
   <view wx:if="{{index !== 0}}">if</view>
   <view wx:elif="{{index === 0}}">elif</view>
   <view wx:else>else</view>
@@ -43,6 +43,9 @@ JComponent.register('compa', `
   },
   data: {
     index: 0,
+    styleObject: {
+      style: 'color: green;',
+    },
   },
   using: ['view', 'compb'],
   options: {},

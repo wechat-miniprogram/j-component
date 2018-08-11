@@ -1,4 +1,4 @@
-const exparser = require('./lib/exparser.min.js');
+const exparser = require('miniprogram-exparser');
 const parse = require('./parse');
 const CONSTANT = require('./constant');
 const JNode = require('./jnode');
@@ -295,6 +295,9 @@ class ComponentManager {
   }
 }
 
+/**
+ * template engine for exparser
+ */
 class TemplateEngine {
   static create(behavior, initValues, componentOptions) {
     let templateEngine = new TemplateEngine();
@@ -337,6 +340,9 @@ class TemplateEngine {
   }
 }
 
+/**
+ * template engine instance for exparser
+ */
 class TemplateEngineInstance {
 
 }

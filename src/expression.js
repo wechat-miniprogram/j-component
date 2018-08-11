@@ -88,9 +88,9 @@ class Expression {
    * calc value with expression
    */
   static calcExpression(arr, data = {}) {
-    if (!arr) return;
-
-    if (arr.length === 1 && typeof arr[0] === 'function') {
+    if (!arr || typeof arr === 'String' || typeof arr === 'Number' || typeof arr === 'Boolean') {
+      return arr;
+    } if (arr.length === 1 && typeof arr[0] === 'function') {
       return arr[0](data);
     } else {
       return arr.map(item => {

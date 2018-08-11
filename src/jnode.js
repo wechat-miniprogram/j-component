@@ -40,6 +40,10 @@ class JNode {
       if (type === CONSTANT.TYPE_WXS && name === 'module') {
         this.wxsModuleName = value;
       }
+
+      if (value) {
+        attr.value = Expression.getExpression(value);
+      }
     }
   }
 
@@ -201,6 +205,15 @@ class JNode {
       }
     }
 
+    // check attrs
+    let attrs = [];
+    for (let { name, value } of this.attrs) {
+      attrs.push({
+        name,
+        value: value ? Expression.calcExpression(value, data) : value,
+      });
+    }
+
     return new VirtualNode({
       type: this.type,
       tagName: this.tagName,
@@ -208,6 +221,8 @@ class JNode {
       key: options.forKey,
       children,
       generics: options.generics,
+      attrs,
+      event: this.event,
     });
   }
 }

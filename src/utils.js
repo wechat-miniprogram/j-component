@@ -35,8 +35,37 @@ function isHtmlTag(tagName) {
   return tags.indexOf(tagName) >= 0;
 }
 
+/**
+ * transform rpx to px
+ */
+function transformRpx(style) {
+  return style.replace(/(\d+)rpx/ig, '$1px');
+}
+
+/**
+ * transform dash to camel case
+ */
+function dashToCamelCase(dash) {
+  return dash.replace(/-[a-z]/g, s => s[1].toUpperCase());
+}
+
+/**
+ * transform camel to dash case
+ */
+function camelToDashCase(camel) {
+  return camel.replace(/([A-Z])/g, '-$1').toLowerCase();
+}
+
+function animationToStyle() {
+  // TODO
+}
+
 module.exports = {
   getId,
   copy,
   isHtmlTag,
+  transformRpx,
+  dashToCamelCase,
+  camelToDashCase,
+  animationToStyle,
 };
