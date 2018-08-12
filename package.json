@@ -1,7 +1,7 @@
 {
   "name": "j-component",
   "version": "0.0.1",
-  "description": "",
+  "description": "miniprogram custom component framework",
   "main": "index.js",
   "scripts": {
     "test": "jest ./test/* --silent --bail",
