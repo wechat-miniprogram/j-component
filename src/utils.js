@@ -56,6 +56,9 @@ function camelToDashCase(camel) {
   return camel.replace(/([A-Z])/g, '-$1').toLowerCase();
 }
 
+/**
+ * transform animation object to style
+ */
 function animationToStyle() {
   // TODO
 }

@@ -42,13 +42,12 @@ function filterAttrs(attrs = []) {
         let isCatch = res[2] === 'catch';
         let eventName = res[3];
 
-        event[eventName] = event[eventName] || [];
-        event[eventName].push({
+        event[eventName] = {
           name: eventName,
           isCapture,
           isCatch,
           handler: value,
-        });
+        };
       } else {
         // normal attr
         normalAttrs.push(attr);
@@ -253,6 +252,7 @@ class ComponentManager {
       }
     });
 
+    // let definitionFilter = exparser.Behavior.callDefinitionFilter(definition);
     let exparserDef = {
       is: this.name,
       using: this.using,
@@ -289,6 +289,16 @@ class ComponentManager {
         writeFieldsToNode: false,
         writeIdToDOM: false,
       },
+      // lifetimes: definition.lifetimes,
+      // pageLifetimes: definition.pageLifetimes,
+      // definitionFilter,
+      initiator() {
+        let methods = definition.methods || {};
+        let caller = Object.create(this);
+
+        Object.keys(methods).forEach(name => caller[name] = methods[name]);
+        exparser.Element.setMethodCaller(this, caller);
+      }
     };
 
     return exparser.registerElement(exparserDef);
@@ -301,11 +311,12 @@ class ComponentManager {
 class TemplateEngine {
   static create(behavior, initValues, componentOptions) {
     let templateEngine = new TemplateEngine();
-    templateEngine._initValues = initValues;
-    templateEngine._data = initValues;
+    let data = Object.assign({}, initValues, behavior.template.data);
+
+    templateEngine._data = data;
     templateEngine._generateFunc = behavior.template.func;
     templateEngine._virtualTree = templateEngine._generateFunc({
-      data: Object.assign({}, templateEngine._data, behavior.template.data)
+      data
     }); // generate a virtual tree
 
     return templateEngine;
@@ -327,8 +338,9 @@ class TemplateEngine {
     let instance = new TemplateEngineInstance();
     instance._generateFunc = this._generateFunc;
     instance._virtualTree = this._virtualTree;
+    instance.originData = 
 
-    instance.data = _.copy(this._initValues);
+    instance.data = _.copy(this._data);
     instance.idMap = {};
     instance.slots = {};
     instance.shadowRoot = instance._virtualTree.render(exparserNode, null, customArgs); // render to exparser tree
@@ -344,7 +356,18 @@ class TemplateEngine {
  * template engine instance for exparser
  */
 class TemplateEngineInstance {
+  /**
+   * it will be called when need to rerender
+   */
+  updateValues(exparserNode, data, changedPaths, changedValues, changes) {
+    // prepare data
+    let newVirtualTree = this._generateFunc({ data }); // generate a new virtual tree
 
+    // apply changes
+    let apply = this._virtualTree.diff(newVirtualTree);
+    apply(this.shadowRoot);
+    this._virtualTree = newVirtualTree;
+  }
 }
 
 module.exports = ComponentManager;

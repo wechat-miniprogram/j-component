@@ -1,32 +1,39 @@
 const exparser = require('miniprogram-exparser');
 const CONSTANT = require('./constant');
 const _ = require('./utils');
+const Patch = require('./patch');
 
 const transitionKeys = ['transition', 'transitionProperty', 'transform', 'transformOrigin', 'webkitTransition', 'webkitTransitionProperty', 'webkitTransform', 'webkitTransformOrigin'];
 
 class VirtualNode {
   constructor(options = {}) {
     this.type = options.type;
-    this.tagName = options.tagName;
-    this.content = String(options.content || '');
-    this.key = options.key;
+    this.tagName = options.tagName || '';
+    this.content = options.content !== undefined ? String(options.content) : '';
+    this.key = options.key || '';
     this.children = options.children || [];
     this.generics = options.generics;
     this.attrs = options.attrs || [];
-    this.event = options.event || [];
+    this.event = options.event || {};
+    this.childCount = this.children.length;
+
+    this.children.forEach(child => {
+      this.childCount += child.childCount;
+    });
   }
 
   /**
    * append a child virtual node
    */
-  appendChild(VirtualNode) {
-    this.children.push(VirtualNode);
+  appendChild(virtualNode) {
+    this.children.push(virtualNode);
+    this.childCount += (virtualNode.childCount + 1);
   }
 
   /**
    * set attrs to exparser node
    */
-  setAttrs(exparserNode, data = {}) {
+  setAttrs(exparserNode) {
     let attrs = this.attrs;
     let hasDelayedProps = false;
     let isComponentNode = exparserNode instanceof exparser.Component;
@@ -35,11 +42,7 @@ class VirtualNode {
 
     exparserNode.dataset = exparserNode.dataset || {};
 
-    for (let attr of attrs) {
-      let name = attr.name;
-      let value = attr.value;
-      let matches = null;
-
+    for (let { name, value } of attrs) {
       if (exparserNode.is === 'slot' && exparserNode instanceof exparser.VirtualNode && name === 'name') {
         // slot name
         exparser.Element.setSlotName(exparserNode, value);
@@ -54,12 +57,12 @@ class VirtualNode {
           animationStyle = transitionKeys.map(key => {
             let styleValue = animationStyle[key.replace('webkitT', 't')];
 
-            return styleValue ||styleValue === 0 ? `${key.replace(/([A-Z]{1})/g, char => `-${char.toLowerCase()}`)}:${styleValue}` : '';
+            return styleValue !== undefined ? `${key.replace(/([A-Z]{1})/g, char => `-${char.toLowerCase()}`)}:${styleValue}` : '';
           }).filter(item => !!item.trim()).join(';');
 
           exparserNode.setNodeStyle(_.transformRpx(value, true) + animationStyle);
         }
-      } else if (isComponentNode && exparser.Component.hasPublicProperty(node, name)) {
+      } else if (isComponentNode && exparser.Component.hasPublicProperty(exparserNode, name)) {
         // public properties of exparser node, delay it
         dataProxy.scheduleReplace([name], value);
         needDoUpdate = true;
@@ -109,15 +112,54 @@ class VirtualNode {
    * set event to exparser node
    */
   setEvent(exparserNode) {
-    // if (matches = propName.match(/^(capture-)?(bind|catch):?(.+)$/)) {
-    //   bindEvent(tm, node, matches[3], propValue, matches[2] === 'catch', matches[1])
-    //   if(inDevtoolsWebview() && !isDataThread()) node.setAttribute('exparser:info-attr-' + propName, propValue)
-    //   continue
-    // }
-    // if (propName.slice(0, 2) === 'on') {
-    //   bindEvent(tm, node, propName.slice(2), propValue, false, false)
-    //   continue
-    // }
+    let convertEventTarget = (target, currentTarget) => {
+      if (currentTarget && (target instanceof exparser.VirtualNode) && !target.id && !Object.keys(target.dataset).length) {
+        // the target is slot without id and dataset
+        target = currentTarget;
+      }
+
+      return {
+        id: target.id,
+        offsetLeft: target.$$ && target.$$.offsetLeft || 0,
+        offsetTop: target.$$ && target.$$.offsetTop || 0,
+        dataset: target.dataset,
+      };
+    };
+
+    Object.keys(this.event).forEach(key => {
+      let { name, isCapture, isCatch, handler } = this.event[key];
+
+      if (!handler) return;
+
+      exparserNode.addListener(name, function(evt) {
+        let shadowRoot = exparserNode.ownerShadowRoot;
+
+        if (shadowRoot) {
+          let host = shadowRoot.getHostNode();
+          let writeOnly = exparser.Component.getComponentOptions(host).writeOnly;
+
+          if (!writeOnly) {
+            let caller = exparser.Element.getMethodCaller(host);
+
+            if (typeof caller[handler] !== 'function') {
+              console.warn(`Component "${host.is}" does not have a method "${handler}" to handle event "${evt.type}"`);
+            } else {
+              caller[handler]({
+                type: evt.type,
+                timeStamp: evt.timeStamp,
+                target: convertEventTarget(evt.target, this),
+                currentTarget: convertEventTarget(this, null),
+                detail: evt.detail,
+                touches: evt.touches,
+                changedTouches: evt.changedTouches,
+              });
+            }
+          }
+        }
+
+        if (isCatch) return false;
+      }, { capture: isCapture });
+    });
   }
 
   /**
@@ -158,10 +200,202 @@ class VirtualNode {
   }
 
   /**
-   * diff
+   * diff two tree
    */
-  diff() {
+  diff(newVirtualTree) {
+    let patches = {};
+    VirtualNode.diffSubTree(this, newVirtualTree, patches, 0);
+    return Patch.getApply(this, patches);
+  }
+
+  /**
+   * diff two sub tree
+   */
+  static diffSubTree(oldT, newT, patches, index) {
+    let patch = patches[index] = patches[index] || [];
+
+    if (!newT) {
+      // remove
+      patch.push(new Patch(CONSTANT.PATCH_REMOVE, newT));
+    } else if (oldT.type === CONSTANT.TYPE_TEXT) {
+      // update text virtual node
+      if (newT.type !== CONSTANT.TYPE_TEXT || newT.content !== oldT.content) {
+        patch.push(new Patch(CONSTANT.PATCH_REPLACE, newT, newT));
+      }
+    } else {
+      // update other virtual node
+      if (newT.type === CONSTANT.TYPE_TEXT) {
+        // new virtual node is text
+        patch.push(new Patch(CONSTANT.PATCH_REPLACE, newT, newT));
+      } else if (newT.type === oldT.type && newT.tagName === oldT.tagName && newT.key === oldT.key) {
+        // check attrs
+        let attrs = VirtualNode.diffAttrs(oldT.attrs, newT.attrs);
+        if (attrs) {
+          newT.attrs = attrs;
+          patch.push(new Patch(CONSTANT.PATCH_ATTRS, newT, attrs));
+        }
+
+        // check children
+        let oldChildren = oldT.children;
+        let newChildren = newT.children;
+        let diffs = oldT.type === CONSTANT.TYPE_IF || oldT.type === CONSTANT.TYPE_FOR || oldT.type === CONSTANT.TYPE_FORITEM ? VirtualNode.diffList(oldChildren, newChildren) : { children: newChildren, moves: null }; // only statement need diff
+        let subIndex = index;
+
+        // diff old child's subtree
+        for (let i = 0, len = oldChildren.length; i < len; i++) {
+          let oldChild = oldChildren[i];
+          let newChild = diffs.children[i];
+
+          subIndex++;
+
+          if (newChild) VirtualNode.diffSubTree(oldChild, newChild, patches, subIndex);
+          if (oldChild.type !== CONSTANT.TYPE_TEXT) subIndex += oldChild.childCount;
+        }
+        if (diffs.moves) {
+          patch.push(new Patch(CONSTANT.PATCH_REORDER, newT, diffs.moves));
+        }
+      } else {
+        patch.push(new Patch(CONSTANT.PATCH_REPLACE, newT, newT))
+      }
+    }
+
+    if (!patch.length) patches[index] = undefined;
+  }
+
+  /**
+   * diff attrs
+   */
+  static diffAttrs(oldAttrs, newAttrs) {
+    let oldAttrsMap = {};
+    let newAttrsMap = {};
+    let retAttrs = [];
+    let isChange = false;
+
+    oldAttrs.forEach(attr => oldAttrsMap[attr.name] = attr.value);
+
+    for (let attr of newAttrs) {
+      // new or update
+      newAttrsMap[attr.name] = attr.value;
+      retAttrs.push(attr);
+
+      if (oldAttrsMap[attr.name] === undefined || oldAttrsMap[attr.name] !== attr.value) isChange = true;
+    }
+
+    for (let attr of oldAttrs) {
+      if (newAttrsMap[attr.name] === undefined) {
+        // remove
+        attr.value = undefined;
+        retAttrs.push(attr);
+
+        isChange = true;
+      }
+    }
     
+    return isChange ? retAttrs : false;
+  }
+
+  /**
+   * diff list
+   */
+  static diffList(oldList, newList) {
+    let oldKeyMap = {}; // key-index map for old list
+    let newKeyMap = {}; // key-index map for new list
+    let oldFreeList = []; // index list without key for old list
+    let newFreeList = []; // index list without key for new list
+
+    oldList.forEach((item, index) => {
+      if (item.key) {
+        // has key
+        if (Object.prototype.hasOwnProperty.call(oldKeyMap, item.key)) item.key = '';
+        else oldKeyMap[item.key] = index;
+      } else {
+        // without key
+        oldFreeList.push(index);
+      }
+    });
+    newList.forEach((item, index) => {
+      if (item.key) {
+        // has key
+        if (Object.prototype.hasOwnProperty.call(newKeyMap, item.key)) newFreeList.push(index);
+        else newKeyMap[item.key] = index;
+      } else {
+        // without key
+        newFreeList.push(index);
+      }
+    });
+
+    let children = [];
+    let removes = [];
+    let inserts = [];
+
+    // check old list
+    for (let i = 0, j = 0; i < oldList.length; i++) {
+      let item = oldList[i];
+      let key = item.key;
+
+      if (key) {
+        if (Object.prototype.hasOwnProperty.call(newKeyMap, key)) {
+          // exist in new list
+          children.push(newList[newKeyMap[key]]);
+        } else {
+          // remove from new list
+          removes.push(i);
+          children.push(null);
+        }
+      } else {
+        if (j < newFreeList.length) {
+          // exist in new list
+          children.push(newList[newFreeList[j++]]);
+        } else {
+          // remove from new list
+          removes.push(i);
+          children.push(null);
+        }
+      }
+    }
+    removes = removes.reverse(); // delete from end to start
+
+    // check new list
+    let hasCheckIndexMap = {};
+    for (let i = 0, j = 0, k = 0, len = newList.length; i < len; i++) {
+      let item = newList[i];
+      let key = item.key;
+
+      while (children[j] === null || hasCheckIndexMap[j]) j++; // skip remove and checked item
+
+      if (key) {
+        if (Object.prototype.hasOwnProperty.call(oldKeyMap, key) && children[j]) {
+          // exist in old list
+          if (children[j].key === key) {
+            // with same key
+            j++;
+          } else {
+            // witch different key
+            let oldIndex = oldKeyMap[key];
+            hasCheckIndexMap[oldIndex] = true;
+            inserts.push({ oldIndex, index: i });
+          }
+        } else {
+          // insert new item
+          inserts.push({ oldIndex: -1, index: i });
+        }
+      } else {
+        if (k < oldFreeList.length) {
+          // exist in old list
+          let oldIndex = oldFreeList[k++];
+          hasCheckIndexMap[oldIndex] = true;
+          inserts.push({ oldIndex, index: i });
+        } else {
+          // insert new item
+          inserts.push({ oldIndex: -1, index: i });
+        }
+      }
+    }
+
+    return {
+      children,
+      moves: { removes, inserts },
+    };
   }
 }
 

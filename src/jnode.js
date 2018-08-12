@@ -5,7 +5,7 @@ const Expression = require('./expression');
 class JNode {
   constructor(options = {}) {
     this.type = options.type;
-    this.tagName = options.tagName;
+    this.tagName = options.tagName || '';
     this.root = options.root || this; // root node's root is this
     this.parent = options.parent;
     this.index = options.index || 0;
@@ -132,13 +132,20 @@ class JNode {
   checkPreviousCondition(data) {
     let previousSibling = this.previousSibling();
 
-    if (previousSibling) {
+    while (previousSibling) {
       let statement = previousSibling.statement;
 
       if (previousSibling.type !== CONSTANT.TYPE_IF) return false; // not if node
       if (!statement.if && !statement.elif) return false; // not have condition statement 
       if (statement.if) return previousSibling.checkIf(data);
-      if (statement.elif) return previousSibling.checkElif(data);
+
+      if (statement.elif) {
+        if (!previousSibling.checkElif(data)) {
+          previousSibling = previousSibling.previousSibling();
+        } else {
+          return true;
+        }
+      }
     }
 
     return false;
@@ -150,6 +157,9 @@ class JNode {
   generate(options = {}) {
     let data = options.data = options.data || {};
     let statement = this.statement;
+    let key = options.key;
+
+    delete options.key; // not cross passing
 
     // check wxs
     if (this.type === CONSTANT.TYPE_WXS) {
@@ -189,16 +199,14 @@ class JNode {
         options.extra = options.extra || {};
         let { forItem, forIndex } = options.extra;
         let { forItem: bakItem, forIndex: bakIndex } = data;
-        let bakKey = options.forKey;
         data[statement.forItem] = forItem; // list item
         data[statement.forIndex] = forIndex; // list index
-        if (statement.forKey) options.forKey = statement.forKey === '*this' ? forItem : forItem[statement.forKey]; // list key
+        if (statement.forKey) options.key = statement.forKey === '*this' ? forItem : forItem[statement.forKey]; // list key
 
         children = this.children.map(node => node.generate(options)).filter(virtualNode => !!virtualNode);
 
         data[statement.forItem] = bakItem;
         data[statement.forIndex] = bakIndex;
-        options.forKey = bakKey;
       } else {
         // normal
         children = this.children.map(node => node.generate(options)).filter(virtualNode => !!virtualNode);
@@ -218,7 +226,7 @@ class JNode {
       type: this.type,
       tagName: this.tagName,
       content: Expression.calcExpression(this.content, data),
-      key: options.forKey,
+      key,
       children,
       generics: options.generics,
       attrs,
