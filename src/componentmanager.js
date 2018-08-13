@@ -235,22 +235,9 @@ class ComponentManager {
   registerToExparser() {
     let definition = this.definition;
     let options = definition.options || {};
+    let methods = {};
 
-    // adjust properties
-    let properties = definition.properties || {};
-    Object.keys(properties).forEach(key => {
-      let value = properties[key];
-      if (value === null) {
-        properties[key] = { type: null };
-      } else if (value === Number || value === String || value === Boolean || value === Object || value === Array) {
-        properties[key] = { type: value.name };
-      } else if (value.public === undefined || value.public) {
-        properties[key] = {
-          type: value.type === null ? null : value.type.name,
-          value: value.value,
-        };
-      }
-    });
+    _.adjustExparserDefinition(definition);
 
     // let definitionFilter = exparser.Behavior.callDefinitionFilter(definition);
     let exparserDef = {
@@ -293,7 +280,6 @@ class ComponentManager {
       // pageLifetimes: definition.pageLifetimes,
       // definitionFilter,
       initiator() {
-        let methods = definition.methods || {};
         let caller = Object.create(this);
 
         Object.keys(methods).forEach(name => caller[name] = methods[name]);
@@ -301,7 +287,11 @@ class ComponentManager {
       }
     };
 
-    return exparser.registerElement(exparserDef);
+    let exparserReg = exparser.registerElement(exparserDef);
+    exparser.Behavior.prepare(exparserReg.behavior);
+    methods = exparserReg.behavior.methods;
+
+    return exparserReg;
   }
 }
 
@@ -315,9 +305,7 @@ class TemplateEngine {
 
     templateEngine._data = data;
     templateEngine._generateFunc = behavior.template.func;
-    templateEngine._virtualTree = templateEngine._generateFunc({
-      data
-    }); // generate a virtual tree
+    templateEngine._virtualTree = templateEngine._generateFunc({ data }); // generate a virtual tree
 
     return templateEngine;
   }

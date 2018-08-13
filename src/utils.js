@@ -63,6 +63,29 @@ function animationToStyle() {
   // TODO
 }
 
+/**
+ * adjust exparser definition
+ */
+function adjustExparserDefinition(definition) {
+  // adjust properties
+  let properties = definition.properties || {};
+  Object.keys(properties).forEach(key => {
+    let value = properties[key];
+    if (value === null) {
+      properties[key] = { type: null };
+    } else if (value === Number || value === String || value === Boolean || value === Object || value === Array) {
+      properties[key] = { type: value.name };
+    } else if (value.public === undefined || value.public) {
+      properties[key] = {
+        type: value.type === null ? null : value.type.name,
+        value: value.value,
+      };
+    }
+  });
+
+  return definition;
+}
+
 module.exports = {
   getId,
   copy,
@@ -71,4 +94,5 @@ module.exports = {
   dashToCamelCase,
   camelToDashCase,
   animationToStyle,
+  adjustExparserDefinition,
 };
