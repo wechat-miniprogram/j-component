@@ -23,6 +23,9 @@ class JNode {
     // for wxs
     this.wxsModuleName = '';
 
+    // for slot
+    this.slotName = '';
+
     this.checkAttrs();
   }
 
@@ -32,19 +35,25 @@ class JNode {
   checkAttrs() {
     let type = this.type
     let attrs = this.attrs
+    let filterAttrs = []
 
     for (let attr of attrs) {
       let name = attr.name
       let value = attr.value
 
       if (type === CONSTANT.TYPE_WXS && name === 'module') {
+        // wxs module
         this.wxsModuleName = value;
-      }
-
-      if (value) {
-        attr.value = Expression.getExpression(value);
+      } else if (type === CONSTANT.TYPE_SLOT && name) {
+        // slot name
+        this.slotName = value;
+      } else {
+        if (value) attr.value = Expression.getExpression(value);
+        filterAttrs.push(attr);
       }
     }
+
+    this.attrs = filterAttrs;
   }
 
   /**
@@ -231,6 +240,7 @@ class JNode {
       generics: options.generics,
       attrs,
       event: this.event,
+      slotName: this.slotName,
     });
   }
 }

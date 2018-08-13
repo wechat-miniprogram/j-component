@@ -15,6 +15,7 @@ class VirtualNode {
     this.generics = options.generics;
     this.attrs = options.attrs || [];
     this.event = options.event || {};
+    this.slotName = options.slotName || '';
     this.childCount = this.children.length;
 
     this.children.forEach(child => {
@@ -43,10 +44,7 @@ class VirtualNode {
     exparserNode.dataset = exparserNode.dataset || {};
 
     for (let { name, value } of attrs) {
-      if (exparserNode.is === 'slot' && exparserNode instanceof exparser.VirtualNode && name === 'name') {
-        // slot name
-        exparser.Element.setSlotName(exparserNode, value);
-      } else if (name === 'id' || name === 'slot' || (isComponentNode && name === 'class')) {
+      if (name === 'id' || name === 'slot' || (isComponentNode && name === 'class')) {
         // common properties
         exparserNode[name] = value || '';
       } else if (isComponentNode && name === 'style') {
@@ -179,7 +177,7 @@ class VirtualNode {
       exparserNode = shadowRoot = exparser.ShadowRoot.create(shadowRootHost);
     } else if (type === CONSTANT.TYPE_SLOT) {
       exparserNode = exparser.VirtualNode.create(tagName);
-      exparser.Element.setSlotName(exparserNode, '');
+      exparser.Element.setSlotName(exparserNode, this.slotName);
     } else if (type === CONSTANT.TYPE_TEMPLATE || type === CONSTANT.TYPE_IF || type === CONSTANT.TYPE_FOR || type === CONSTANT.TYPE_FORITEM) {
       exparserNode = exparser.VirtualNode.create(tagName);
       exparser.Element.setInheritSlots(exparserNode);
