@@ -17,11 +17,9 @@ test('create component successfully', () => {
   });
   debugger;
   let id1 = JComponent.register({
-    name: 'view',
     template: '<div><slot/></div>'
   });
   let id2 = JComponent.register({
-    name: 'compb',
     template: `
       <view wx:for="{{list}}">{{index + '-' + item}}</view><span><slot/></span>
     `,
@@ -37,7 +35,6 @@ test('create component successfully', () => {
     },
   });
   let id3 = JComponent.register({
-    name: 'compa',
     template: `
       <wxs module="m1">
         var msg = 'hello world';
