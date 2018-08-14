@@ -30,6 +30,7 @@ let behavior = jComponent.behavior({
  * 注册组件
  */
 let componentId = jComponent.register({
+    id: 'xxx', // 可选字段，如果传了此字段，则表明注册为全局组件，其他组件可直接在 template 中使用而无需在 usingComponents 里引入
     template: '<view id="a">xxx</view>', // 组件模板，即组件对应的 wxml 内容
     usingComponents: { // 使用到的自定义组件
         'view': 'xxx', // xxx 为组件 id，调 register 方法时会返回

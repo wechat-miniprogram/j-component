@@ -64,7 +64,8 @@ function filterAttrs(attrs = []) {
 
 class ComponentManager {
   constructor(definition = {}) {
-    this.id = _.getId(true);
+    this.id = definition.id || _.getId(true);
+    this.isGlobal = !!definition.id; // is global component
     this.definition = definition;
     this.root = new JNode({
       type: CONSTANT.TYPE_ROOT,
@@ -123,7 +124,7 @@ class ComponentManager {
         } else {
           type = CONSTANT.TYPE_COMPONENT;
           id = usingComponents[tagName];
-          componentManager = ComponentManager.get(id);
+          componentManager = id ? ComponentManager.get(id) : ComponentManager.get(tagName);
 
           if (!componentManager) throw new Error(`component ${tagName} not found`);
         }
