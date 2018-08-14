@@ -16,10 +16,15 @@ test('create component successfully', () => {
     }
   });
 
-  JComponent.register('view', '<div><slot/></div>');
-  JComponent.register('compb', `
-    <view wx:for="{{list}}">{{index + '-' + item}}</view><span><slot/></span>
-  `, {
+  JComponent.register({
+    name: 'view',
+    template: '<div><slot/></div>'
+  });
+  JComponent.register({
+    name: 'compb',
+    template: `
+      <view wx:for="{{list}}">{{index + '-' + item}}</view><span><slot/></span>
+    `,
     properties: {
       list: {
         type: Array,
@@ -27,19 +32,25 @@ test('create component successfully', () => {
         value: [],
       }
     },
-    using: ['view'],
+    usingComponents: ['view'],
   });
-  JComponent.register('compa', `
-    <wxs module="m1">
-      var msg = 'hello world';
-      module.exports.message = msg;
-    </wxs>
-    <view class="wxs" style="{{styleObject.style}}" bindtap="onTap1">{{m1.message}}+{{index}}</view>
-    <view wx:if="{{index !== 0}}">if</view>
-    <view wx:elif="{{index === 0}}">elif</view>
-    <view wx:else>else</view>
-    <compb id="compb" bindtap="onTap2" list="{{list}}">{{index}}</compb>
-  `, {
+  JComponent.register({
+    name: 'compa',
+    template: `
+      <wxs module="m1">
+        var msg = 'hello world';
+        module.exports.message = msg;
+      </wxs>
+      <view class="wxs" style="{{styleObject.style}}" bindtap="onTap1">{{m1.message}}+{{index}}</view>
+      <view wx:if="{{index !== 0}}">if</view>
+      <view wx:elif="{{index === 0}}">elif</view>
+      <view wx:else>else</view>
+      <compb id="compb" bindtap="onTap2" list="{{list}}">{{index}}</compb>
+    `,
+    usingComponents: ['view', 'compb'],
+    options: {
+      classPrefix: 'compa',
+    },
     properties: {},
     data: {
       index: 0,
@@ -48,8 +59,6 @@ test('create component successfully', () => {
       },
       list: [1, 2],
     },
-    using: ['view', 'compb'],
-    options: {},
     behaviors: [behavior],
     relations: {},
     externalClasses: [],
@@ -70,7 +79,7 @@ test('create component successfully', () => {
   });
 
   let compa = JComponent.create('compa');
-  expect(compa.dom.innerHTML).toBe('<view class="wxs" style="color: green;"><div>hello world+0</div></view><view><div>elif</div></view><compb><view><div>0-1</div></view><view><div>1-2</div></view><span>0</span></compb>');
+  expect(compa.dom.innerHTML).toBe('<view class="compa--wxs" style="color: green;"><div>hello world+0</div></view><view><div>elif</div></view><compb><view><div>0-1</div></view><view><div>1-2</div></view><span>0</span></compb>');
 
   let node1 = compa.querySelector('.wxs');
   node1.dispatchEvent('tap');
@@ -82,5 +91,5 @@ test('create component successfully', () => {
 
   let node2 = compa.querySelector('#compb');
   node2.dispatchEvent('tap');
-  expect(compa.dom.innerHTML).toBe('<view class="wxs" style="color: red;"><div>hello world+1</div></view><view><div>if</div></view><compb><view><div>0-2</div></view><view><div>1-3</div></view><view><div>2-4</div></view><span>1</span></compb>');
+  expect(compa.dom.innerHTML).toBe('<view class="compa--wxs" style="color: red;"><div>hello world+1</div></view><view><div>if</div></view><compb><view><div>0-2</div></view><view><div>1-3</div></view><view><div>2-4</div></view><span>1</span></compb>');
 });

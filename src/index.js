@@ -4,12 +4,12 @@ const Component = require('./component');
 const _ = require('./utils');
 
 module.exports = {
-  register(name, template, definition) {
-    if (!name) return;
+  register(definition = {}) {
+    if (!definition.name) return;
 
-    if (ComponentManager.get(name)) return;
+    if (ComponentManager.get(definition.name)) return;
 
-    new ComponentManager(name, template, definition);
+    new ComponentManager(definition);
   },
 
   behavior(definition) {

@@ -63,23 +63,23 @@ function filterAttrs(attrs = []) {
 }
 
 class ComponentManager {
-  constructor(name, template, definition = {}) {
-    this.name = name;
+  constructor(definition = {}) {
+    this.name = definition.name;
     this.definition = definition;
-    this.using = [];
+    this.usingComponents = [];
     this.root = new JNode({
       type: CONSTANT.TYPE_ROOT,
       componentManager: this,
     });
 
-    if (typeof template === 'string') {
-      template = template.trim();
+    if (typeof definition.template === 'string') {
+      let template = definition.template.trim();
       if (template) this.parse(template);
     }
 
     this.exparserDef = this.registerToExparser();
 
-    CACHE[name] = this;
+    CACHE[definition.name] = this;
   }
 
   /**
@@ -124,7 +124,7 @@ class ComponentManager {
           componentManager = ComponentManager.get(tagName);
 
           if (!componentManager) throw new Error(`component ${tagName} not found`);
-          if (this.using.indexOf(tagName) === -1) this.using.push(tagName);
+          if (this.usingComponents.indexOf(tagName) === -1) this.usingComponents.push(tagName);
         }
 
         let { statement, event, normalAttrs } = filterAttrs(attrs);
@@ -242,7 +242,7 @@ class ComponentManager {
     // let definitionFilter = exparser.Behavior.callDefinitionFilter(definition);
     let exparserDef = {
       is: this.name,
-      using: this.using,
+      using: this.usingComponents,
       generics: [], // TODO
       template: {
         func: this.root.generate.bind(this.root),
@@ -266,7 +266,7 @@ class ComponentManager {
         writeOnly: options.writeOnly || false,
         allowInWriteOnly: false,
         lazyRegistration: true,
-        classPrefix: '',
+        classPrefix: options.classPrefix || '',
         addGlobalClass: false,
         templateEngine: TemplateEngine,
         renderingMode: 'full',
