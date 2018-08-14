@@ -5,15 +5,13 @@ const _ = require('./utils');
 
 module.exports = {
   register(definition = {}) {
-    if (!definition.name) return;
+    let componentManager = new ComponentManager(definition);
 
-    if (ComponentManager.get(definition.name)) return;
-
-    new ComponentManager(definition);
+    return componentManager.id;
   },
 
   behavior(definition) {
-    definition.is = '' + _.getId();
+    definition.is = _.getId(true);
     definition.options = {
       lazyRegistration: true,
       publicProperties: true,
@@ -25,8 +23,8 @@ module.exports = {
     return definition.is;
   },
 
-  create(name) {
-    let componentManager = ComponentManager.get(name);
+  create(id) {
+    let componentManager = ComponentManager.get(id);
 
     if (!componentManager) return;
 

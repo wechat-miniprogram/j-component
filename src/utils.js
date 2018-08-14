@@ -2,8 +2,10 @@
  * get random id
  */
 let seed = +new Date();
-function getId() {
-  return ++seed;
+let charString = 'abcdefghij';
+function getId(notNumber) {
+  let id = ++seed;
+  return notNumber ? id.toString().split('').map(item => charString[+item]).join('') : id;
 }
 
 /**

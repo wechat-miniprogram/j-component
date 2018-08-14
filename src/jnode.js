@@ -6,6 +6,7 @@ class JNode {
   constructor(options = {}) {
     this.type = options.type;
     this.tagName = options.tagName || '';
+    this.componentId = options.componentId || '';
     this.root = options.root || this; // root node's root is this
     this.parent = options.parent;
     this.index = options.index || 0;
@@ -234,6 +235,7 @@ class JNode {
     return new VirtualNode({
       type: this.type,
       tagName: this.tagName,
+      componentId: this.componentId,
       content: Expression.calcExpression(this.content, data),
       key,
       children,

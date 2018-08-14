@@ -8,6 +8,7 @@ class VirtualNode {
   constructor(options = {}) {
     this.type = options.type;
     this.tagName = options.tagName || '';
+    this.componentId = options.componentId || '';
     this.content = options.content !== undefined ? String(options.content) : '';
     this.key = options.key || '';
     this.children = options.children || [];
@@ -159,6 +160,7 @@ class VirtualNode {
   render(shadowRootHost, shadowRoot) {
     let type = this.type;
     let tagName = this.tagName;
+    let componentId = this.componentId || undefined;
 
     if (type === CONSTANT.TYPE_TEXT) {
       this.exparserNode = exparser.createTextNode(this.content);
@@ -176,7 +178,7 @@ class VirtualNode {
       exparserNode = exparser.VirtualNode.create(tagName);
       exparser.Element.setInheritSlots(exparserNode);
     } else {
-      exparserNode = shadowRoot.createComponent(this.tagName, undefined, this.generics);
+      exparserNode = shadowRoot.createComponent(tagName, componentId, this.generics);
     }
 
     this.setAttrs(exparserNode);
@@ -228,7 +230,7 @@ class VirtualNode {
           let newExparserNode = newT.render(null, parentExparserNode.ownerShadowRoot);
           parentExparserNode.replaceChild(newExparserNode, exparserNode);
         }
-      } else if (newT.type === oldT.type && newT.tagName === oldT.tagName && newT.key === oldT.key) {
+      } else if (newT.type === oldT.type && newT.componentId === oldT.componentId && newT.key === oldT.key) {
         // check attrs
         let attrs = VirtualNode.diffAttrs(oldT.attrs, newT.attrs);
         if (attrs) {

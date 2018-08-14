@@ -5,7 +5,7 @@ const JNode = require('./jnode');
 const Expression = require('./expression');
 const _ = require('./utils');
 
-const CACHE = {};
+const CACHE = {}; // cache component manager instance
 
 /**
  * check if/for statement
@@ -64,9 +64,8 @@ function filterAttrs(attrs = []) {
 
 class ComponentManager {
   constructor(definition = {}) {
-    this.name = definition.name;
+    this.id = _.getId(true);
     this.definition = definition;
-    this.usingComponents = [];
     this.root = new JNode({
       type: CONSTANT.TYPE_ROOT,
       componentManager: this,
@@ -79,14 +78,14 @@ class ComponentManager {
 
     this.exparserDef = this.registerToExparser();
 
-    CACHE[definition.name] = this;
+    CACHE[this.id] = this;
   }
 
   /**
-   * get component with name
+   * get component with id
    */
-  static get(name) {
-    return CACHE[name];
+  static get(id) {
+    return CACHE[id];
   }
 
   /**
@@ -94,6 +93,7 @@ class ComponentManager {
    */
   parse(template) {
     let stack = [this.root];
+    let usingComponents = this.definition.usingComponents || {};
 
     stack.last = function() {
       return this[this.length - 1];
@@ -103,6 +103,7 @@ class ComponentManager {
       start: (tagName, attrs, unary) => {
         let type;
         let componentManager;
+        let id = '';
 
         if (tagName === 'slot') {
           type = CONSTANT.TYPE_SLOT;
@@ -121,10 +122,10 @@ class ComponentManager {
           type = CONSTANT.TYPE_NATIVE;
         } else {
           type = CONSTANT.TYPE_COMPONENT;
-          componentManager = ComponentManager.get(tagName);
+          id = usingComponents[tagName];
+          componentManager = ComponentManager.get(id);
 
           if (!componentManager) throw new Error(`component ${tagName} not found`);
-          if (this.usingComponents.indexOf(tagName) === -1) this.usingComponents.push(tagName);
         }
 
         let { statement, event, normalAttrs } = filterAttrs(attrs);
@@ -133,6 +134,7 @@ class ComponentManager {
         let node = new JNode({
           type,
           tagName,
+          componentId: id,
           attrs: normalAttrs,
           event,
           generics: {}, // TODO
@@ -235,14 +237,16 @@ class ComponentManager {
   registerToExparser() {
     let definition = this.definition;
     let options = definition.options || {};
+    let usingComponents = definition.usingComponents || {};
+    let using = Object.keys(usingComponents).map(key => usingComponents[key]);
     let methods = {};
 
     _.adjustExparserDefinition(definition);
 
     // let definitionFilter = exparser.Behavior.callDefinitionFilter(definition);
     let exparserDef = {
-      is: this.name,
-      using: this.usingComponents,
+      is: this.id,
+      using,
       generics: [], // TODO
       template: {
         func: this.root.generate.bind(this.root),

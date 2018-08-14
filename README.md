@@ -29,10 +29,11 @@ let behavior = jComponent.behavior({
 /**
  * 注册组件
  */
-jComponent.register({
-    name: 'xxx', // 组件名称，必须唯一
+let componentId = jComponent.register({
     template: '<view id="a">xxx</view>', // 组件模板，即组件对应的 wxml 内容
-    usingComponents: ['view'], // 使用到的组件名称
+    usingComponents: { // 使用到的自定义组件
+        'view': 'xxx', // xxx 为组件 id，调 register 方法时会返回
+    },
     options: {
         classPrefix: 'xxx', // 组件样式的私有化前缀，默认是空串，即没有前缀
         /* 其他小程序自定义组件支持的 option */
@@ -44,7 +45,7 @@ jComponent.register({
 /**
  * 创建组件实例
  */
-let comp = jComponentManager.create('xxx');
+let comp = jComponentManager.create(componentId);
 
 comp.dom; // 组件实例对应的 dom 节点
 let compNode = comp.querySelector('#a'); // 选取组件树中的节点
