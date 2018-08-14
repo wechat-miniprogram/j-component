@@ -1,4 +1,4 @@
-const JComponent = require('../src/index');
+const jComponent = require('../src/index');
 const _ = require('./utils');
 
 beforeAll(() => {
@@ -8,7 +8,7 @@ beforeAll(() => {
 test('create component successfully', () => {
   let eventList = [];
 
-  let behavior = JComponent.behavior({
+  let behavior = jComponent.behavior({
     methods: {
       onTap1(evt) {
         eventList.push(this.data.index);
@@ -16,11 +16,11 @@ test('create component successfully', () => {
     }
   });
   debugger;
-  JComponent.register({
+  jComponent.register({
     id: 'view',
     template: '<div><slot/></div>'
   });
-  let id1 = JComponent.register({
+  let id1 = jComponent.register({
     template: `
       <view wx:for="{{list}}">{{index + '-' + item}}</view><span><slot/></span>
     `,
@@ -33,7 +33,7 @@ test('create component successfully', () => {
     },
     usingComponents: {},
   });
-  let id2 = JComponent.register({
+  let id2 = jComponent.register({
     template: `
       <wxs module="m1">
         var msg = 'hello world';
@@ -78,7 +78,7 @@ test('create component successfully', () => {
     }
   });
 
-  let compa = JComponent.create(id2);
+  let compa = jComponent.create(id2);
   expect(compa.dom.innerHTML).toBe('<view class="compa--wxs" style="color: green;"><div>hello world+0</div></view><view><div>elif</div></view><compb><view><div>0-1</div></view><view><div>1-2</div></view><span>0</span></compb>');
 
   let node1 = compa.querySelector('.wxs');
