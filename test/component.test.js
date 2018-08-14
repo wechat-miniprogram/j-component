@@ -63,6 +63,7 @@ test('create component successfully', () => {
         this.setData({
           index: ++this.data.index,
           'styleObject.style': 'color: red;',
+          list: [2, 3, 4],
         });
       }
     }
@@ -81,5 +82,5 @@ test('create component successfully', () => {
 
   let node2 = compa.querySelector('#compb');
   node2.dispatchEvent('tap');
-  expect(compa.dom.innerHTML).toBe('<view class="wxs" style="color: red;"><div>hello world+1</div></view><view><div>if</div></view><compb><view><div>0-1</div></view><view><div>1-2</div></view><span>1</span></compb>');
+  expect(compa.dom.innerHTML).toBe('<view class="wxs" style="color: red;"><div>hello world+1</div></view><view><div>if</div></view><compb><view><div>0-2</div></view><view><div>1-3</div></view><view><div>2-4</div></view><span>1</span></compb>');
 });

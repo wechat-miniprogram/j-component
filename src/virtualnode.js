@@ -1,7 +1,6 @@
 const exparser = require('miniprogram-exparser');
 const CONSTANT = require('./constant');
 const _ = require('./utils');
-const Patch = require('./patch');
 
 const transitionKeys = ['transition', 'transitionProperty', 'transform', 'transformOrigin', 'webkitTransition', 'webkitTransitionProperty', 'webkitTransform', 'webkitTransformOrigin'];
 
@@ -16,11 +15,6 @@ class VirtualNode {
     this.attrs = options.attrs || [];
     this.event = options.event || {};
     this.slotName = options.slotName || '';
-    this.childCount = this.children.length;
-
-    this.children.forEach(child => {
-      this.childCount += child.childCount;
-    });
   }
 
   /**
@@ -28,7 +22,6 @@ class VirtualNode {
    */
   appendChild(virtualNode) {
     this.children.push(virtualNode);
-    this.childCount += (virtualNode.childCount + 1);
   }
 
   /**
@@ -168,7 +161,8 @@ class VirtualNode {
     let tagName = this.tagName;
 
     if (type === CONSTANT.TYPE_TEXT) {
-      return exparser.createTextNode(this.content);
+      this.exparserNode = exparser.createTextNode(this.content);
+      return this.exparserNode;
     }
 
     let exparserNode;
@@ -194,6 +188,8 @@ class VirtualNode {
       exparserNode.appendChild(childExparserNode);
     });
 
+    this.exparserNode = exparserNode;
+
     return exparserNode;
   }
 
@@ -201,63 +197,79 @@ class VirtualNode {
    * diff two tree
    */
   diff(newVirtualTree) {
-    let patches = {};
-    VirtualNode.diffSubTree(this, newVirtualTree, patches, 0);
-    return Patch.getApply(this, patches);
+    VirtualNode.diffSubTree(this, newVirtualTree);
   }
 
   /**
    * diff two sub tree
    */
-  static diffSubTree(oldT, newT, patches, index) {
-    let patch = patches[index] = patches[index] || [];
+  static diffSubTree(oldT, newT) {
+    let exparserNode = oldT.exparserNode;
+    let parentExparserNode = exparserNode.parentNode;
+
+    newT.exparserNode = exparserNode; // update new virtual tree exparser node
 
     if (!newT) {
       // remove
-      patch.push(new Patch(CONSTANT.PATCH_REMOVE, newT));
+      if (parentExparserNode) parentExparserNode.removeChild(exparserNode);
     } else if (oldT.type === CONSTANT.TYPE_TEXT) {
       // update text virtual node
       if (newT.type !== CONSTANT.TYPE_TEXT || newT.content !== oldT.content) {
-        patch.push(new Patch(CONSTANT.PATCH_REPLACE, newT, newT));
+        if (parentExparserNode) {
+          let newExparserNode = newT.render(null, parentExparserNode.ownerShadowRoot);
+          parentExparserNode.replaceChild(newExparserNode, exparserNode);
+        }
       }
     } else {
       // update other virtual node
       if (newT.type === CONSTANT.TYPE_TEXT) {
         // new virtual node is text
-        patch.push(new Patch(CONSTANT.PATCH_REPLACE, newT, newT));
+        if (parentExparserNode) {
+          let newExparserNode = newT.render(null, parentExparserNode.ownerShadowRoot);
+          parentExparserNode.replaceChild(newExparserNode, exparserNode);
+        }
       } else if (newT.type === oldT.type && newT.tagName === oldT.tagName && newT.key === oldT.key) {
         // check attrs
         let attrs = VirtualNode.diffAttrs(oldT.attrs, newT.attrs);
         if (attrs) {
+          // update attrs
           newT.attrs = attrs;
-          patch.push(new Patch(CONSTANT.PATCH_ATTRS, newT, attrs));
+          newT.setAttrs(exparserNode);
         }
 
         // check children
         let oldChildren = oldT.children;
         let newChildren = newT.children;
         let diffs = oldT.type === CONSTANT.TYPE_IF || oldT.type === CONSTANT.TYPE_FOR || oldT.type === CONSTANT.TYPE_FORITEM ? VirtualNode.diffList(oldChildren, newChildren) : { children: newChildren, moves: null }; // only statement need diff
-        let subIndex = index;
 
         // diff old child's subtree
         for (let i = 0, len = oldChildren.length; i < len; i++) {
           let oldChild = oldChildren[i];
           let newChild = diffs.children[i];
 
-          subIndex++;
-
-          if (newChild) VirtualNode.diffSubTree(oldChild, newChild, patches, subIndex);
-          if (oldChild.type !== CONSTANT.TYPE_TEXT) subIndex += oldChild.childCount;
+          if (newChild) VirtualNode.diffSubTree(oldChild, newChild);
         }
         if (diffs.moves) {
-          patch.push(new Patch(CONSTANT.PATCH_REORDER, newT, diffs.moves));
+          // children remove\insert\reorder
+          let { removes, inserts } = diffs.moves;
+          let children = exparserNode.childNodes;
+          let newChildren = newT.children;
+
+          inserts = inserts.map(({ oldIndex, index }) => {
+            return { 
+              newExparserNode: children[oldIndex] || newChildren[index].render(null, exparserNode.ownerShadowRoot),
+              index,
+            };
+          });
+
+          removes.forEach(index => exparserNode.removeChild(children[index]));
+          inserts.forEach(({ newExparserNode, index }) => exparserNode.insertBefore(newExparserNode, children[index]));
         }
-      } else {
-        patch.push(new Patch(CONSTANT.PATCH_REPLACE, newT, newT))
+      } else if (parentExparserNode) {
+        let newExparserNode = newT.render(null, parentExparserNode.ownerShadowRoot);
+        parentExparserNode.replaceChild(newExparserNode, exparserNode);
       }
     }
-
-    if (!patch.length) patches[index] = undefined;
   }
 
   /**
@@ -371,7 +383,7 @@ class VirtualNode {
             // witch different key
             let oldIndex = oldKeyMap[key];
             hasCheckIndexMap[oldIndex] = true;
-            inserts.push({ oldIndex, index: i });
+            if (oldIndex !== i) inserts.push({ oldIndex, index: i });
           }
         } else {
           // insert new item
@@ -382,7 +394,7 @@ class VirtualNode {
           // exist in old list
           let oldIndex = oldFreeList[k++];
           hasCheckIndexMap[oldIndex] = true;
-          inserts.push({ oldIndex, index: i });
+          if (oldIndex !== i) inserts.push({ oldIndex, index: i });
         } else {
           // insert new item
           inserts.push({ oldIndex: -1, index: i });

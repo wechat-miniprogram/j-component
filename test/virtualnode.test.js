@@ -108,6 +108,16 @@ test('diffList: miscellaneous actions', () => {
   ]);
 });
 
+test('diffList: without key', () => {
+  let oldList = [{ a: 1 }, { a: 2 }];
+  let newList = [{ a: 2 }, { a: 3 }, { a: 4 }];
+  let diffs = VirtualNode.diffList(oldList, newList);
+
+  expect(diffs.children).toEqual([{ a: 2 }, { a: 3 }]);
+  expect((diffs.moves.removes)).toEqual([]);
+  expect((diffs.moves.inserts)).toEqual([{ oldIndex: -1, index: 2 }]);
+});
+
 test('diffList: mixed', () => {
   let oldList = [{ key: 1 }, { key: 2 }, { key: 3 }, { key: 4 }, { name: 'a' }, { key: 5 }, { name: 'b' }, { key: 6 }];
   let newList = [{ name: 'c' }, { key: 6 }, { key: 7 }, { key: 2 }, { key: 1 }, { key: 9 }, { key: 5 }];

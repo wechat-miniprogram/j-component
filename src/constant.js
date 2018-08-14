@@ -13,11 +13,4 @@ module.exports = {
     TYPE_FOR: 20,
     TYPE_FORITEM: 21,
     TYPE_NATIVE: 22,
-
-    // path type
-    PATCH_REPLACE: 1,
-    PATCH_ATTRS: 2,
-    PATCH_REORDER: 3,
-    PATCH_INSERT: 4,
-    PATCH_REMOVE: 5,
 };

@@ -326,7 +326,6 @@ class TemplateEngine {
     let instance = new TemplateEngineInstance();
     instance._generateFunc = this._generateFunc;
     instance._virtualTree = this._virtualTree;
-    instance.originData = 
 
     instance.data = _.copy(this._data);
     instance.idMap = {};
@@ -347,13 +346,11 @@ class TemplateEngineInstance {
   /**
    * it will be called when need to rerender
    */
-  updateValues(exparserNode, data, changedPaths, changedValues, changes) {
-    // prepare data
+  updateValues(exparserNode, data) {
     let newVirtualTree = this._generateFunc({ data }); // generate a new virtual tree
 
     // apply changes
-    let apply = this._virtualTree.diff(newVirtualTree);
-    apply(this.shadowRoot);
+    this._virtualTree.diff(newVirtualTree);
     this._virtualTree = newVirtualTree;
   }
 }
