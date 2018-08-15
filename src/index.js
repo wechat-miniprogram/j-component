@@ -23,11 +23,11 @@ module.exports = {
     return definition.is;
   },
 
-  create(id) {
+  create(id, properties) {
     let componentManager = ComponentManager.get(id);
 
     if (!componentManager) return;
 
-    return new Component(componentManager);
+    return new Component(componentManager, properties);
   },
 };

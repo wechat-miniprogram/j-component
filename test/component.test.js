@@ -39,6 +39,7 @@ test('create component successfully', () => {
         var msg = 'hello world';
         module.exports.message = msg;
       </wxs>
+      <view>{{prop}}</view>
       <view class="wxs" style="{{styleObject.style}}" bindtap="onTap1">{{m1.message}}+{{index}}</view>
       <view wx:if="{{index !== 0}}">if</view>
       <view wx:elif="{{index === 0}}">elif</view>
@@ -51,7 +52,12 @@ test('create component successfully', () => {
     options: {
       classPrefix: 'compa',
     },
-    properties: {},
+    properties: {
+      prop: {
+        type: String,
+        value: '',
+      }
+    },
     data: {
       index: 0,
       styleObject: {
@@ -78,8 +84,8 @@ test('create component successfully', () => {
     }
   });
 
-  let compa = jComponent.create(id2);
-  expect(compa.dom.innerHTML).toBe('<view class="compa--wxs" style="color: green;"><div>hello world+0</div></view><view><div>elif</div></view><compb><view><div>0-1</div></view><view><div>1-2</div></view><span>0</span></compb>');
+  let compa = jComponent.create(id2, { prop: 'prop-value' });
+  expect(compa.dom.innerHTML).toBe('<view><div>prop-value</div></view><view class="compa--wxs" style="color: green;"><div>hello world+0</div></view><view><div>elif</div></view><compb><view><div>0-1</div></view><view><div>1-2</div></view><span>0</span></compb>');
 
   let node1 = compa.querySelector('.wxs');
   node1.dispatchEvent('tap');
@@ -91,5 +97,5 @@ test('create component successfully', () => {
 
   let node2 = compa.querySelector('#compb');
   node2.dispatchEvent('tap');
-  expect(compa.dom.innerHTML).toBe('<view class="compa--wxs" style="color: red;"><div>hello world+1</div></view><view><div>if</div></view><compb><view><div>0-2</div></view><view><div>1-3</div></view><view><div>2-4</div></view><span>1</span></compb>');
+  expect(compa.dom.innerHTML).toBe('<view><div>prop-value</div></view><view class="compa--wxs" style="color: red;"><div>hello world+1</div></view><view><div>if</div></view><compb><view><div>0-2</div></view><view><div>1-3</div></view><view><div>2-4</div></view><span>1</span></compb>');
 });

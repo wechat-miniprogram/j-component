@@ -310,7 +310,6 @@ class TemplateEngine {
 
     templateEngine._data = data;
     templateEngine._generateFunc = behavior.template.func;
-    templateEngine._virtualTree = templateEngine._generateFunc({ data }); // generate a virtual tree
 
     return templateEngine;
   }
@@ -327,7 +326,10 @@ class TemplateEngine {
     }
   }
 
-  createInstance(exparserNode, customArgs) {
+  createInstance(exparserNode, properties = {}) {
+    this._data = Object.assign(this._data, properties);
+    this._virtualTree = this._generateFunc({ data: this._data }); // generate a virtual tree
+
     let instance = new TemplateEngineInstance();
     instance._generateFunc = this._generateFunc;
     instance._virtualTree = this._virtualTree;
@@ -335,7 +337,7 @@ class TemplateEngine {
     instance.data = _.copy(this._data);
     instance.idMap = {};
     instance.slots = {};
-    instance.shadowRoot = instance._virtualTree.render(exparserNode, null, customArgs); // render to exparser tree
+    instance.shadowRoot = instance._virtualTree.render(exparserNode, null); // render to exparser tree
     instance.listeners = [];
 
     TemplateEngine.collectIdMapAndSlots(instance.shadowRoot, instance.idMap, instance.slots);
