@@ -46,7 +46,7 @@ let componentId = jComponent.register({
 /**
  * 创建组件实例
  */
-let comp = jComponentManager.create(componentId);
+let comp = jComponentManager.create(componentId, properties); // properties 是创建组件实例时，由组件接收的 properties 对象
 
 comp.dom; // 组件实例对应的 dom 节点
 let compNode = comp.querySelector('#a'); // 选取组件树中的节点
