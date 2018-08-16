@@ -198,3 +198,82 @@ test('update event', () => {
   comp.querySelector('.a').dispatchEvent('tap');
   expect(comp.dom.innerHTML).toBe('<wx-view class="a"><div>else-2</div></wx-view>');
 });
+
+test('life time', () => {
+  let callbackCheck = [];
+  let grandChildId = jComponent.register({
+    template: `<view>123</view>`,
+    created() {
+      callbackCheck.push('grand-child-created');
+    },
+    attached() {
+      callbackCheck.push('grand-child-attached');
+    },
+    ready() {
+      callbackCheck.push('grand-child-ready');
+    },
+    moved() {
+      callbackCheck.push('grand-child-moved');
+    },
+    detached() {
+      callbackCheck.push('grand-child-detached');
+    },
+  });
+  let childId = jComponent.register({
+    template: `<grand-child/>`,
+    usingComponents: {
+      'grand-child': grandChildId
+    },
+    created() {
+      callbackCheck.push('child-created');
+    },
+    attached() {
+      callbackCheck.push('child-attached');
+    },
+    ready() {
+      callbackCheck.push('child-ready');
+    },
+    moved() {
+      callbackCheck.push('child-moved');
+    },
+    detached() {
+      callbackCheck.push('child-detached');
+    },
+  });
+  let compId = jComponent.register({
+    tagName: 'lift-time-comp',
+    template: `<child/>`,
+    usingComponents: {
+      'child': childId
+    },
+    created() {
+      callbackCheck.push('created');
+    },
+    attached() {
+      callbackCheck.push('attached');
+    },
+    ready() {
+      callbackCheck.push('ready');
+    },
+    moved() {
+      callbackCheck.push('moved');
+    },
+    detached() {
+      callbackCheck.push('detached');
+    },
+  });
+  let comp = jComponent.create(compId);
+  let parent = document.createElement('div');
+
+  expect(parent.innerHTML).toBe('');
+  comp.attach(parent);
+  expect(parent.innerHTML).toBe('<lift-time-comp><child><grand-child><wx-view><div>123</div></wx-view></grand-child></child></lift-time-comp>');
+  comp.detach();
+  expect(parent.innerHTML).toBe('');
+  expect(callbackCheck).toEqual([
+    'grand-child-created', 'child-created', 'created',
+    'attached', 'child-attached', 'grand-child-attached',
+    'grand-child-ready', 'child-ready', 'ready',
+    'grand-child-detached', 'child-detached', 'detached'
+  ]);
+});

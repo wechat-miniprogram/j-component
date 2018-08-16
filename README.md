@@ -56,6 +56,8 @@ comp.dom; // 组件实例对应的 dom 节点
 let compNode = comp.querySelector('#a'); // 选取组件树中的节点
 let compNodes = comp.querySelectorAll('.a'); // 选取组件树中的节点
 comp.setData({ text: 'a' }, () => {}); // 组件的 setData 接口
+comp.attach(parentDom); // 将组件插入到某个 dom 节点下
+comp.detach(); // 将组件从某个 dom 节点下移除
 
 /**
  * 组件树中的节点的属性和方法

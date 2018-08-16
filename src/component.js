@@ -84,6 +84,7 @@ class Component {
         this._isTapCancel = false;
         this._lastScrollTime = 0;
 
+        this.parentNode = null;
         this.dom = this._exparserNode.$$;
 
         this._bindEvent();
@@ -204,6 +205,36 @@ class Component {
         this._exparserNode.setData(data);
 
         if (typeof callback === 'function') callback();
+    }
+
+    /**
+     * attach to a dom
+     */
+    attach(parent) {
+        parent.appendChild(this.dom);
+        this.parentNode = parent;
+
+        exparser.Element.pretendAttached(this._exparserNode);
+        _.dfsExparserTree(this._exparserNode, node => node.triggerLifeTime('ready'));
+    }
+
+    /**
+     * detach from a dom
+     */
+    detach() {
+        if (!this.parentNode) return;
+
+        this.parentNode.removeChild(this.dom);
+        this.parentNode = null;
+
+        exparser.Element.pretendDetached(this._exparserNode);
+    }
+
+    /**
+     * trigger life time
+     */
+    triggerLifeTime(lifeTime) {
+        this._exparserNode.triggerLifeTime(lifeTime);
     }
 }
 

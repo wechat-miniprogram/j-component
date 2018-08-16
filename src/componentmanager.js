@@ -355,7 +355,7 @@ class TemplateEngineInstance {
     let newVt = this._generateFunc({ data }); // generate a new vt
 
     // apply changes
-    diff.diffSubTree(this._vt, newVt);
+    diff.diffVt(this._vt, newVt);
     this._vt = newVt;
   }
 }

@@ -1,3 +1,5 @@
+const exparser = require('miniprogram-exparser');
+
 /**
  * get random id
  */
@@ -103,6 +105,20 @@ function getTagName(id) {
   return idTagNameMap[id];
 }
 
+/**
+ * dfs exparser tree
+ */
+function dfsExparserTree(node, callback, fromTopToBottom) {
+  if (node instanceof exparser.Component) {
+    if (fromTopToBottom) callback(node);
+    if (node.shadowRoot instanceof exparser.Element) dfsExparserTree(node.shadowRoot, callback, fromTopToBottom);
+    if (!fromTopToBottom) callback(node);
+  }
+  node.childNodes.forEach(child => {
+    if (child instanceof exparser.Element) dfsExparserTree(child, callback, fromTopToBottom);
+  });
+}
+
 module.exports = {
   getId,
   copy,
@@ -114,4 +130,5 @@ module.exports = {
   adjustExparserDefinition,
   setTagName,
   getTagName,
+  dfsExparserTree,
 };

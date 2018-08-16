@@ -3,32 +3,32 @@ const CONSTANT = require('./constant');
 const render = require('./render');
 
 /**
- * diff two sub tree
+ * diff two vt
  */
-function diffSubTree(oldVt, newVt) {
-  let exparserNode = oldVt.exparserNode;
-  let parentExparserNode = exparserNode.parentNode;
+function diffVt(oldVt, newVt) {
+  let node = oldVt.exparserNode;
+  let parent = node.parentNode;
 
-  newVt.exparserNode = exparserNode; // update new vt's exparser node
+  newVt.exparserNode = node; // update new vt's exparser node
 
   if (!newVt) {
     // remove
-    if (parentExparserNode) parentExparserNode.removeChild(exparserNode);
+    if (parent) parent.removeChild(node);
   } else if (oldVt.type === CONSTANT.TYPE_TEXT) {
     // update for text node
     if (newVt.type !== CONSTANT.TYPE_TEXT || newVt.content !== oldVt.content) {
-      if (parentExparserNode) {
-        let newExparserNode = render.renderExparserNode(newVt, null, parentExparserNode.ownerShadowRoot);
-        parentExparserNode.replaceChild(newExparserNode, exparserNode);
+      if (parent) {
+        let newNode = render.renderExparserNode(newVt, null, parent.ownerShadowRoot);
+        parent.replaceChild(newNode, node);
       }
     }
   } else {
     // update for other node
     if (newVt.type === CONSTANT.TYPE_TEXT) {
       // new vt is text
-      if (parentExparserNode) {
-        let newExparserNode = render.renderExparserNode(newVt, null, parentExparserNode.ownerShadowRoot);
-        parentExparserNode.replaceChild(newExparserNode, exparserNode);
+      if (parent) {
+        let newNode = render.renderExparserNode(newVt, null, parent.ownerShadowRoot);
+        parent.replaceChild(newNode, node);
       }
     } else if (newVt.type === oldVt.type && newVt.componentId === oldVt.componentId && newVt.key === oldVt.key) {
       // check attrs
@@ -36,16 +36,16 @@ function diffSubTree(oldVt, newVt) {
       if (attrs) {
         // update attrs
         newVt.attrs = attrs;
-        render.updateAttrs(exparserNode, attrs);
+        render.updateAttrs(node, attrs);
       }
 
       // check event
       Object.keys(oldVt.event).forEach(key => {
         let { name, isCapture, id } = oldVt.event[key];
 
-        exparser.removeListenerFromElement(exparserNode, name, id, { capture: isCapture });
+        exparser.removeListenerFromElement(node, name, id, { capture: isCapture });
       });
-      render.updateEvent(exparserNode, newVt.event);
+      render.updateEvent(node, newVt.event);
 
       // check children
       let oldChildren = oldVt.children;
@@ -57,27 +57,27 @@ function diffSubTree(oldVt, newVt) {
         let oldChild = oldChildren[i];
         let newChild = diffs.children[i];
 
-        if (newChild) diffSubTree(oldChild, newChild);
+        if (newChild) diffVt(oldChild, newChild);
       }
       if (diffs.moves) {
         // children remove\insert\reorder
         let { removes, inserts } = diffs.moves;
-        let children = exparserNode.childNodes;
+        let children = node.childNodes;
         let newChildren = newVt.children;
 
         inserts = inserts.map(({ oldIndex, index }) => {
           return { 
-            newExparserNode: children[oldIndex] || render.renderExparserNode(newChildren[index], null, exparserNode.ownerShadowRoot),
+            newNode: children[oldIndex] || render.renderExparserNode(newChildren[index], null, node.ownerShadowRoot),
             index,
           };
         });
 
-        removes.forEach(index => exparserNode.removeChild(children[index]));
-        inserts.forEach(({ newExparserNode, index }) => exparserNode.insertBefore(newExparserNode, children[index]));
+        removes.forEach(index => node.removeChild(children[index]));
+        inserts.forEach(({ newNode, index }) => node.insertBefore(newNode, children[index]));
       }
-    } else if (parentExparserNode) {
-      let newExparserNode = render.renderExparserNode(newVt, null, parentExparserNode.ownerShadowRoot);
-      parentExparserNode.replaceChild(newExparserNode, exparserNode);
+    } else if (parent) {
+      let newNode = render.renderExparserNode(newVt, null, parent.ownerShadowRoot);
+      parent.replaceChild(newNode, node);
     }
   }
 }
@@ -219,7 +219,7 @@ function diffList(oldList, newList) {
 }
 
 module.exports = {
-  diffSubTree,
+  diffVt,
   diffAttrs,
   diffList,
 };
