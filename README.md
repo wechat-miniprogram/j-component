@@ -81,4 +81,6 @@ compNode.dispatchEvent('customevent', {  // 触发组件树中的节点自定义
 * import 支持
 * 动画支持
 * generics 支持
+* relations 和 moved 生命周期
+* 外部 wxs
 * ......
