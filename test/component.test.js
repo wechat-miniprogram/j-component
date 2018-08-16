@@ -152,6 +152,7 @@ test('block', () => {
 });
 
 test('setData', () => {
+  let callbackCheck = [];
   let compId = jComponent.register({
     template: `<view>{{num}}</view>`,
     data: {
@@ -161,8 +162,11 @@ test('setData', () => {
   let comp = jComponent.create(compId);
 
   expect(comp.dom.innerHTML).toBe('<wx-view><div>0</div></wx-view>');
-  comp.setData({ num: 2 });
+  comp.setData({ num: 2 }, () => {
+    callbackCheck.push(0);
+  });
   expect(comp.dom.innerHTML).toBe('<wx-view><div>2</div></wx-view>');
+  expect(callbackCheck.length).toBe(1);
 });
 
 test('update event', () => {

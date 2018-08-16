@@ -200,8 +200,10 @@ class Component {
     /**
      * set data
      */
-    setData(data) {
+    setData(data, callback) {
         this._exparserNode.setData(data);
+
+        if (typeof callback === 'function') callback();
     }
 }
 
