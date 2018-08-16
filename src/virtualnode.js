@@ -19,13 +19,6 @@ class VirtualNode {
   }
 
   /**
-   * append a child virtual node
-   */
-  appendChild(virtualNode) {
-    this.children.push(virtualNode);
-  }
-
-  /**
    * set attrs to exparser node
    */
   setAttrs(exparserNode) {
@@ -64,7 +57,7 @@ class VirtualNode {
         exparserNode.setAttribute(name, value);
       } else if (isComponentNode && name === 'animation') {
         // animation
-        if (exparserNode.$$ && value !== null && typeof value === 'object' && value.actions && value.actions.length > 0) {
+        if (exparserNode.$$ && value && value.actions && value.actions.length > 0) {
           let index = 0;
           let actions = value.actions;
           let length = value.actions.length;
