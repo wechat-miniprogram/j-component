@@ -213,13 +213,29 @@ class JNode {
         data[statement.forIndex] = forIndex; // list index
         if (statement.forKey) options.key = statement.forKey === '*this' ? forItem : forItem[statement.forKey]; // list key
 
-        children = this.children.map(node => node.generate(options)).filter(virtualNode => !!virtualNode);
+        children = this.children.map(node => node.generate(options));
 
         data[statement.forItem] = bakItem;
         data[statement.forIndex] = bakIndex;
       } else {
         // normal
-        children = this.children.map(node => node.generate(options)).filter(virtualNode => !!virtualNode);
+        children = this.children.map(node => node.generate(options));
+      }
+    }
+
+    // filter children
+    let filterChildren = [];
+    for (let child of children) {
+      if (!child) continue;
+
+      if (child.type === CONSTANT.TYPE_BLOCK) {
+        // block
+        let grandChildren = child.children;
+        for (let grandChild of grandChildren) {
+          filterChildren.push(grandChild);
+        }
+      } else {
+        filterChildren.push(child);
       }
     }
 
@@ -238,7 +254,7 @@ class JNode {
       componentId: this.componentId,
       content: Expression.calcExpression(this.content, data),
       key,
-      children,
+      children: filterChildren,
       generics: options.generics,
       attrs,
       event: this.event,
