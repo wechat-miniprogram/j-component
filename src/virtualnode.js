@@ -1,7 +1,6 @@
 const exparser = require('miniprogram-exparser');
 const CONSTANT = require('./constant');
 const _ = require('./utils');
-const diff =require('./diff');
 
 const transitionKeys = ['transition', 'transitionProperty', 'transform', 'transformOrigin', 'webkitTransition', 'webkitTransitionProperty', 'webkitTransform', 'webkitTransformOrigin'];
 
@@ -196,16 +195,7 @@ class VirtualNode {
     this.exparserNode = exparserNode;
 
     return exparserNode;
-  }
-
-  /**
-   * diff two tree
-   */
-  diff(newVirtualTree) {
-    diff.diffSubTree(this, newVirtualTree);
-  }
-
-  
+  }  
 }
 
 module.exports = VirtualNode;

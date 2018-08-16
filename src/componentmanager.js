@@ -4,6 +4,7 @@ const CONSTANT = require('./constant');
 const JNode = require('./jnode');
 const Expression = require('./expression');
 const _ = require('./utils');
+const diff =require('./diff');
 
 const CACHE = {}; // cache component manager instance
 
@@ -359,7 +360,7 @@ class TemplateEngineInstance {
     let newVirtualTree = this._generateFunc({ data }); // generate a new virtual tree
 
     // apply changes
-    this._virtualTree.diff(newVirtualTree);
+    diff.diffSubTree(this._virtualTree, newVirtualTree);
     this._virtualTree = newVirtualTree;
   }
 }
