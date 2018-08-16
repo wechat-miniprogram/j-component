@@ -18,6 +18,7 @@ test('create component successfully', () => {
   debugger;
   jComponent.register({
     id: 'view',
+    tagName: 'wx-view',
     template: '<div><slot/></div>'
   });
   let id1 = jComponent.register({
@@ -34,6 +35,7 @@ test('create component successfully', () => {
     usingComponents: {},
   });
   let id2 = jComponent.register({
+    tagName: 'compa',
     template: `
       <wxs module="m1">
         var msg = 'hello world';
@@ -85,7 +87,11 @@ test('create component successfully', () => {
   });
 
   let compa = jComponent.create(id2, { prop: 'prop-value' });
-  expect(compa.dom.innerHTML).toBe('<view><div>prop-value</div></view><view class="compa--wxs" style="color: green;"><div>hello world+0</div></view><view><div>elif</div></view><compb><view><div>0-1</div></view><view><div>1-2</div></view><span>0</span></compb>');
+  expect(compa.dom.tagName).toBe('COMPA');
+  expect(compa.dom.innerHTML).toBe('<wx-view><div>prop-value</div></wx-view><wx-view class="compa--wxs" style="color: green;"><div>hello world+0</div></wx-view><wx-view><div>elif</div></wx-view><compb><wx-view><div>0-1</div></wx-view><wx-view><div>1-2</div></wx-view><span>0</span></compb>');
+
+  let compb = jComponent.create(id1);
+  expect(compb.dom.tagName.length).toBe(13);
 
   let node1 = compa.querySelector('.wxs');
   node1.dispatchEvent('tap');
@@ -97,5 +103,5 @@ test('create component successfully', () => {
 
   let node2 = compa.querySelector('#compb');
   node2.dispatchEvent('tap');
-  expect(compa.dom.innerHTML).toBe('<view><div>prop-value</div></view><view class="compa--wxs" style="color: red;"><div>hello world+1</div></view><view><div>if</div></view><compb><view><div>0-2</div></view><view><div>1-3</div></view><view><div>2-4</div></view><span>1</span></compb>');
+  expect(compa.dom.innerHTML).toBe('<wx-view><div>prop-value</div></wx-view><wx-view class="compa--wxs" style="color: red;"><div>hello world+1</div></wx-view><wx-view><div>if</div></wx-view><compb><wx-view><div>0-2</div></wx-view><wx-view><div>1-3</div></wx-view><wx-view><div>2-4</div></wx-view><span>1</span></compb>');
 });

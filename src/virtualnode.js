@@ -178,7 +178,9 @@ class VirtualNode {
       exparserNode = exparser.VirtualNode.create(tagName);
       exparser.Element.setInheritSlots(exparserNode);
     } else {
-      exparserNode = shadowRoot.createComponent(tagName, componentId, this.generics);
+      let componentTagName = _.getTagName(componentId || tagName) || tagName;
+      let componentName = componentId || tagName;
+      exparserNode = shadowRoot.createComponent(componentTagName, componentName, this.generics);
     }
 
     this.setAttrs(exparserNode);

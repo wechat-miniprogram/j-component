@@ -72,6 +72,8 @@ class ComponentManager {
       componentManager: this,
     });
 
+    if (definition.tagName) _.setTagName(this.id, definition.tagName); // save tagName
+
     if (typeof definition.template === 'string') {
       let template = definition.template.trim();
       if (template) this.parse(template);

@@ -88,6 +88,21 @@ function adjustExparserDefinition(definition) {
   return definition;
 }
 
+/**
+ * set tagName with id
+ */
+let idTagNameMap = {};
+function setTagName(id, tagName) {
+  idTagNameMap[id] = tagName;
+}
+
+/**
+ * get tagName by id
+ */
+function getTagName(id) {
+  return idTagNameMap[id];
+}
+
 module.exports = {
   getId,
   copy,
@@ -97,4 +112,6 @@ module.exports = {
   camelToDashCase,
   animationToStyle,
   adjustExparserDefinition,
+  setTagName,
+  getTagName,
 };

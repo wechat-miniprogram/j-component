@@ -78,8 +78,9 @@ class ComponentNode {
 class Component {
     constructor(componentManager, properties) {
         let id = componentManager.id;
+        let tagName = _.getTagName(id);
         let exparserDef = componentManager.exparserDef;
-        this._exparserNode = exparser.createElement(id, exparserDef, properties); // create exparser node and render
+        this._exparserNode = exparser.createElement(tagName || id, exparserDef, properties); // create exparser node and render
         this._componentManager = componentManager;
         this._isTapCancel = false;
         this._lastScrollTime = 0;
