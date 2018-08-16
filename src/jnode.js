@@ -171,6 +171,21 @@ class JNode {
 
     delete options.key; // not cross passing
 
+    // check include
+    if (this.type === CONSTANT.TYPE_INCLUDE) {
+      return null;
+    }
+
+    // check import
+    if (this.type === CONSTANT.TYPE_IMPORT) {
+      return null;
+    }
+    
+    // check template
+    if (this.type === CONSTANT.TYPE_TEMPLATE) {
+      return null;
+    }
+
     // check wxs
     if (this.type === CONSTANT.TYPE_WXS) {
       return null;
