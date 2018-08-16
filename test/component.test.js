@@ -54,7 +54,7 @@ test('register and create normal component', () => {
   expect(compa.dom.innerHTML).toBe('<wx-view><div>0-a</div></wx-view><wx-view><div>1-b</div></wx-view><span></span>');
 });
 
-test('trigger event', () => {
+test('querySelector', () => {
   compbId = jComponent.register({
     tagName: 'compb',
     template: `
@@ -105,6 +105,18 @@ test('trigger event', () => {
   expect(compb.dom.innerHTML).toBe('<wx-view><div>prop-value</div></wx-view><wx-view class="compa--wxs" style="color: green;"><div>hello world+0</div></wx-view><wx-view><div>elif</div></wx-view><compa><wx-view><div>0-1</div></wx-view><wx-view><div>1-2</div></wx-view><span>0</span></compa>');
 
   let node1 = compb.querySelector('.wxs');
+  expect(node1.dom.tagName).toBe('WX-VIEW');
+  expect(node1.dom.innerHTML).toBe('<div>hello world+0</div>')
+
+  let node2 = compb.querySelector('#compa');
+  expect(node2.dom.tagName).toBe('COMPA');
+  expect(node2.dom.innerHTML).toBe('<wx-view><div>0-1</div></wx-view><wx-view><div>1-2</div></wx-view><span>0</span>');
+});
+
+test('dispatchEvent', () => {
+  let compb = jComponent.create(compbId, { prop: 'prop-value' });
+
+  let node1 = compb.querySelector('.wxs');
   node1.dispatchEvent('tap');
   node1.dispatchEvent('touchstart');
   node1.dispatchEvent('touchend');
@@ -118,7 +130,7 @@ test('trigger event', () => {
 });
 
 test('block', () => {
-  compcId = jComponent.register({
+  let compId = jComponent.register({
     template: `
       <block><view>123</view></block>
       <block>456</block>
@@ -134,7 +146,51 @@ test('block', () => {
       list: ['a', 'b']
     },
   });
-  let compc = jComponent.create(compcId);
+  let comp = jComponent.create(compId);
 
-  expect(compc.dom.innerHTML).toBe('<wx-view><div>123</div></wx-view>456<wx-view><div>101112</div></wx-view><wx-view><div>0</div></wx-view><wx-view><div>a</div></wx-view><wx-view><div>1</div></wx-view><wx-view><div>b</div></wx-view>');
+  expect(comp.dom.innerHTML).toBe('<wx-view><div>123</div></wx-view>456<wx-view><div>101112</div></wx-view><wx-view><div>0</div></wx-view><wx-view><div>a</div></wx-view><wx-view><div>1</div></wx-view><wx-view><div>b</div></wx-view>');
+});
+
+test('setData', () => {
+  let compId = jComponent.register({
+    template: `<view>{{num}}</view>`,
+    data: {
+      num: 0,
+    },
+  });
+  let comp = jComponent.create(compId);
+
+  expect(comp.dom.innerHTML).toBe('<wx-view><div>0</div></wx-view>');
+  comp.setData({ num: 2 });
+  expect(comp.dom.innerHTML).toBe('<wx-view><div>2</div></wx-view>');
+});
+
+test('update event', () => {
+  let compId = jComponent.register({
+    template: `
+      <view class="a" wx:if="{{flag}}" bindtap="onTap">if-{{num}}</view>
+      <view class="a" wx:else bindtap="onTap2">else-{{num}}</view>
+    `,
+    data: {
+      num: 0,
+      flag: true,
+    },
+    methods: {
+      onTap() {
+        this.setData({ num: 1 });
+      },
+      onTap2() {
+        this.setData({ num: 2 });
+      },
+    },
+  });
+  let comp = jComponent.create(compId);
+
+  expect(comp.dom.innerHTML).toBe('<wx-view class="a"><div>if-0</div></wx-view>');
+  comp.querySelector('.a').dispatchEvent('tap');
+  expect(comp.dom.innerHTML).toBe('<wx-view class="a"><div>if-1</div></wx-view>');
+  comp.setData({ flag: false });
+  expect(comp.dom.innerHTML).toBe('<wx-view class="a"><div>else-1</div></wx-view>');
+  comp.querySelector('.a').dispatchEvent('tap');
+  expect(comp.dom.innerHTML).toBe('<wx-view class="a"><div>else-2</div></wx-view>');
 });

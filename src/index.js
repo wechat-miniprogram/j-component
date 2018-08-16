@@ -4,12 +4,18 @@ const Component = require('./component');
 const _ = require('./utils');
 
 module.exports = {
+  /**
+   * register component
+   */
   register(definition = {}) {
     let componentManager = new ComponentManager(definition);
 
     return componentManager.id;
   },
 
+  /**
+   * register behavior
+   */
   behavior(definition) {
     definition.is = _.getId(true);
     definition.options = {
@@ -23,6 +29,9 @@ module.exports = {
     return definition.is;
   },
 
+  /**
+   * create a component instance
+   */
   create(id, properties) {
     let componentManager = ComponentManager.get(id);
 

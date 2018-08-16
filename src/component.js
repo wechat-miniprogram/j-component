@@ -7,9 +7,8 @@ const SCROLL_PROTECTED = 150;
 const NATIVE_TOUCH_EVENT = ['touchstart', 'touchmove', 'touchend', 'touchcancel'];
 
 class ComponentNode {
-    constructor(exparserNode, component) {
+    constructor(exparserNode) {
         this._exparserNode = exparserNode;
-        this._component = component;
 
         this.dom = this._exparserNode.$$;
     }
@@ -176,20 +175,33 @@ class Component {
         }));
     }
 
+    /**
+     * select child component node
+     */
     querySelector(selector) {
         let shadowRoot = this._exparserNode.shadowRoot;
         let selExparserNode = shadowRoot && shadowRoot.querySelector(selector);
 
         if (selExparserNode) {
-            return selExparserNode.__componentNode__ ? selExparserNode.__componentNode__ : new ComponentNode(selExparserNode, this);
+            return selExparserNode.__componentNode__ ? selExparserNode.__componentNode__ : new ComponentNode(selExparserNode);
         }
     }
 
+    /**
+     * select child component nodes
+     */
     querySelectorAll(selector) {
         let shadowRoot = this._exparserNode.shadowRoot;
         let selExparserNodes = shadowRoot.querySelectorAll(selector) || [];
 
-        return selExparserNodes.map(selExparserNode => selExparserNode.__componentNode__ ? selExparserNode.__componentNode__ : new ComponentNode(selExparserNode, this));
+        return selExparserNodes.map(selExparserNode => selExparserNode.__componentNode__ ? selExparserNode.__componentNode__ : new ComponentNode(selExparserNode));
+    }
+
+    /**
+     * set data
+     */
+    setData(data) {
+        this._exparserNode.setData(data);
     }
 }
 

@@ -49,10 +49,17 @@ let componentId = jComponent.register({
  */
 let comp = jComponentManager.create(componentId, properties); // properties 是创建组件实例时，由组件接收的 properties 对象
 
+/**
+ * 组件实例的属性和方法
+ */
 comp.dom; // 组件实例对应的 dom 节点
 let compNode = comp.querySelector('#a'); // 选取组件树中的节点
 let compNodes = comp.querySelectorAll('.a'); // 选取组件树中的节点
+comp.setData({ text: 'a' }); // 组件的 setData 接口
 
+/**
+ * 组件树中的节点的属性和方法
+ */
 compNode.dom; // 组件树中的节点对应的 dom 节点
 compNode.dispatchEvent('touchstart', { // 触发组件树中的节点事件
     touches: [{ x: 0, y: 0 }],

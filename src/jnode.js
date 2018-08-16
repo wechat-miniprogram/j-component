@@ -1,12 +1,11 @@
 const CONSTANT = require('./constant');
-const VirtualNode = require('./virtualnode');
 const Expression = require('./expression');
 
 class JNode {
   constructor(options = {}) {
     this.type = options.type;
     this.tagName = options.tagName || '';
-    this.componentId = options.componentId || '';
+    this.componentId = options.componentId;
     this.root = options.root || this; // root node's root is this
     this.parent = options.parent;
     this.index = options.index || 0;
@@ -44,10 +43,10 @@ class JNode {
 
       if (type === CONSTANT.TYPE_WXS && name === 'module') {
         // wxs module
-        this.wxsModuleName = value;
-      } else if (type === CONSTANT.TYPE_SLOT && name) {
+        this.wxsModuleName = value || '';
+      } else if (type === CONSTANT.TYPE_SLOT && name === 'name') {
         // slot name
-        this.slotName = value;
+        this.slotName = value || '';
       } else {
         if (value) attr.value = Expression.getExpression(value);
         filterAttrs.push(attr);
@@ -162,12 +161,12 @@ class JNode {
   }
 
   /**
-   * generate to a virtual tree
+   * generate to a vt
    */
   generate(options = {}) {
     let data = options.data = options.data || {};
     let statement = this.statement;
-    let key = options.key;
+    let key = options.key || '';
 
     delete options.key; // not cross passing
 
@@ -212,8 +211,8 @@ class JNode {
           options.extra.forIndex = i;
 
           this.children.forEach(node => {
-            let virtualNode = node.generate(options);
-            children.push(virtualNode);
+            let vt = node.generate(options);
+            children.push(vt);
           });
 
           options.extra.forItem = bakItem;
@@ -263,18 +262,22 @@ class JNode {
       });
     }
 
-    return new VirtualNode({
+    // calc content
+    let content = Expression.calcExpression(this.content, data);
+    content = content !== undefined ? String(content) : '';
+
+    return {
       type: this.type,
       tagName: this.tagName,
       componentId: this.componentId,
-      content: Expression.calcExpression(this.content, data),
+      content,
       key,
       children: filterChildren,
       generics: this.generics,
       attrs,
       event: this.event,
       slotName: this.slotName,
-    });
+    };
   }
 }
 

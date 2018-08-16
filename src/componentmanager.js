@@ -5,6 +5,7 @@ const JNode = require('./jnode');
 const Expression = require('./expression');
 const _ = require('./utils');
 const diff =require('./diff');
+const render = require('./render');
 
 const CACHE = {}; // cache component manager instance
 
@@ -229,13 +230,6 @@ class ComponentManager {
   }
 
   /**
-   * get ast
-   */
-  getAst() {
-    return this.root;
-  }
-
-  /**
    * register to exparser
    */
   registerToExparser() {
@@ -288,6 +282,7 @@ class ComponentManager {
       // pageLifetimes: definition.pageLifetimes,
       // definitionFilter,
       initiator() {
+        // update method caller
         let caller = Object.create(this);
 
         Object.keys(methods).forEach(name => caller[name] = methods[name]);
@@ -331,16 +326,16 @@ class TemplateEngine {
 
   createInstance(exparserNode, properties = {}) {
     this._data = Object.assign(this._data, properties);
-    this._virtualTree = this._generateFunc({ data: this._data }); // generate a virtual tree
+    this._vt = this._generateFunc({ data: this._data }); // generate a vt
 
     let instance = new TemplateEngineInstance();
     instance._generateFunc = this._generateFunc;
-    instance._virtualTree = this._virtualTree;
+    instance._vt = this._vt;
 
     instance.data = _.copy(this._data);
     instance.idMap = {};
     instance.slots = {};
-    instance.shadowRoot = instance._virtualTree.render(exparserNode, null); // render to exparser tree
+    instance.shadowRoot = render.renderExparserNode(instance._vt, exparserNode, null); // render to exparser tree
     instance.listeners = [];
 
     TemplateEngine.collectIdMapAndSlots(instance.shadowRoot, instance.idMap, instance.slots);
@@ -357,11 +352,11 @@ class TemplateEngineInstance {
    * it will be called when need to rerender
    */
   updateValues(exparserNode, data) {
-    let newVirtualTree = this._generateFunc({ data }); // generate a new virtual tree
+    let newVt = this._generateFunc({ data }); // generate a new vt
 
     // apply changes
-    diff.diffSubTree(this._virtualTree, newVirtualTree);
-    this._virtualTree = newVirtualTree;
+    diff.diffSubTree(this._vt, newVt);
+    this._vt = newVt;
   }
 }
 
