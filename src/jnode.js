@@ -270,7 +270,7 @@ class JNode {
       content: Expression.calcExpression(this.content, data),
       key,
       children: filterChildren,
-      generics: options.generics,
+      generics: this.generics,
       attrs,
       event: this.event,
       slotName: this.slotName,

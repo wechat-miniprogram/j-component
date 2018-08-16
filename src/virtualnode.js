@@ -16,6 +16,7 @@ class VirtualNode {
     this.attrs = options.attrs || [];
     this.event = options.event || {};
     this.slotName = options.slotName || '';
+    this.exparserNode = null;
   }
 
   /**
@@ -23,7 +24,6 @@ class VirtualNode {
    */
   setAttrs(exparserNode) {
     let attrs = this.attrs;
-    let hasDelayedProps = false;
     let isComponentNode = exparserNode instanceof exparser.Component;
     let dataProxy = exparser.Component.getDataProxy(exparserNode);
     let needDoUpdate = false;
