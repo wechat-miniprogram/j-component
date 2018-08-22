@@ -29,6 +29,6 @@
     "webpack": "^4.16.0"
   },
   "dependencies": {
-    "miniprogram-exparser": "0.0.1"
+    "miniprogram-exparser": "latest"
   }
 }
