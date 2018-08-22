@@ -1,21 +1,42 @@
+const exparser = require('miniprogram-exparser');
 const ComponentManager = require('./componentmanager');
 const Component = require('./component');
 const _ = require('./utils');
 
 module.exports = {
-  register(name, template, definition) {
-    if (!name) return;
+  /**
+   * register component
+   */
+  register(definition = {}) {
+    let componentManager = new ComponentManager(definition);
 
-    if (ComponentManager.get(name)) return;
-
-    new ComponentManager(name, template, definition);
+    return componentManager.id;
   },
 
-  create(name) {
-    let componentManager = ComponentManager.get(name);
+  /**
+   * register behavior
+   */
+  behavior(definition) {
+    definition.is = _.getId(true);
+    definition.options = {
+      lazyRegistration: true,
+      publicProperties: true,
+    };
+
+    _.adjustExparserDefinition(definition);
+    exparser.registerBehavior(definition);
+
+    return definition.is;
+  },
+
+  /**
+   * create a component instance
+   */
+  create(id, properties) {
+    let componentManager = ComponentManager.get(id);
 
     if (!componentManager) return;
 
-    return new Component(componentManager);
+    return new Component(componentManager, properties);
   },
 };

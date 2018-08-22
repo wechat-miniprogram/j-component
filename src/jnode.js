@@ -1,11 +1,11 @@
 const CONSTANT = require('./constant');
-const VirtualNode = require('./virtualnode');
 const Expression = require('./expression');
 
 class JNode {
   constructor(options = {}) {
     this.type = options.type;
     this.tagName = options.tagName || '';
+    this.componentId = options.componentId;
     this.root = options.root || this; // root node's root is this
     this.parent = options.parent;
     this.index = options.index || 0;
@@ -23,6 +23,9 @@ class JNode {
     // for wxs
     this.wxsModuleName = '';
 
+    // for slot
+    this.slotName = '';
+
     this.checkAttrs();
   }
 
@@ -32,19 +35,25 @@ class JNode {
   checkAttrs() {
     let type = this.type
     let attrs = this.attrs
+    let filterAttrs = []
 
     for (let attr of attrs) {
       let name = attr.name
       let value = attr.value
 
       if (type === CONSTANT.TYPE_WXS && name === 'module') {
-        this.wxsModuleName = value;
-      }
-
-      if (value) {
-        attr.value = Expression.getExpression(value);
+        // wxs module
+        this.wxsModuleName = value || '';
+      } else if (type === CONSTANT.TYPE_SLOT && name === 'name') {
+        // slot name
+        this.slotName = value || '';
+      } else {
+        if (value) attr.value = Expression.getExpression(value);
+        filterAttrs.push(attr);
       }
     }
+
+    this.attrs = filterAttrs;
   }
 
   /**
@@ -152,14 +161,29 @@ class JNode {
   }
 
   /**
-   * generate to a virtual tree
+   * generate to a vt
    */
   generate(options = {}) {
     let data = options.data = options.data || {};
     let statement = this.statement;
-    let key = options.key;
+    let key = options.key || '';
 
     delete options.key; // not cross passing
+
+    // check include
+    if (this.type === CONSTANT.TYPE_INCLUDE) {
+      return null;
+    }
+
+    // check import
+    if (this.type === CONSTANT.TYPE_IMPORT) {
+      return null;
+    }
+    
+    // check template
+    if (this.type === CONSTANT.TYPE_TEMPLATE) {
+      return null;
+    }
 
     // check wxs
     if (this.type === CONSTANT.TYPE_WXS) {
@@ -187,8 +211,8 @@ class JNode {
           options.extra.forIndex = i;
 
           this.children.forEach(node => {
-            let virtualNode = node.generate(options);
-            children.push(virtualNode);
+            let vt = node.generate(options);
+            children.push(vt);
           });
 
           options.extra.forItem = bakItem;
@@ -203,13 +227,29 @@ class JNode {
         data[statement.forIndex] = forIndex; // list index
         if (statement.forKey) options.key = statement.forKey === '*this' ? forItem : forItem[statement.forKey]; // list key
 
-        children = this.children.map(node => node.generate(options)).filter(virtualNode => !!virtualNode);
+        children = this.children.map(node => node.generate(options));
 
         data[statement.forItem] = bakItem;
         data[statement.forIndex] = bakIndex;
       } else {
         // normal
-        children = this.children.map(node => node.generate(options)).filter(virtualNode => !!virtualNode);
+        children = this.children.map(node => node.generate(options));
+      }
+    }
+
+    // filter children
+    let filterChildren = [];
+    for (let child of children) {
+      if (!child) continue;
+
+      if (child.type === CONSTANT.TYPE_BLOCK) {
+        // block
+        let grandChildren = child.children;
+        for (let grandChild of grandChildren) {
+          filterChildren.push(grandChild);
+        }
+      } else {
+        filterChildren.push(child);
       }
     }
 
@@ -222,16 +262,22 @@ class JNode {
       });
     }
 
-    return new VirtualNode({
+    // calc content
+    let content = Expression.calcExpression(this.content, data);
+    content = content !== undefined ? String(content) : '';
+
+    return {
       type: this.type,
       tagName: this.tagName,
-      content: Expression.calcExpression(this.content, data),
+      componentId: this.componentId,
+      content,
       key,
-      children,
-      generics: options.generics,
+      children: filterChildren,
+      generics: this.generics,
       attrs,
       event: this.event,
-    });
+      slotName: this.slotName,
+    };
   }
 }
 

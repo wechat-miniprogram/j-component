@@ -1,9 +1,13 @@
+const exparser = require('miniprogram-exparser');
+
 /**
  * get random id
  */
 let seed = +new Date();
-function getId() {
-  return ++seed;
+let charString = 'abcdefghij';
+function getId(notNumber) {
+  let id = ++seed;
+  return notNumber ? id.toString().split('').map(item => charString[+item]).join('') : id;
 }
 
 /**
@@ -63,6 +67,58 @@ function animationToStyle() {
   // TODO
 }
 
+/**
+ * adjust exparser definition
+ */
+function adjustExparserDefinition(definition) {
+  // adjust properties
+  let properties = definition.properties || {};
+  Object.keys(properties).forEach(key => {
+    let value = properties[key];
+    if (value === null) {
+      properties[key] = { type: null };
+    } else if (value === Number || value === String || value === Boolean || value === Object || value === Array) {
+      properties[key] = { type: value.name };
+    } else if (value.public === undefined || value.public) {
+      properties[key] = {
+        type: value.type === null ? null : value.type.name,
+        value: value.value,
+      };
+    }
+  });
+
+  return definition;
+}
+
+/**
+ * set tagName with id
+ */
+let idTagNameMap = {};
+function setTagName(id, tagName) {
+  idTagNameMap[id] = tagName;
+}
+
+/**
+ * get tagName by id
+ */
+function getTagName(id) {
+  return idTagNameMap[id];
+}
+
+/**
+ * dfs exparser tree
+ */
+function dfsExparserTree(node, callback, fromTopToBottom) {
+  if (node instanceof exparser.Component) {
+    if (fromTopToBottom) callback(node);
+    if (node.shadowRoot instanceof exparser.Element) dfsExparserTree(node.shadowRoot, callback, fromTopToBottom);
+    if (!fromTopToBottom) callback(node);
+  }
+  node.childNodes.forEach(child => {
+    if (child instanceof exparser.Element) dfsExparserTree(child, callback, fromTopToBottom);
+  });
+}
+
 module.exports = {
   getId,
   copy,
@@ -71,4 +127,8 @@ module.exports = {
   dashToCamelCase,
   camelToDashCase,
   animationToStyle,
+  adjustExparserDefinition,
+  setTagName,
+  getTagName,
+  dfsExparserTree,
 };

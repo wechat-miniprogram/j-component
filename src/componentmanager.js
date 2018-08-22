@@ -4,8 +4,10 @@ const CONSTANT = require('./constant');
 const JNode = require('./jnode');
 const Expression = require('./expression');
 const _ = require('./utils');
+const diff =require('./diff');
+const render = require('./render');
 
-const CACHE = {};
+const CACHE = {}; // cache component manager instance
 
 /**
  * check if/for statement
@@ -63,30 +65,32 @@ function filterAttrs(attrs = []) {
 }
 
 class ComponentManager {
-  constructor(name, template, definition = {}) {
-    this.name = name;
+  constructor(definition = {}) {
+    this.id = definition.id || _.getId(true);
+    this.isGlobal = !!definition.id; // is global component
     this.definition = definition;
-    this.using = [];
     this.root = new JNode({
       type: CONSTANT.TYPE_ROOT,
       componentManager: this,
     });
 
-    if (typeof template === 'string') {
-      template = template.trim();
+    if (definition.tagName) _.setTagName(this.id, definition.tagName); // save tagName
+
+    if (typeof definition.template === 'string') {
+      let template = definition.template.trim();
       if (template) this.parse(template);
     }
 
     this.exparserDef = this.registerToExparser();
 
-    CACHE[name] = this;
+    CACHE[this.id] = this;
   }
 
   /**
-   * get component with name
+   * get component with id
    */
-  static get(name) {
-    return CACHE[name];
+  static get(id) {
+    return CACHE[id];
   }
 
   /**
@@ -94,6 +98,7 @@ class ComponentManager {
    */
   parse(template) {
     let stack = [this.root];
+    let usingComponents = this.definition.usingComponents || {};
 
     stack.last = function() {
       return this[this.length - 1];
@@ -103,6 +108,7 @@ class ComponentManager {
       start: (tagName, attrs, unary) => {
         let type;
         let componentManager;
+        let id = '';
 
         if (tagName === 'slot') {
           type = CONSTANT.TYPE_SLOT;
@@ -121,10 +127,10 @@ class ComponentManager {
           type = CONSTANT.TYPE_NATIVE;
         } else {
           type = CONSTANT.TYPE_COMPONENT;
-          componentManager = ComponentManager.get(tagName);
+          id = usingComponents[tagName];
+          componentManager = id ? ComponentManager.get(id) : ComponentManager.get(tagName);
 
           if (!componentManager) throw new Error(`component ${tagName} not found`);
-          if (this.using.indexOf(tagName) === -1) this.using.push(tagName);
         }
 
         let { statement, event, normalAttrs } = filterAttrs(attrs);
@@ -133,6 +139,7 @@ class ComponentManager {
         let node = new JNode({
           type,
           tagName,
+          componentId: id,
           attrs: normalAttrs,
           event,
           generics: {}, // TODO
@@ -223,39 +230,21 @@ class ComponentManager {
   }
 
   /**
-   * get ast
-   */
-  getAst() {
-    return this.root;
-  }
-
-  /**
    * register to exparser
    */
   registerToExparser() {
     let definition = this.definition;
     let options = definition.options || {};
+    let usingComponents = definition.usingComponents || {};
+    let using = Object.keys(usingComponents).map(key => usingComponents[key]);
+    let methods = {};
 
-    // adjust properties
-    let properties = definition.properties || {};
-    Object.keys(properties).forEach(key => {
-      let value = properties[key];
-      if (value === null) {
-        properties[key] = { type: null };
-      } else if (value === Number || value === String || value === Boolean || value === Object || value === Array) {
-        properties[key] = { type: value.name };
-      } else if (value.public === undefined || value.public) {
-        properties[key] = {
-          type: value.type === null ? null : value.type.name,
-          value: value.value,
-        };
-      }
-    });
+    _.adjustExparserDefinition(definition);
 
     // let definitionFilter = exparser.Behavior.callDefinitionFilter(definition);
     let exparserDef = {
-      is: this.name,
-      using: this.using,
+      is: this.id,
+      using,
       generics: [], // TODO
       template: {
         func: this.root.generate.bind(this.root),
@@ -279,7 +268,7 @@ class ComponentManager {
         writeOnly: options.writeOnly || false,
         allowInWriteOnly: false,
         lazyRegistration: true,
-        classPrefix: '',
+        classPrefix: options.classPrefix || '',
         addGlobalClass: false,
         templateEngine: TemplateEngine,
         renderingMode: 'full',
@@ -293,7 +282,7 @@ class ComponentManager {
       // pageLifetimes: definition.pageLifetimes,
       // definitionFilter,
       initiator() {
-        let methods = definition.methods || {};
+        // update method caller
         let caller = Object.create(this);
 
         Object.keys(methods).forEach(name => caller[name] = methods[name]);
@@ -301,7 +290,11 @@ class ComponentManager {
       }
     };
 
-    return exparser.registerElement(exparserDef);
+    let exparserReg = exparser.registerElement(exparserDef);
+    exparser.Behavior.prepare(exparserReg.behavior);
+    methods = exparserReg.behavior.methods;
+
+    return exparserReg;
   }
 }
 
@@ -315,9 +308,6 @@ class TemplateEngine {
 
     templateEngine._data = data;
     templateEngine._generateFunc = behavior.template.func;
-    templateEngine._virtualTree = templateEngine._generateFunc({
-      data
-    }); // generate a virtual tree
 
     return templateEngine;
   }
@@ -334,16 +324,18 @@ class TemplateEngine {
     }
   }
 
-  createInstance(exparserNode, customArgs) {
+  createInstance(exparserNode, properties = {}) {
+    this._data = Object.assign(this._data, properties);
+    this._vt = this._generateFunc({ data: this._data }); // generate a vt
+
     let instance = new TemplateEngineInstance();
     instance._generateFunc = this._generateFunc;
-    instance._virtualTree = this._virtualTree;
-    instance.originData = 
+    instance._vt = this._vt;
 
     instance.data = _.copy(this._data);
     instance.idMap = {};
     instance.slots = {};
-    instance.shadowRoot = instance._virtualTree.render(exparserNode, null, customArgs); // render to exparser tree
+    instance.shadowRoot = render.renderExparserNode(instance._vt, exparserNode, null); // render to exparser tree
     instance.listeners = [];
 
     TemplateEngine.collectIdMapAndSlots(instance.shadowRoot, instance.idMap, instance.slots);
@@ -359,14 +351,12 @@ class TemplateEngineInstance {
   /**
    * it will be called when need to rerender
    */
-  updateValues(exparserNode, data, changedPaths, changedValues, changes) {
-    // prepare data
-    let newVirtualTree = this._generateFunc({ data }); // generate a new virtual tree
+  updateValues(exparserNode, data) {
+    let newVt = this._generateFunc({ data }); // generate a new vt
 
     // apply changes
-    let apply = this._virtualTree.diff(newVirtualTree);
-    apply(this.shadowRoot);
-    this._virtualTree = newVirtualTree;
+    diff.diffVt(this._vt, newVt);
+    this._vt = newVt;
   }
 }
 

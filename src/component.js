@@ -7,9 +7,8 @@ const SCROLL_PROTECTED = 150;
 const NATIVE_TOUCH_EVENT = ['touchstart', 'touchmove', 'touchend', 'touchcancel'];
 
 class ComponentNode {
-    constructor(exparserNode, component) {
+    constructor(exparserNode) {
         this._exparserNode = exparserNode;
-        this._component = component;
 
         this.dom = this._exparserNode.$$;
     }
@@ -76,14 +75,16 @@ class ComponentNode {
 }
 
 class Component {
-    constructor(componentManager) {
-        let name = componentManager.name;
+    constructor(componentManager, properties) {
+        let id = componentManager.id;
+        let tagName = _.getTagName(id);
         let exparserDef = componentManager.exparserDef;
-        this._exparserNode = exparser.createElement(name, exparserDef); // create exparser node and render
+        this._exparserNode = exparser.createElement(tagName || id, exparserDef, properties); // create exparser node and render
         this._componentManager = componentManager;
         this._isTapCancel = false;
         this._lastScrollTime = 0;
 
+        this.parentNode = null;
         this.dom = this._exparserNode.$$;
 
         this._bindEvent();
@@ -175,20 +176,65 @@ class Component {
         }));
     }
 
+    /**
+     * select child component node
+     */
     querySelector(selector) {
         let shadowRoot = this._exparserNode.shadowRoot;
         let selExparserNode = shadowRoot && shadowRoot.querySelector(selector);
 
         if (selExparserNode) {
-            return selExparserNode.__componentNode__ ? selExparserNode.__componentNode__ : new ComponentNode(selExparserNode, this);
+            return selExparserNode.__componentNode__ ? selExparserNode.__componentNode__ : new ComponentNode(selExparserNode);
         }
     }
 
+    /**
+     * select child component nodes
+     */
     querySelectorAll(selector) {
         let shadowRoot = this._exparserNode.shadowRoot;
         let selExparserNodes = shadowRoot.querySelectorAll(selector) || [];
 
-        return selExparserNodes.map(selExparserNode => selExparserNode.__componentNode__ ? selExparserNode.__componentNode__ : new ComponentNode(selExparserNode, this));
+        return selExparserNodes.map(selExparserNode => selExparserNode.__componentNode__ ? selExparserNode.__componentNode__ : new ComponentNode(selExparserNode));
+    }
+
+    /**
+     * set data
+     */
+    setData(data, callback) {
+        this._exparserNode.setData(data);
+
+        if (typeof callback === 'function') callback();
+    }
+
+    /**
+     * attach to a dom
+     */
+    attach(parent) {
+        parent.appendChild(this.dom);
+        this.parentNode = parent;
+
+        exparser.Element.pretendAttached(this._exparserNode);
+        _.dfsExparserTree(this._exparserNode, node => node.triggerLifeTime('ready'));
+    }
+
+    /**
+     * detach from a dom
+     */
+    detach() {
+        if (!this.parentNode) return;
+
+        this.parentNode.removeChild(this.dom);
+        this.parentNode = null;
+
+        exparser.Element.pretendDetached(this._exparserNode);
+    }
+
+    /**
+     * trigger life time
+     */
+    triggerLifeTime(lifeTime) {
+        this._exparserNode.triggerLifeTime(lifeTime);
     }
 }
 

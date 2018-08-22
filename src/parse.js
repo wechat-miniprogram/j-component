@@ -3,7 +3,7 @@
  * source code: https://johnresig.com/files/htmlparser.js
  */
 
-// Regular Expressions for parsing tags and attributes
+// regexs for parsing tags and attrs
 const startTagReg = /^<([-A-Za-z0-9_]+)((?:\s+[\w\:]+(?:\s*=\s*(?:(?:"[^"]*")|(?:'[^']*')|[^>\s]+))?)*)\s*(\/?)>/;
 const endTagReg = /^<\/([-A-Za-z0-9_]+)[^>]*>/;
 const attrReg = /([-A-Za-z0-9_\:]+)(?:\s*=\s*(?:(?:"((?:\\.|[^"])*)")|(?:'((?:\\.|[^'])*)')|([^>\s]+)))?/g;
@@ -21,7 +21,7 @@ module.exports = function(content, handler) {
 
         if (!stack.last() || stack.last() !== 'wxs') {
             if (content.indexOf('<!--') === 0) {
-                // Comment
+                // comment
                 let index = content.indexOf('-->');
 
                 if (index >= 0) {
@@ -77,7 +77,7 @@ module.exports = function(content, handler) {
         last = content;
     }
 
-    // Clean up any remaining tags
+    // clean up any remaining tags
     parseEndTag();
 
     function parseStartTag(tag, tagName, rest, unary) {
@@ -106,22 +106,20 @@ module.exports = function(content, handler) {
         let pos;
 
         if (!tagName) {
-            // If no tag name is provided, clean shop
             pos = 0;
         } else {
-            // Find the closest opened tag of the same type
+            // find the closest opened tag of the same type
             for (pos = stack.length - 1; pos >= 0; pos--) {
                 if (stack[pos] === tagName) break;
             }
         }
 
         if (pos >= 0) {
-            // Close all the open elements, up the stack
+            // close all the open elements, up the stack
             for (let i = stack.length - 1; i >= pos; i--) {
                 handler.end && handler.end(stack[i]);
             }
 
-            // Remove the open elements from the stack
             stack.length = pos;
         }
     }

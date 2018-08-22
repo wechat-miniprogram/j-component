@@ -21,7 +21,7 @@ function getParseResult(content) {
   return { startStack, endStack, textStack };
 }
 
-test('parse successfully', () => {
+test('parse template', () => {
   let res1 = getParseResult('<div><slot/></div>');
   expect(res1.startStack.length).toBe(2);
   expect(res1.endStack.length).toBe(1);
@@ -62,7 +62,7 @@ test('parse successfully', () => {
   expect(res2.textStack).toEqual(['123123', '123', '321', '567']);
 });
 
-test('parse wxs successfully', () => {
+test('parse wxs', () => {
   let res1 = getParseResult(`
     <div>123</div>
     <wxs module="m1">

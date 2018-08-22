@@ -1,6 +1,6 @@
 const Expression = require('../src/expression');
 
-test('parse successfully', () => {
+test('parse expression', () => {
   let expr1 = new Expression('a.value + 12 - (2 * 14 / 4)').parse();
   expect(expr1({ a: { value: 1 } })).toBe(6);
   expect(expr1({ a: { value: 3 } })).toBe(8);
@@ -31,7 +31,7 @@ test('parse successfully', () => {
   expect(expr7({ a: 2, b: 3 })).toBe(2);  
 });
 
-test('get and calc expression successfully', () => {
+test('get and calc expression', () => {
   let arr = Expression.getExpression('123-{{a + b}}-456-{{a - b}}');
 
   expect(arr[0]).toBe('123-');
