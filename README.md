@@ -53,6 +53,7 @@ let comp = jComponentManager.create(componentId, properties); // properties 是�
  * 组件实例的属性和方法
  */
 comp.dom; // 组件实例对应的 dom 节点
+comp.data; // 组件实例的 data 对象
 let compNode = comp.querySelector('#a'); // 选取组件树中的节点
 let compNodes = comp.querySelectorAll('.a'); // 选取组件树中的节点
 comp.setData({ text: 'a' }, () => {}); // 组件的 setData 接口

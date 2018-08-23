@@ -85,9 +85,16 @@ class Component {
         this._lastScrollTime = 0;
 
         this.parentNode = null;
-        this.dom = this._exparserNode.$$;
 
         this._bindEvent();
+    }
+
+    get dom() {
+        return this._exparserNode.$$
+    }
+
+    get data() {
+        return this._exparserNode.data
     }
 
     /**

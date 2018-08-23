@@ -169,6 +169,24 @@ test('setData', () => {
   expect(callbackCheck.length).toBe(1);
 });
 
+test('getData', () => {
+  let compId = jComponent.register({
+    template: `<view>123</view>`,
+    data: {
+      num: 0,
+    },
+  });
+  let comp = jComponent.create(compId);
+
+  expect(comp.data.num).toBe(0);
+
+  comp.setData({ num: 2 });
+  expect(comp.data.num).toBe(2);
+
+  comp.setData({ num: 'I am a string' });
+  expect(comp.data.num).toBe('I am a string');
+});
+
 test('update event', () => {
   let compId = jComponent.register({
     template: `
