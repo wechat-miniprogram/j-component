@@ -202,8 +202,9 @@ class Component {
      * set data
      */
     setData(data, callback) {
-        this._exparserNode.setData(data);
+        let caller = exparser.Element.getMethodCaller(this._exparserNode);
 
+        if (caller && typeof caller.setData === 'function') caller.setData(data);
         if (typeof callback === 'function') callback();
     }
 
