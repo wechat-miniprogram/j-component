@@ -241,7 +241,7 @@ class ComponentManager {
 
     _.adjustExparserDefinition(definition);
 
-    // let definitionFilter = exparser.Behavior.callDefinitionFilter(definition);
+    let definitionFilter = exparser.Behavior.callDefinitionFilter(definition);
     let exparserDef = {
       is: this.id,
       using,
@@ -278,9 +278,9 @@ class ComponentManager {
         writeFieldsToNode: false,
         writeIdToDOM: false,
       },
-      // lifetimes: definition.lifetimes,
-      // pageLifetimes: definition.pageLifetimes,
-      // definitionFilter,
+      lifetimes: definition.lifetimes,
+      pageLifetimes: definition.pageLifetimes,
+      definitionFilter,
       initiator() {
         // update method caller
         let caller = Object.create(this);

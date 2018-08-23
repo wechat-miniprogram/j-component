@@ -27,7 +27,7 @@
     "babel-preset-es2015": "^6.24.1",
     "jest": "^23.5.0",
     "jsdom": "^11.12.0",
-    "webpack": "^4.16.0"
+    "webpack": "^4.17.1"
   },
   "dependencies": {
     "miniprogram-exparser": "latest"
