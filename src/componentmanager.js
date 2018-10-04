@@ -285,6 +285,7 @@ class ComponentManager {
         // update method caller
         let caller = Object.create(this);
 
+        caller.data = _.copy(this.data);
         Object.keys(methods).forEach(name => caller[name] = methods[name]);
         exparser.Element.setMethodCaller(this, caller);
       }
@@ -351,8 +352,40 @@ class TemplateEngineInstance {
   /**
    * it will be called when need to rerender
    */
-  updateValues(exparserNode, data) {
+  updateValues(exparserNode, data, changedValues, changes) {
     let newVt = this._generateFunc({ data }); // generate a new vt
+
+    // merge to caller's data
+    const callerData = exparser.Element.getMethodCaller(exparserNode).data;
+    const hasOwnProperty = Object.prototype.hasOwnProperty;
+    for (let [path, newData] of changes) {
+      let currentData = callerData;
+      let currentPath = path[0];
+
+      // check update path
+      for (let i = 1, len = path.length; i < len; i++) {
+        let nextPath = path[i];
+        let currentValue = currentData[currentPath];
+
+        if (!hasOwnProperty.call(currentData, currentPath)) {
+          // init if not exists
+          if (typeof nextPath === 'number' && isFinite(nextPath)) {
+            // array
+            if (!Array.isArray(currentValue)) currentData[currentPath] = [];
+          } else if (currentValue === null || typeof currentValue !== 'object' || Array.isArray(currentValue)) {
+            // object
+            currentData[currentPath] = {};
+          }
+        }
+
+        currentData = currentData[currentPath];
+        currentPath = nextPath;
+      }
+
+      let oldData = currentData[currentPath];
+      currentData[currentPath] = _.copy(newData);
+      changedValues  = [currentData[currentPath], oldData];
+    }
 
     // apply changes
     diff.diffVt(this._vt, newVt);
