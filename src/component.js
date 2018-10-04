@@ -90,11 +90,13 @@ class Component {
     }
 
     get dom() {
-        return this._exparserNode.$$
+        return this._exparserNode.$$;
     }
 
     get data() {
-        return this._exparserNode.data
+        let caller = exparser.Element.getMethodCaller(this._exparserNode);
+
+        return caller && caller.data;
     }
 
     /**

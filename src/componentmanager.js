@@ -352,13 +352,17 @@ class TemplateEngineInstance {
   /**
    * it will be called when need to rerender
    */
-  updateValues(exparserNode, data, changedValues, changes) {
+  updateValues(exparserNode, data, changedPaths, changedValues, changes) {
     let newVt = this._generateFunc({ data }); // generate a new vt
 
     // merge to caller's data
     const callerData = exparser.Element.getMethodCaller(exparserNode).data;
     const hasOwnProperty = Object.prototype.hasOwnProperty;
-    for (let [path, newData] of changes) {
+    for (let changeInfo of changes) {
+      if (!changeInfo) continue;
+
+      let path = changeInfo[1];
+      let newData = changeInfo[2];
       let currentData = callerData;
       let currentPath = path[0];
 
