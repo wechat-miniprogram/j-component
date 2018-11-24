@@ -1,5 +1,12 @@
 # j-component
 
+[![](https://img.shields.io/npm/v/j-component.svg?style=flat)](https://www.npmjs.org/package/j-component)
+[![](https://img.shields.io/travis/JuneAndGreen/j-component.svg)](https://github.com/JuneAndGreen/j-component)
+[![](https://img.shields.io/npm/l/j-component.svg)](https://github.com/JuneAndGreen/j-component)
+[![](https://img.shields.io/coveralls/github/JuneAndGreen/j-component.svg)](https://github.com/JuneAndGreen/j-component)
+
+## 简介
+
 仿小程序组件系统，可以让小程序自定义组件跑在 web 端。
 
 ## 注意

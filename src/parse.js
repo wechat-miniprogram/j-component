@@ -1,14 +1,13 @@
 /**
- * thanks for John Resig
- * source code: https://johnresig.com/files/htmlparser.js
+ * 感谢 John Resig
+ * 源码：https://johnresig.com/files/htmlparser.js
  */
 
-// regexs for parsing tags and attrs
 const startTagReg = /^<([-A-Za-z0-9_]+)((?:\s+[\w\-\:]+(?:\s*=\s*(?:(?:"[^"]*")|(?:'[^']*')|[^>\s]+))?)*)\s*(\/?)>/;
 const endTagReg = /^<\/([-A-Za-z0-9_]+)[^>]*>/;
 const attrReg = /([-A-Za-z0-9_\:]+)(?:\s*=\s*(?:(?:"((?:\\.|[^"])*)")|(?:'((?:\\.|[^'])*)')|([^>\s]+)))?/g;
 
-module.exports = function(content, handler) {
+module.exports = function (content, handler = {}) {
     let stack = [];
     let last = content;
 
@@ -21,7 +20,7 @@ module.exports = function(content, handler) {
 
         if (!stack.last() || stack.last() !== 'wxs') {
             if (content.indexOf('<!--') === 0) {
-                // comment
+                // 注释
                 let index = content.indexOf('-->');
 
                 if (index >= 0) {
@@ -30,7 +29,7 @@ module.exports = function(content, handler) {
                 }
 
             } else if (content.indexOf('</') === 0) {
-                // end tag
+                // 结束标签
                 let match = content.match(endTagReg);
 
                 if (match) {
@@ -40,7 +39,7 @@ module.exports = function(content, handler) {
                 }
 
             } else if (content.indexOf('<') === 0) {
-                // start tag
+                // 开始标签
                 let match = content.match(startTagReg);
 
                 if (match) {
@@ -77,7 +76,7 @@ module.exports = function(content, handler) {
         last = content;
     }
 
-    // clean up any remaining tags
+    // 清空保留的标签
     parseEndTag();
 
     function parseStartTag(tag, tagName, rest, unary) {
@@ -108,14 +107,14 @@ module.exports = function(content, handler) {
         if (!tagName) {
             pos = 0;
         } else {
-            // find the closest opened tag of the same type
+            // 找到最近的同类型开始标签
             for (pos = stack.length - 1; pos >= 0; pos--) {
                 if (stack[pos] === tagName) break;
             }
         }
 
         if (pos >= 0) {
-            // close all the open elements, up the stack
+            // 关闭所有的开始标签，并让其出栈
             for (let i = stack.length - 1; i >= pos; i--) {
                 handler.end && handler.end(stack[i]);
             }

@@ -7,12 +7,12 @@ const _ = require('./utils');
 const diff =require('./diff');
 const render = require('./render');
 
-const CACHE = {}; // cache component manager instance
+const CACHE = {}; // componentManager 实例缓存
 
 /**
- * check if/for statement
+ * 检查 if/for 语句
  */
-function filterAttrs(attrs = []) {
+function filterAttrs(attrs) {
   let statement = {};
   let event = {};
   let normalAttrs = [];
@@ -39,7 +39,7 @@ function filterAttrs(attrs = []) {
       let res = /^(capture-)?(bind|catch|)(?:\:)?(.*)$/ig.exec(name);
 
       if (res[2] && res[3]) {
-        // event binding
+        // 事件绑定
         let isCapture = !!res[1];
         let isCatch = res[2] === 'catch';
         let eventName = res[3];
@@ -51,7 +51,7 @@ function filterAttrs(attrs = []) {
           handler: value,
         };
       } else {
-        // normal attr
+        // 普通属性
         normalAttrs.push(attr);
       }
     }
@@ -65,21 +65,22 @@ function filterAttrs(attrs = []) {
 }
 
 class ComponentManager {
-  constructor(definition = {}) {
+  constructor(definition) {
     this.id = definition.id || _.getId(true);
-    this.isGlobal = !!definition.id; // is global component
+    this.isGlobal = !!definition.id; // 是否全局组件
     this.definition = definition;
     this.root = new JNode({
       type: CONSTANT.TYPE_ROOT,
       componentManager: this,
     });
 
-    if (definition.tagName) _.setTagName(this.id, definition.tagName); // save tagName
+    if (definition.tagName) _.setTagName(this.id, definition.tagName); // 保存标签名
 
-    if (typeof definition.template === 'string') {
-      let template = definition.template.trim();
-      if (template) this.parse(template);
-    }
+    let template = definition.template;
+    if (!template || typeof template !== 'string' || !template.trim()) throw new Error('invalid template');
+
+    template = template.trim();
+    this.parse(template);
 
     this.exparserDef = this.registerToExparser();
 
@@ -87,14 +88,14 @@ class ComponentManager {
   }
 
   /**
-   * get component with id
+   * 根据 id 获取组件
    */
   static get(id) {
     return CACHE[id];
   }
 
   /**
-   * parse the template
+   * 解析模板
    */
   parse(template) {
     let stack = [this.root];
@@ -161,7 +162,7 @@ class ComponentManager {
             children: [node],
             root: this.root,
           });
-          node.setParent(itemNode, 0); // update parent
+          node.setParent(itemNode, 0); // 更新父节点
 
           let forNode = new JNode({
             type: CONSTANT.TYPE_FOR,
@@ -172,12 +173,12 @@ class ComponentManager {
             children: [itemNode],
             root: this.root,
           });
-          itemNode.setParent(forNode, 0); // update parent
+          itemNode.setParent(forNode, 0); // 更新父节点
 
           appendNode = forNode;
         }
 
-        // condition statement
+        // 条件语句
         if (statement.if || statement.elif || statement.else) {
           let ifNode = new JNode({
             type: CONSTANT.TYPE_IF,
@@ -190,7 +191,7 @@ class ComponentManager {
             children: [node],
             root: this.root,
           });
-          node.setParent(ifNode, 0); // update parent
+          node.setParent(ifNode, 0); // 更新父节点
 
           appendNode = ifNode;
         }
@@ -199,7 +200,7 @@ class ComponentManager {
           stack.push(node);
         }
 
-        appendNode.setParent(parent, parent.children.length); // update parent
+        appendNode.setParent(parent, parent.children.length); // 更新父节点
         parent.appendChild(appendNode);
       },
       end: tagName => {
@@ -211,7 +212,7 @@ class ComponentManager {
 
         let parent = stack.last();
         if (parent.type === CONSTANT.TYPE_WXS) {
-          // wxs, transform content to a function
+          // wxs 节点
           parent.setWxsContent(content);
         } else {
           parent.appendChild(new JNode({
@@ -230,7 +231,7 @@ class ComponentManager {
   }
 
   /**
-   * register to exparser
+   * 注册 exparser 组件
    */
   registerToExparser() {
     let definition = this.definition;
@@ -282,7 +283,7 @@ class ComponentManager {
       pageLifetimes: definition.pageLifetimes,
       definitionFilter,
       initiator() {
-        // update method caller
+        // 更新方法调用者，即自定义组件中的 this
         let caller = Object.create(this);
 
         caller.data = _.copy(this.data);
@@ -300,7 +301,7 @@ class ComponentManager {
 }
 
 /**
- * template engine for exparser
+ * exparser 的模板引擎封装
  */
 class TemplateEngine {
   static create(behavior, initValues, componentOptions) {
@@ -327,7 +328,7 @@ class TemplateEngine {
 
   createInstance(exparserNode, properties = {}) {
     this._data = Object.assign(this._data, properties);
-    this._vt = this._generateFunc({ data: this._data }); // generate a vt
+    this._vt = this._generateFunc({ data: this._data }); // 生成虚拟树
 
     let instance = new TemplateEngineInstance();
     instance._generateFunc = this._generateFunc;
@@ -336,7 +337,7 @@ class TemplateEngine {
     instance.data = _.copy(this._data);
     instance.idMap = {};
     instance.slots = {};
-    instance.shadowRoot = render.renderExparserNode(instance._vt, exparserNode, null); // render to exparser tree
+    instance.shadowRoot = render.renderExparserNode(instance._vt, exparserNode, null); // 渲染成 exparser 树
     instance.listeners = [];
 
     TemplateEngine.collectIdMapAndSlots(instance.shadowRoot, instance.idMap, instance.slots);
@@ -346,16 +347,16 @@ class TemplateEngine {
 }
 
 /**
- * template engine instance for exparser
+ * exparser 的模板引擎实例
  */
 class TemplateEngineInstance {
   /**
-   * it will be called when need to rerender
+   * 当遇到组件更新时，会触发此方法
    */
   updateValues(exparserNode, data, changedPaths, changedValues, changes) {
-    let newVt = this._generateFunc({ data }); // generate a new vt
+    let newVt = this._generateFunc({ data }); // 生成新虚拟树
 
-    // merge to caller's data
+    // 合并到方法调用者的 data 中
     const callerData = exparser.Element.getMethodCaller(exparserNode).data;
     const hasOwnProperty = Object.prototype.hasOwnProperty;
     for (let changeInfo of changes) {
@@ -366,18 +367,18 @@ class TemplateEngineInstance {
       let currentData = callerData;
       let currentPath = path[0];
 
-      // check update path
+      // 检查更新路径
       for (let i = 1, len = path.length; i < len; i++) {
         let nextPath = path[i];
         let currentValue = currentData[currentPath];
 
         if (!hasOwnProperty.call(currentData, currentPath)) {
-          // init if not exists
+          // 不存在，则进行初始化
           if (typeof nextPath === 'number' && isFinite(nextPath)) {
-            // array
+            // 数组
             if (!Array.isArray(currentValue)) currentData[currentPath] = [];
           } else if (currentValue === null || typeof currentValue !== 'object' || Array.isArray(currentValue)) {
-            // object
+            // 对象
             currentData[currentPath] = {};
           }
         }
@@ -391,7 +392,7 @@ class TemplateEngineInstance {
       changedValues  = [currentData[currentPath], oldData];
     }
 
-    // apply changes
+    // 应用更新
     diff.diffVt(this._vt, newVt);
     this._vt = newVt;
   }

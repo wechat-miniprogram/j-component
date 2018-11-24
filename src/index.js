@@ -5,7 +5,7 @@ const _ = require('./utils');
 
 module.exports = {
   /**
-   * register component
+   * 注册组件
    */
   register(definition = {}) {
     let componentManager = new ComponentManager(definition);
@@ -14,7 +14,7 @@ module.exports = {
   },
 
   /**
-   * register behavior
+   * 注册 behavior
    */
   behavior(definition) {
     definition.is = _.getId(true);
@@ -30,7 +30,7 @@ module.exports = {
   },
 
   /**
-   * create a component instance
+   * 创建组件实例
    */
   create(id, properties) {
     let componentManager = ComponentManager.get(id);

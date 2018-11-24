@@ -5,9 +5,9 @@ const _ = require('./utils');
 const transitionKeys = ['transition', 'transitionProperty', 'transform', 'transformOrigin', 'webkitTransition', 'webkitTransitionProperty', 'webkitTransform', 'webkitTransformOrigin'];
 
 /**
- * update attrs for exparser node
+ * 更新 exparser 节点的属性
  */
-function updateAttrs(exparserNode, attrs = []) {
+function updateAttrs(exparserNode, attrs) {
   let isComponentNode = exparserNode instanceof exparser.Component;
   let dataProxy = exparser.Component.getDataProxy(exparserNode);
   let needDoUpdate = false;
@@ -16,7 +16,7 @@ function updateAttrs(exparserNode, attrs = []) {
 
   for (let { name, value } of attrs) {
     if (name === 'id' || name === 'slot' || (isComponentNode && name === 'class')) {
-      // common properties
+      // 普通属性
       exparserNode[name] = value || '';
     } else if (isComponentNode && name === 'style') {
       // style
@@ -29,10 +29,10 @@ function updateAttrs(exparserNode, attrs = []) {
           return styleValue !== undefined ? `${key.replace(/([A-Z]{1})/g, char => `-${char.toLowerCase()}`)}:${styleValue}` : '';
         }).filter(item => !!item.trim()).join(';');
 
-        exparserNode.setNodeStyle(_.transformRpx(value, true) + animationStyle);
+        exparserNode.setNodeStyle(_.transformRpx(value || '', true) + animationStyle);
       }
     } else if (isComponentNode && exparser.Component.hasPublicProperty(exparserNode, name)) {
-      // public properties of exparser node, delay it
+      // public 属性，延迟处理
       dataProxy.scheduleReplace([name], value);
       needDoUpdate = true;
     } else if(/^data-/.test(name)) {
@@ -40,7 +40,7 @@ function updateAttrs(exparserNode, attrs = []) {
       exparserNode.dataset[_.dashToCamelCase(name.slice(5).toLowerCase())] = value;
       exparserNode.setAttribute(name, value);
     } else if (isComponentNode && name === 'animation') {
-      // animation
+      // 动画
       if (exparserNode.$$ && value && value.actions && value.actions.length > 0) {
         let index = 0;
         let actions = value.actions;
@@ -69,7 +69,7 @@ function updateAttrs(exparserNode, attrs = []) {
         step();
       }
     } else if (isComponentNode && exparserNode.hasExternalClass(_.camelToDashCase(name))) {
-      // external classes
+      // 外部样式类
       exparserNode.setExternalClass(_.camelToDashCase(name), value);
     }
   }
@@ -78,12 +78,12 @@ function updateAttrs(exparserNode, attrs = []) {
 }
 
 /**
- * update event for exparser node
+ * 更新 exparser 节点的事件监听
  */
-function updateEvent(exparserNode, event = {}) {
+function updateEvent(exparserNode, event) {
   let convertEventTarget = (target, currentTarget) => {
     if (currentTarget && (target instanceof exparser.VirtualNode) && !target.id && !Object.keys(target.dataset).length) {
-      // the target is slot without id and dataset
+      // 如果 target 是 slot 且 slot 未设置 id 和 dataset，则兼容以前的逻辑：target === currentTarget
       target = currentTarget;
     }
 
@@ -130,7 +130,7 @@ function updateEvent(exparserNode, event = {}) {
 }
 
 /**
- * render to a exparser node
+ * 渲染成 exparser 节点
  */
 function renderExparserNode(options, shadowRootHost, shadowRoot) {
   let type = options.type;
@@ -166,7 +166,7 @@ function renderExparserNode(options, shadowRootHost, shadowRoot) {
 
   }
 
-  options.exparserNode = exparserNode; // save exparser node
+  options.exparserNode = exparserNode; // 保存 exparser node
 
   return exparserNode;
 }

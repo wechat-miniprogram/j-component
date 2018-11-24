@@ -22,14 +22,12 @@ function getParseResult(content) {
 }
 
 test('parse template', () => {
-  let res1 = getParseResult('<div><slot/></div>');
-  expect(res1.startStack.length).toBe(2);
-  expect(res1.endStack.length).toBe(1);
-  expect(res1.textStack.length).toBe(0);
-  expect(res1.startStack).toEqual([{ tagName: 'div', attrs: [], unary: false }, { tagName: 'slot', attrs: [], unary: true }]);
-  expect(res1.endStack).toEqual(['div']);
+  let res = getParseResult('<div><slot/></div>');
+  expect(res.startStack).toEqual([{ tagName: 'div', attrs: [], unary: false }, { tagName: 'slot', attrs: [], unary: true }]);
+  expect(res.endStack).toEqual(['div']);
+  expect(res.textStack).toEqual([]);
 
-  let res2 = getParseResult(`
+  res = getParseResult(`
     <div><slot/></div>
     <div id="a" class="xx">123123</div>
     <input id="b" type="checkbox" checked/>
@@ -41,10 +39,7 @@ test('parse template', () => {
       </ul>
     </div>
   `);
-  expect(res2.startStack.length).toBe(12);
-  expect(res2.endStack.length).toBe(10);
-  expect(res2.textStack.length).toBe(4);
-  expect(res2.startStack).toEqual([
+  expect(res.startStack).toEqual([
     { tagName: 'div', attrs: [], unary: false },
     { tagName: 'slot', attrs: [], unary: true },
     { tagName: 'div', attrs: [{ name: 'id', value: 'a' }, { name: 'class', value: 'xx' }], unary: false },
@@ -58,12 +53,27 @@ test('parse template', () => {
     { tagName: 'li', attrs: [], unary: false },
     { tagName: 'span', attrs: [], unary: false }
   ]);
-  expect(res2.endStack).toEqual(['div', 'div', 'span', 'li', 'span', 'li', 'span', 'li', 'ul', 'div']);
-  expect(res2.textStack).toEqual(['123123', '123', '321', '567']);
+  expect(res.endStack).toEqual(['div', 'div', 'span', 'li', 'span', 'li', 'span', 'li', 'ul', 'div']);
+  expect(res.textStack).toEqual(['123123', '123', '321', '567']);
+
+  res = getParseResult(`<div><span>123</div>`);
+  expect(res.startStack).toEqual([
+    { tagName: 'div', attrs: [], unary: false },
+    { tagName: 'span', attrs: [], unary: false }
+  ]);
+  expect(res.endStack).toEqual(['span', 'div']);
+  expect(res.textStack).toEqual(['123']);
+
+  res = getParseResult(`<div>123</h1>`);
+  expect(res.startStack).toEqual([
+    { tagName: 'div', attrs: [], unary: false }
+  ]);
+  expect(res.endStack).toEqual(['div']);
+  expect(res.textStack).toEqual(['123']);
 });
 
 test('parse wxs', () => {
-  let res1 = getParseResult(`
+  let res = getParseResult(`
     <div>123</div>
     <wxs module="m1">
       var msg = "hello world";
@@ -72,15 +82,55 @@ test('parse wxs', () => {
     <view>{{m1.message}}</view>
     <div>321</div>
   `);
-  expect(res1.startStack.length).toBe(4);
-  expect(res1.endStack.length).toBe(4);
-  expect(res1.textStack.length).toBe(4);
-  expect(res1.startStack).toEqual([
+  expect(res.startStack).toEqual([
     { tagName: 'div', attrs: [], unary: false },
     { tagName: 'wxs', attrs: [{ name: 'module', value: 'm1' }], unary: false },
     { tagName: 'view', attrs: [], unary: false },
     { tagName: 'div', attrs: [], unary: false }
   ]);
-  expect(res1.endStack).toEqual(['div', 'wxs', 'view', 'div']);
-  expect(res1.textStack).toEqual(['123', 'var msg = "hello world";\n      module.exports.message = msg;', '{{m1.message}}', '321']);
+  expect(res.endStack).toEqual(['div', 'wxs', 'view', 'div']);
+  expect(res.textStack).toEqual(['123', 'var msg = "hello world";\n      module.exports.message = msg;', '{{m1.message}}', '321']);
+
+  res = getParseResult(`<wxs></wxs>`);
+  expect(res.startStack).toEqual([
+    { tagName: 'wxs', attrs: [], unary: false }
+  ]);
+  expect(res.endStack).toEqual(['wxs']);
+  expect(res.textStack).toEqual([]);
+});
+
+test('parse comment', () => {
+  let res = getParseResult(`<!-- 123 -->`);
+  expect(res.startStack).toEqual([]);
+  expect(res.startStack).toEqual([]);
+  expect(res.startStack).toEqual([]);
+});
+
+test('parse without options', () => {
+  let catchErr = null;
+  try {
+    parse('<div>123</div>');
+  } catch (err) {
+    catchErr = err;
+  }
+
+  expect(catchErr).toBe(null);
+});
+
+test('parse error', () => {
+  function getErr(str) {
+    let catchErr = null;
+    try {
+      getParseResult(str);
+    } catch (err) {
+      catchErr = err;
+    }
+
+    return catchErr && catchErr.message || '';
+  }
+
+  expect(getErr('<div')).toBe('parse error: <div');
+  expect(getErr('<wxs>123')).toBe('parse error: 123');
+  expect(getErr('<!-- 123')).toBe('parse error: <!-- 123');
+  expect(getErr('<div>123</%%^6.....>')).toBe('parse error: </%%^6.....>');
 });

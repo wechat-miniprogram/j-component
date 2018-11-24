@@ -6,15 +6,31 @@ const LONGPRESS_TIME = 350;
 const SCROLL_PROTECTED = 150;
 const NATIVE_TOUCH_EVENT = ['touchstart', 'touchmove', 'touchend', 'touchcancel'];
 
+/**
+ * 遍历 exparser 树
+ */
+function dfsExparserTree(node, callback, fromTopToBottom) {
+  if (node instanceof exparser.Component) {
+    if (fromTopToBottom) callback(node);
+    if (node.shadowRoot instanceof exparser.Element) dfsExparserTree(node.shadowRoot, callback, fromTopToBottom);
+    if (!fromTopToBottom) callback(node);
+  }
+  node.childNodes.forEach(child => {
+    if (child instanceof exparser.Element) dfsExparserTree(child, callback, fromTopToBottom);
+  });
+}
+
 class ComponentNode {
     constructor(exparserNode) {
         this._exparserNode = exparserNode;
+    }
 
-        this.dom = this._exparserNode.$$;
+    get dom() {
+        return this._exparserNode.$$;
     }
 
     /**
-     * dispatch event
+     * 触发事件
      */
     dispatchEvent(eventName, options = {}) {
         let dom = this.dom;
@@ -56,7 +72,7 @@ class ComponentNode {
 
             dom.dispatchEvent(touchEvent);
         } else {
-            // custom event
+            // 自定义事件
             let customEvent = new CustomEvent(eventName, options);
             dom.dispatchEvent(customEvent);
 
@@ -100,12 +116,12 @@ class Component {
     }
 
     /**
-     * initial event listener
+     * 初始化事件
      */
     _bindEvent() {
         let dom = this.dom;
 
-        // for touch
+        // touch 事件
         dom.addEventListener('touchstart', evt => {
             this._triggerExparserEvent(evt, 'touchstart');
 
@@ -158,7 +174,7 @@ class Component {
            if (this._longpressTimer) this._longpressTimer = clearTimeout(this._longpressTimer);
         }, { capture: true, passive: false });
 
-        // for other
+        // 其他事件
         dom.addEventListener('scroll', evt => {
             this._lastScrollTime = +new Date();
             this._triggerExparserEvent(evt, 'scroll');
@@ -170,7 +186,7 @@ class Component {
     }
 
     /**
-     * trigger exparser node event
+     * 触发 exparser 节点事件
      */
     _triggerExparserEvent(evt, name, detail = {}) {
         exparser.Event.dispatchEvent(evt.target, exparser.Event.create(name, detail, {
@@ -186,7 +202,7 @@ class Component {
     }
 
     /**
-     * select child component node
+     * 选取第一个符合的子组件节点
      */
     querySelector(selector) {
         let shadowRoot = this._exparserNode.shadowRoot;
@@ -198,7 +214,7 @@ class Component {
     }
 
     /**
-     * select child component nodes
+     * 选取所有符合的子组件节点
      */
     querySelectorAll(selector) {
         let shadowRoot = this._exparserNode.shadowRoot;
@@ -208,7 +224,7 @@ class Component {
     }
 
     /**
-     * set data
+     * 小程序自定义组件的 setData 方法
      */
     setData(data, callback) {
         let caller = exparser.Element.getMethodCaller(this._exparserNode);
@@ -218,18 +234,18 @@ class Component {
     }
 
     /**
-     * attach to a dom
+     * 添加
      */
     attach(parent) {
         parent.appendChild(this.dom);
         this.parentNode = parent;
 
         exparser.Element.pretendAttached(this._exparserNode);
-        _.dfsExparserTree(this._exparserNode, node => node.triggerLifeTime('ready'));
+        dfsExparserTree(this._exparserNode, node => node.triggerLifeTime('ready'));
     }
 
     /**
-     * detach from a dom
+     * 移除
      */
     detach() {
         if (!this.parentNode) return;
@@ -241,7 +257,7 @@ class Component {
     }
 
     /**
-     * trigger life time
+     * 触发生命周期
      */
     triggerLifeTime(lifeTime) {
         this._exparserNode.triggerLifeTime(lifeTime);

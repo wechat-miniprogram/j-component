@@ -6,31 +6,31 @@ class JNode {
     this.type = options.type;
     this.tagName = options.tagName || '';
     this.componentId = options.componentId;
-    this.root = options.root || this; // root node's root is this
+    this.root = options.root || this; // 根节点的 root 是自己
     this.parent = options.parent;
     this.index = options.index || 0;
     this.content = options.content && Expression.getExpression(options.content);
     this.attrs = options.attrs || [];
     this.event = options.event || {};
-    this.statement = options.statement || {}; // if/for statement
+    this.statement = options.statement || {}; // if/for 语句
     this.children = options.children || [];
     this.generics = options.generics;
-    this.componentManager = options.componentManager; // owner component manager instance
+    this.componentManager = options.componentManager; // 所属的 componentManager 实例
 
-    // for root
+    // 根节点用
     this.data = {};
 
-    // for wxs
+    // wxs 节点用
     this.wxsModuleName = '';
 
-    // for slot
+    // slot 节点用
     this.slotName = '';
 
     this.checkAttrs();
   }
 
   /**
-   * check attrs
+   * 检查属性
    */
   checkAttrs() {
     let type = this.type
@@ -42,10 +42,10 @@ class JNode {
       let value = attr.value
 
       if (type === CONSTANT.TYPE_WXS && name === 'module') {
-        // wxs module
+        // wxs 模块
         this.wxsModuleName = value || '';
       } else if (type === CONSTANT.TYPE_SLOT && name === 'name') {
-        // slot name
+        // slot 名
         this.slotName = value || '';
       } else {
         if (value) attr.value = Expression.getExpression(value);
@@ -57,7 +57,7 @@ class JNode {
   }
 
   /**
-   * set parent and index
+   * 设置父节点
    */
   setParent(parent, index = 0) {
     if (!parent) return;
@@ -67,14 +67,14 @@ class JNode {
   }
 
   /**
-   * append a child node
+   * 添加子节点
    */
   appendChild(node) {
     this.children.push(node);
   }
 
   /**
-   * set wxs content
+   * 设置 wxs 内容并转换成函数
    */
   setWxsContent(content) {
     if (!this.wxsModuleName) return;
@@ -89,21 +89,21 @@ class JNode {
   }
 
   /**
-   * get next sibling node
+   * 获取下一个兄弟节点
    */
   nextSibling() {
     return this.parent && this.parent.children[this.index + 1];
   }
 
   /**
-   * get previous sibling node
+   * 获取前一个兄弟节点
    */
   previousSibling() {
     return this.parent && this.parent.children[this.index - 1];
   }
 
   /**
-   * check if condition statement
+   * 检查 if 语句
    */
   checkIf(data) {
     let statement = this.statement;
@@ -114,7 +114,7 @@ class JNode {
   }
 
   /**
-   * check elif condition statement
+   * 检查 elif 语句
    */
   checkElif(data) {
     let statement = this.statement;
@@ -125,7 +125,7 @@ class JNode {
   }
 
   /**
-   * check else condition statement
+   * 检查 else 语句
    */
   checkElse(data) { 
     let statement = this.statement;
@@ -136,7 +136,7 @@ class JNode {
   }
 
   /**
-   * check previous condition statement
+   * 检查前一个条件语句
    */
   checkPreviousCondition(data) {
     let previousSibling = this.previousSibling();
@@ -161,46 +161,46 @@ class JNode {
   }
 
   /**
-   * generate to a vt
+   * 生成虚拟树
    */
   generate(options = {}) {
     let data = options.data = options.data || {};
     let statement = this.statement;
     let key = options.key || '';
 
-    delete options.key; // not cross passing
+    delete options.key; // 不能跨组件传递
 
-    // check include
+    // 检查 include 节点
     if (this.type === CONSTANT.TYPE_INCLUDE) {
       return null;
     }
 
-    // check import
+    // 检查 import 节点
     if (this.type === CONSTANT.TYPE_IMPORT) {
       return null;
     }
     
-    // check template
+    // 检查 template 节点
     if (this.type === CONSTANT.TYPE_TEMPLATE) {
       return null;
     }
 
-    // check wxs
+    // 检查 wxs 节点
     if (this.type === CONSTANT.TYPE_WXS) {
       return null;
     }
 
-    // check if / elif / else
+    // 检查 if / elif / else 语句
     if (this.type === CONSTANT.TYPE_IF && (!this.checkIf(data) || !this.checkElif(data) || !this.checkElse(data))) {
       return null;
     }
 
     let children = [];
 
-    // check has children
+    // 检查子节点
     if (this.children && this.children.length) {
       if (this.type === CONSTANT.TYPE_FOR) {
-        // check for
+        // 检查 for 语句
         let list = Expression.calcExpression(statement.for, data);
         options.extra = options.extra || {};
 
@@ -219,7 +219,7 @@ class JNode {
           options.extra.forIndex = bakIndex;
         }
       } else if (this.type === CONSTANT.TYPE_FORITEM) {
-        // check for item
+        // 检查 for 子节点
         options.extra = options.extra || {};
         let { forItem, forIndex } = options.extra;
         let { forItem: bakItem, forIndex: bakIndex } = data;
@@ -232,18 +232,18 @@ class JNode {
         data[statement.forItem] = bakItem;
         data[statement.forIndex] = bakIndex;
       } else {
-        // normal
+        // 其他节点
         children = this.children.map(node => node.generate(options));
       }
     }
 
-    // filter children
+    // 过滤子节点
     let filterChildren = [];
     for (let child of children) {
       if (!child) continue;
 
       if (child.type === CONSTANT.TYPE_BLOCK) {
-        // block
+        // block 节点
         let grandChildren = child.children;
         for (let grandChild of grandChildren) {
           filterChildren.push(grandChild);
@@ -253,7 +253,7 @@ class JNode {
       }
     }
 
-    // check attrs
+    // 检查属性
     let attrs = [];
     for (let { name, value } of this.attrs) {
       attrs.push({
@@ -262,7 +262,7 @@ class JNode {
       });
     }
 
-    // calc content
+    // 计算内容
     let content = Expression.calcExpression(this.content, data);
     content = content !== undefined ? String(content) : '';
 

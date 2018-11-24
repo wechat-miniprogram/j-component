@@ -151,6 +151,76 @@ test('block', () => {
   expect(comp.dom.innerHTML).toBe('<wx-view><div>123</div></wx-view>456<wx-view><div>101112</div></wx-view><wx-view><div>0</div></wx-view><wx-view><div>a</div></wx-view><wx-view><div>1</div></wx-view><wx-view><div>b</div></wx-view>');
 });
 
+test('condition statement', () => {
+  let compId = jComponent.register({
+    template: `
+      <view wx:if="{{flag === 0}}">0</view>
+      <view wx:elif="{{flag === 1}}">1</view>
+      <view wx:elif="{{flag === 2}}">2</view>
+      <view wx:else>3</view>
+    `,
+    data: {
+      flag: 0,
+    },
+  });
+  let comp = jComponent.create(compId);
+
+  expect(comp.dom.innerHTML).toBe('<wx-view><div>0</div></wx-view>');
+  comp.setData({ flag: 2 });
+  expect(comp.dom.innerHTML).toBe('<wx-view><div>2</div></wx-view>');
+
+  comp.setData({ flag: 1 });
+  expect(comp.dom.innerHTML).toBe('<wx-view><div>1</div></wx-view>');
+
+  comp.setData({ flag: 4 });
+  expect(comp.dom.innerHTML).toBe('<wx-view><div>3</div></wx-view>');
+
+  comp.setData({ flag: 0 });
+  expect(comp.dom.innerHTML).toBe('<wx-view><div>0</div></wx-view>');
+});
+
+test('for statement', () => {
+  let compId = jComponent.register({
+    template: `
+      <view wx:for="{{list}}" wx:key="id" wx:for-item="a" wx:for-index="idx">{{idx}}-{{a.value}}</view>
+    `,
+    data: {
+      list: [],
+    },
+  });
+  let comp = jComponent.create(compId);
+
+  expect(comp.dom.innerHTML).toBe('');
+  comp.setData({
+    list: [
+      { id: 1, value:'1' },
+      { value: '2' },
+      { id: 3, value: '3' },
+    ],
+  });
+  expect(comp.dom.innerHTML).toBe('<wx-view><div>0-1</div></wx-view><wx-view><div>1-2</div></wx-view><wx-view><div>2-3</div></wx-view>');
+});
+
+test('parse error', () => {
+  let catchErr = null;
+
+  // usingComponents 中使用被定义的组件
+  try {
+    jComponent.register({
+      template: `<xxx>{{num}}</xxx>`,
+      usingComponents: {
+        'xxx': 12345,
+      },
+      data: {
+        num: 0,
+      },
+    });
+  } catch (err) {
+    catchErr = err;
+  }
+  expect(catchErr.message).toBe('component xxx not found');
+});
+
 test('setData', () => {
   let callbackCheck = [];
   let compId = jComponent.register({
@@ -294,4 +364,14 @@ test('life time', () => {
     'grand-child-ready', 'child-ready', 'ready',
     'grand-child-detached', 'child-detached', 'detached'
   ]);
+});
+
+test('error', () => {
+  let catchErr = null
+  try {
+    jComponent.register({});
+  } catch (err) {
+    catchErr = err;
+  }
+  expect(catchErr.message).toBe('invalid template');
 });

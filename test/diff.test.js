@@ -1,5 +1,32 @@
 const diff = require('../src/diff');
 
+test('diffAttrs', () => {
+  expect(diff.diffAttrs([
+    { name: 'a', value: '123' },
+    { name: 'b', value: '123' },
+    { name: 'c', value: '123' }
+  ], [
+    { name: 'b', value: '321' },
+    { name: 'c', value: '123' },
+    { name: 'd', value: '123' }
+  ])).toEqual([
+    { name: 'b', value: '321' },
+    { name: 'c', value: '123' },
+    { name: 'd', value: '123' },
+    { name: 'a', value: undefined }
+  ]);
+
+  expect(diff.diffAttrs([
+    { name: 'a', value: '123' },
+    { name: 'b', value: '123' },
+    { name: 'c', value: '123' }
+  ], [
+    { name: 'a', value: '123' },
+    { name: 'b', value: '123' },
+    { name: 'c', value: '123' }
+  ])).toBe(false);
+});
+
 test('diffList: test moves', () => {
   let oldList = [{ key: 1 }, { key: 2 }, {}];
   let newList = [{ key: 3 }, { key: 1 }];
@@ -8,6 +35,14 @@ test('diffList: test moves', () => {
   expect(diffs.children).toEqual([{ key: 1 }, null, null]);
   expect(diffs.moves.removes).toEqual([2, 1]);
   expect(diffs.moves.inserts).toEqual([{ oldIndex: -1, index: 0 }]);
+
+  oldList = [{ key: 1 }, { key: 2 }, { key: 3 }];
+  newList = [{ key: 3 }, { key: 2 }, { key: 1 }];
+  diffs = diff.diffList(oldList, newList);
+
+  expect(diffs.children).toEqual([{ key: 1 }, { key: 2 }, { key: 3 }]);
+  expect(diffs.moves.removes).toEqual([]);
+  expect(diffs.moves.inserts).toEqual([{ oldIndex: 2, index: 0 }]);
 });
 
 test('diffList: empty old list', () => {
@@ -116,6 +151,16 @@ test('diffList: without key', () => {
   expect(diffs.children).toEqual([{ a: 2 }, { a: 3 }]);
   expect((diffs.moves.removes)).toEqual([]);
   expect((diffs.moves.inserts)).toEqual([{ oldIndex: -1, index: 2 }]);
+});
+
+test('diffList: same key', () => {
+  let oldList = [{ key: 1 }, { key: 1 }, {}];
+  let newList = [{ key: 3 }, { key: 3 }, { key: 1 }];
+  let diffs = diff.diffList(oldList, newList);
+
+  expect(diffs.children).toEqual([{ key: 1 }, { key: 3 }, null]);
+  expect(diffs.moves.removes).toEqual([2]);
+  expect(diffs.moves.inserts).toEqual([{ oldIndex: -1, index: 0 }, { oldIndex: -1, index: 1 }]);
 });
 
 test('diffList: mixed', () => {

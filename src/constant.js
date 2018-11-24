@@ -1,5 +1,5 @@
 module.exports = {
-    // node type
+    // 节点类型
     TYPE_ROOT: 10,
     TYPE_SLOT: 11,
     TYPE_TEMPLATE: 12,
