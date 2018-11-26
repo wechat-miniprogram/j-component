@@ -2,7 +2,7 @@ const exparser = require('miniprogram-exparser');
 const parse = require('./parse');
 const CONSTANT = require('./constant');
 const JNode = require('./jnode');
-const Expression = require('./expression');
+const expr = require('./expr');
 const _ = require('./utils');
 const diff =require('./diff');
 const render = require('./render');
@@ -22,13 +22,13 @@ function filterAttrs(attrs) {
     let value = attr.value || '';
 
     if (name === 'wx:if') {
-      statement.if = Expression.getExpression(value);
+      statement.if = expr.getExpression(value);
     } else if (name === 'wx:elif') {
-      statement.elif = Expression.getExpression(value);
+      statement.elif = expr.getExpression(value);
     } else if (name === 'wx:else') {
       statement.else = true;
     } else if (name === 'wx:for') {
-      statement.for = Expression.getExpression(value);
+      statement.for = expr.getExpression(value);
     } else if (name === 'wx:for-item') {
       statement.forItem = value;
     } else if (name === 'wx:for-index') {

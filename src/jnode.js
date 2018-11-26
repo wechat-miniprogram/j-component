@@ -1,5 +1,5 @@
 const CONSTANT = require('./constant');
-const Expression = require('./expression');
+const expr = require('./expr');
 
 class JNode {
   constructor(options = {}) {
@@ -9,7 +9,7 @@ class JNode {
     this.root = options.root || this; // 根节点的 root 是自己
     this.parent = options.parent;
     this.index = options.index || 0;
-    this.content = options.content && Expression.getExpression(options.content);
+    this.content = options.content && expr.getExpression(options.content);
     this.attrs = options.attrs || [];
     this.event = options.event || {};
     this.statement = options.statement || {}; // if/for 语句
@@ -48,7 +48,7 @@ class JNode {
         // slot 名
         this.slotName = value || '';
       } else {
-        if (value) attr.value = Expression.getExpression(value);
+        if (value) attr.value = expr.getExpression(value);
         filterAttrs.push(attr);
       }
     }
@@ -110,7 +110,7 @@ class JNode {
 
     if (!statement.if) return true;
 
-    return Expression.calcExpression(statement.if, data);
+    return expr.calcExpression(statement.if, data);
   }
 
   /**
@@ -121,7 +121,7 @@ class JNode {
 
     if (!statement.elif) return true;
 
-    return this.checkPreviousCondition(data) ? false : Expression.calcExpression(statement.elif, data);
+    return this.checkPreviousCondition(data) ? false : expr.calcExpression(statement.elif, data);
   }
 
   /**
@@ -201,7 +201,7 @@ class JNode {
     if (this.children && this.children.length) {
       if (this.type === CONSTANT.TYPE_FOR) {
         // 检查 for 语句
-        let list = Expression.calcExpression(statement.for, data);
+        let list = expr.calcExpression(statement.for, data);
         options.extra = options.extra || {};
 
         for (let i = 0, len = list.length; i < len; i++) {
@@ -258,12 +258,12 @@ class JNode {
     for (let { name, value } of this.attrs) {
       attrs.push({
         name,
-        value: value ? Expression.calcExpression(value, data) : value,
+        value: value ? expr.calcExpression(value, data) : value,
       });
     }
 
     // 计算内容
-    let content = Expression.calcExpression(this.content, data);
+    let content = expr.calcExpression(this.content, data);
     content = content !== undefined ? String(content) : '';
 
     return {

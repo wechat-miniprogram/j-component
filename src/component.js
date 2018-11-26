@@ -57,6 +57,8 @@ class ComponentNode {
                     target: dom,
                     clientX: touch.x,
                     clientY: touch.y,
+                    pageX: touch.x,
+                    pageY: touch.y,
                   })
                 }),
                 targetTouches: [],
@@ -66,6 +68,8 @@ class ComponentNode {
                         target: dom,
                         clientX: touch.x,
                         clientY: touch.y,
+                        pageX: touch.x,
+                        pageY: touch.y,
                     });
                 }),
             });
@@ -134,12 +138,13 @@ class Component {
                 this._touchstartEvt = evt;
 
                 if ((+new Date()) - this._lastScrollTime < SCROLL_PROTECTED) {
-                    // is scrolling
+                    // 滚动中
                     this._isTapCancel = true;
-                    this._lastScrollTime = 0; // only checked once
+                    this._lastScrollTime = 0; // 只检查一次
                 } else {
                     this._isTapCancel = false;
                     this._longpressTimer = setTimeout(() => {
+                        this._isTapCancel = true; // 取消后续的 tap
                         this._triggerExparserEvent(evt, 'longpress', { x: this._touchstartX, y: this._touchstartY });
                     }, LONGPRESS_TIME);
                 }
@@ -162,16 +167,22 @@ class Component {
         dom.addEventListener('touchend', evt => {
             this._triggerExparserEvent(evt, 'touchend');
 
+            if (!this._touchstartEvt) return;
             if(evt.touches.length === 0) {
                 if (this._longpressTimer) this._longpressTimer = clearTimeout(this._longpressTimer);
                 if (!this._isTapCancel) this._triggerExparserEvent(this._touchstartEvt, 'tap', { x: evt.changedTouches[0].pageX, y: evt.changedTouches[0].pageY });
             }
+
+            this._touchstartEvt = null; // 重置 touchStart 事件
         }, { capture: true, passive: false });
 
         dom.addEventListener('touchcancel', evt => {
            this._triggerExparserEvent(evt, 'touchcancel');
 
+           if (!this._touchstartEvt) return;
            if (this._longpressTimer) this._longpressTimer = clearTimeout(this._longpressTimer);
+
+           this._touchstartEvt = null; // 重置 touchStart 事件
         }, { capture: true, passive: false });
 
         // 其他事件

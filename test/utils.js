@@ -19,12 +19,24 @@ class Touch {
 }
 
 /**
- * environment
+ * 环境准备
  */
 function env() {
   global.Touch = window.Touch = Touch;
 }
 
+/**
+ * 延迟执行后续代码
+ */
+async function sleep(timeout) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve();
+    }, timeout);
+  });
+}
+
 module.exports = {
   env,
+  sleep,
 };
