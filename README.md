@@ -27,8 +27,6 @@ npm install --save j-component
 const jComponent = require('j-component');
 ```
 
-## 接口
-
 ### behavior(definition)
 
 注册 behavior。
