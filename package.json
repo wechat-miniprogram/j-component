@@ -29,10 +29,10 @@
     "coveralls": "^3.0.2",
     "jest": "^23.5.0",
     "jsdom": "^11.12.0",
-    "webpack": "^4.17.1"
+    "webpack": "^4.26.1"
   },
   "dependencies": {
     "expr-parser": "^1.0.0",
-    "miniprogram-exparser": "latest"
+    "miniprogram-exparser": "^0.0.4"
   }
 }
