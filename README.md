@@ -15,17 +15,21 @@
 * 此框架的功能会比小程序略微弱一点。
 * 此框架不是小程序的子集，是完全独立的实现，请勿将此等价于小程序内的实现，若出现问题概不负责。
 
-## 安装并使用
+## 安装
 
 ```
 npm install --save j-component
 ```
 
+## 使用
+
 ```js
 const jComponent = require('j-component');
 ```
 
-## behavior(definition)
+## 接口
+
+### behavior(definition)
 
 注册 behavior。
 
@@ -35,11 +39,11 @@ let behavior = jComponent.behavior({
 });
 ```
 
-## register(definition)
+### register(definition)
 
 注册自定义组件，返回自定组件 id。
 
-### definition
+#### definition
 
 | 属性名 | 类型 | 描述 |
 |---|---|---|
@@ -79,32 +83,32 @@ let id = jComponent.register({
 });
 ```
 
-## create(componentId, properties)
+### create(componentId, properties)
 
 创建自定义组件实例，返回 [RootComponent](#rootcomponent)。
 
-### componentId
+#### componentId
 
-调用 [register](#register) 接口返回的 id。
+调用 [register](#registerdefinition) 接口返回的 id。
 
-### properties
+#### properties
 
 创建组件实例时，由组件接收的初始 properties 对象。
 
-## Component
+### Component
 
 组件。
 
-### 属性
+#### 属性
 
 | 属性名 | 类型 | 描述 |
 |---|---|---|
 | dom | Object | 组件实例对应的 dom 节点 |
 | data | Object | 组件实例对应的 data 对象 |
 
-### 方法
+#### 方法
 
-#### querySelector(selector)
+##### querySelector(selector)
 
 获取符合给定匹配串的第一个节点，返回 [Component](#component) 实例。
 
@@ -114,7 +118,7 @@ let id = jComponent.register({
 let childComp = comp.querySelector('#a'); // 选取组件树中的节点
 ```
 
-#### querySelectorAll(selector)
+##### querySelectorAll(selector)
 
 获取符合给定匹配串的所有节点，返回 [Component](#component) 实例列表
 
@@ -124,7 +128,7 @@ let childComp = comp.querySelector('#a'); // 选取组件树中的节点
 let childComps = comp.querySelectorAll('.a'); // 选取组件树中的节点
 ```
 
-#### setData(data, callback)
+##### setData(data, callback)
 
 调用组件实例的 setData 方法.
 
@@ -132,7 +136,7 @@ let childComps = comp.querySelectorAll('.a'); // 选取组件树中的节点
 comp.setData({ text: 'a' }, () => {}); // 相当于组件内部的 this.setData 接口
 ```
 
-#### dispatchEvent(eventName, options)
+##### dispatchEvent(eventName, options)
 
 用于模拟触发该组件实例节点上的事件。
 
@@ -151,7 +155,7 @@ comp.dispatchEvent('customevent', {
 });
 ```
 
-#### triggerLifeTime(lifeTime)
+##### triggerLifeTime(lifeTime)
 
 触发组件实例的生命周期钩子。
 
@@ -163,9 +167,9 @@ comp.triggerLifeTime('moved');
 
 根组件，继承自 [Component](#component)。
 
-### 方法
+#### 方法
 
-#### attach
+##### attach
 
 将根组件实例挂载在传入的 dom 节点上。
 
@@ -174,7 +178,7 @@ const parent = document.createElement('div')
 rootComp.attach(parent)
 ```
 
-#### detach
+##### detach
 
 将根组件实例从父亲 dom 节点上移除。
 
