@@ -20,13 +20,19 @@ function dfsExparserTree(node, callback, fromTopToBottom) {
   });
 }
 
-class ComponentNode {
+class Component {
     constructor(exparserNode) {
         this._exparserNode = exparserNode;
     }
 
     get dom() {
         return this._exparserNode.$$;
+    }
+
+    get data() {
+        let caller = exparser.Element.getMethodCaller(this._exparserNode);
+
+        return caller && caller.data;
     }
 
     /**
@@ -92,15 +98,55 @@ class ComponentNode {
             }));
         }
     }
+
+    /**
+     * 选取第一个符合的子组件节点
+     */
+    querySelector(selector) {
+        let shadowRoot = this._exparserNode.shadowRoot;
+        let selExparserNode = shadowRoot && shadowRoot.querySelector(selector);
+
+        if (selExparserNode) {
+            return selExparserNode.__componentNode__ ? selExparserNode.__componentNode__ : new Component(selExparserNode);
+        }
+    }
+
+    /**
+     * 选取所有符合的子组件节点
+     */
+    querySelectorAll(selector) {
+        let shadowRoot = this._exparserNode.shadowRoot;
+        let selExparserNodes = shadowRoot.querySelectorAll(selector) || [];
+
+        return selExparserNodes.map(selExparserNode => selExparserNode.__componentNode__ ? selExparserNode.__componentNode__ : new Component(selExparserNode));
+    }
+
+    /**
+     * 小程序自定义组件的 setData 方法
+     */
+    setData(data, callback) {
+        let caller = exparser.Element.getMethodCaller(this._exparserNode);
+
+        if (caller && typeof caller.setData === 'function') caller.setData(data);
+        if (typeof callback === 'function') callback();
+    }
+
+    /**
+     * 触发生命周期
+     */
+    triggerLifeTime(lifeTime) {
+        this._exparserNode.triggerLifeTime(lifeTime);
+    }
 }
 
-class Component {
+class RootComponent extends Component {
     constructor(componentManager, properties) {
+        super();
+
         let id = componentManager.id;
         let tagName = _.getTagName(id);
         let exparserDef = componentManager.exparserDef;
         this._exparserNode = exparser.createElement(tagName || id, exparserDef, properties); // create exparser node and render
-        this._componentManager = componentManager;
         this._isTapCancel = false;
         this._lastScrollTime = 0;
 
@@ -111,12 +157,6 @@ class Component {
 
     get dom() {
         return this._exparserNode.$$;
-    }
-
-    get data() {
-        let caller = exparser.Element.getMethodCaller(this._exparserNode);
-
-        return caller && caller.data;
     }
 
     /**
@@ -213,38 +253,6 @@ class Component {
     }
 
     /**
-     * 选取第一个符合的子组件节点
-     */
-    querySelector(selector) {
-        let shadowRoot = this._exparserNode.shadowRoot;
-        let selExparserNode = shadowRoot && shadowRoot.querySelector(selector);
-
-        if (selExparserNode) {
-            return selExparserNode.__componentNode__ ? selExparserNode.__componentNode__ : new ComponentNode(selExparserNode);
-        }
-    }
-
-    /**
-     * 选取所有符合的子组件节点
-     */
-    querySelectorAll(selector) {
-        let shadowRoot = this._exparserNode.shadowRoot;
-        let selExparserNodes = shadowRoot.querySelectorAll(selector) || [];
-
-        return selExparserNodes.map(selExparserNode => selExparserNode.__componentNode__ ? selExparserNode.__componentNode__ : new ComponentNode(selExparserNode));
-    }
-
-    /**
-     * 小程序自定义组件的 setData 方法
-     */
-    setData(data, callback) {
-        let caller = exparser.Element.getMethodCaller(this._exparserNode);
-
-        if (caller && typeof caller.setData === 'function') caller.setData(data);
-        if (typeof callback === 'function') callback();
-    }
-
-    /**
      * 添加
      */
     attach(parent) {
@@ -266,13 +274,6 @@ class Component {
 
         exparser.Element.pretendDetached(this._exparserNode);
     }
-
-    /**
-     * 触发生命周期
-     */
-    triggerLifeTime(lifeTime) {
-        this._exparserNode.triggerLifeTime(lifeTime);
-    }
 }
 
-module.exports = Component;
+module.exports = RootComponent;

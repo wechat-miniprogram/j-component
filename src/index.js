@@ -1,6 +1,6 @@
 const exparser = require('miniprogram-exparser');
 const ComponentManager = require('./componentmanager');
-const Component = require('./component');
+const RootComponent = require('./component');
 const _ = require('./utils');
 
 module.exports = {
@@ -37,6 +37,6 @@ module.exports = {
 
     if (!componentManager) return;
 
-    return new Component(componentManager, properties);
+    return new RootComponent(componentManager, properties);
   },
 };

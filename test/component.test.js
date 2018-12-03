@@ -44,7 +44,7 @@ test('register and create normal component', () => {
 
 test('querySelector', () => {
   let compaId = jComponent.register({
-    template: `<view wx:for="{{list}}">{{index + '-' + item}}</view><span><slot/></span>`,
+    template: `<view class="item" wx:for="{{list}}">{{index + '-' + item}}</view><span><slot/></span>`,
     properties: {
       list: {
         type: Array,
@@ -81,7 +81,7 @@ test('querySelector', () => {
   }), { prop: 'prop-value' });
 
   expect(comp.dom.tagName).toBe('COMPB');
-  expect(comp.dom.innerHTML).toBe('<wx-view><div>prop-value</div></wx-view><wx-view class="a" style="color: green;"><div>0</div></wx-view><wx-view><div>elif</div></wx-view><compa class="a"><wx-view><div>0-1</div></wx-view><wx-view><div>1-2</div></wx-view><span>0</span></compa>');
+  expect(comp.dom.innerHTML).toBe('<wx-view><div>prop-value</div></wx-view><wx-view class="a" style="color: green;"><div>0</div></wx-view><wx-view><div>elif</div></wx-view><compa class="a"><wx-view class="item"><div>0-1</div></wx-view><wx-view class="item"><div>1-2</div></wx-view><span>0</span></compa>');
 
   let node1List = comp.querySelectorAll('.a');
   expect(node1List.length).toBe(2);
@@ -91,7 +91,13 @@ test('querySelector', () => {
 
   let node2 = comp.querySelector('#compa');
   expect(node2.dom.tagName).toBe('COMPA');
-  expect(node2.dom.innerHTML).toBe('<wx-view><div>0-1</div></wx-view><wx-view><div>1-2</div></wx-view><span>0</span>');
+  expect(node2.dom.innerHTML).toBe('<wx-view class="item"><div>0-1</div></wx-view><wx-view class="item"><div>1-2</div></wx-view><span>0</span>');
+
+  let firstItem = node2.querySelector('.item');
+  let items = node2.querySelectorAll('.item');
+  expect(firstItem.dom.innerHTML).toBe(items[0].dom.innerHTML);
+  expect(items[0].dom.innerHTML).toBe('<div>0-1</div>');
+  expect(items[1].dom.innerHTML).toBe('<div>1-2</div>');
 });
 
 test('dispatchEvent', async () => {
@@ -255,40 +261,76 @@ test('dispatchEvent', async () => {
   let node2 = comp.querySelector('#compa');
   node2.dispatchEvent('tap');
   expect(comp.dom.innerHTML).toBe('<wx-view class="a" style="color: red;"><div>1</div></wx-view><wx-view><div>if</div></wx-view><compa><wx-view><div>0-2</div></wx-view><wx-view><div>1-3</div></wx-view><wx-view><div>2-4</div></wx-view><span>1</span></compa>');
+
+  // 其他自定义事件
+  let event = null;
+  comp.dom.addEventListener('test', evt => {
+    event = evt; 
+  });
+  comp.dispatchEvent('test');
+  expect(event.type).toBe('test');
 });
 
 test('setData', () => {
   let callbackCheck = [];
+  let childId = jComponent.register({
+    tagName: 'child',
+    template: `<view><slot/>-{{show}}</view>`,
+    data: {
+      show: 1,
+    },
+  });
   let comp = jComponent.create(jComponent.register({
-    template: `<view>{{num}}</view>`,
+    template: `<child id="a">{{num}}</child>`,
     data: {
       num: 0,
     },
+    usingComponents: {
+      'child': childId
+    },
   }));
 
-  expect(comp.dom.innerHTML).toBe('<wx-view><div>0</div></wx-view>');
+  expect(comp.dom.innerHTML).toBe('<child><wx-view><div>0-1</div></wx-view></child>');
   comp.setData({ num: 2 }, () => {
     callbackCheck.push(0);
   });
-  expect(comp.dom.innerHTML).toBe('<wx-view><div>2</div></wx-view>');
   expect(callbackCheck.length).toBe(1);
+  comp.querySelector('#a').setData({ show: 14 }, () => {
+    callbackCheck.push(0);
+  });
+  expect(callbackCheck.length).toBe(2);
+  expect(comp.dom.innerHTML).toBe('<child><wx-view><div>2-14</div></wx-view></child>');
 });
 
 test('getData', () => {
+  let childId = jComponent.register({
+    template: `<view><slot/></view>`,
+    data: {
+      show: 1,
+    },
+  });
   let comp = jComponent.create(jComponent.register({
-    template: `<view>123</view>`,
+    template: `<child id="a">123</child>`,
     data: {
       num: 0,
     },
+    usingComponents: {
+      'child': childId
+    },
   }));
 
+  const child = comp.querySelector('#a');
   expect(comp.data.num).toBe(0);
+  expect(child.data.show).toBe(1);
 
   comp.setData({ num: 2 });
   expect(comp.data.num).toBe(2);
+  expect(child.data.show).toBe(1);
 
   comp.setData({ num: 'I am a string' });
+  child.setData({ show: 'do something' });
   expect(comp.data.num).toBe('I am a string');
+  expect(child.data.show).toBe('do something');
 });
 
 test('update event', () => {
@@ -318,6 +360,24 @@ test('update event', () => {
   expect(comp.dom.innerHTML).toBe('<wx-view class="a"><div>else-1</div></wx-view>');
   comp.querySelector('.a').dispatchEvent('tap');
   expect(comp.dom.innerHTML).toBe('<wx-view class="a"><div>else-2</div></wx-view>');
+});
+
+test('attached and detached', () => {
+  let comp = jComponent.create(jComponent.register({
+    tagName: 'test',
+    template: `<div>123</div>`,
+  }));
+
+  const parent = document.createElement('div');
+
+  comp.detach(); // 未 attach，作 detach 则不作任何处理
+  expect(parent.innerHTML).toBe('');
+
+  comp.attach(parent);
+  expect(parent.innerHTML).toBe('<test><div>123</div></test>');
+
+  comp.detach();
+  expect(parent.innerHTML).toBe('');
 });
 
 test('life time', () => {
@@ -387,13 +447,14 @@ test('life time', () => {
 
   expect(parent.innerHTML).toBe('');
   comp.attach(parent);
+  comp.triggerLifeTime('moved');
   expect(parent.innerHTML).toBe('<lift-time-comp><child><grand-child><wx-view><div>123</div></wx-view></grand-child></child></lift-time-comp>');
   comp.detach();
   expect(parent.innerHTML).toBe('');
   expect(callbackCheck).toEqual([
     'grand-child-created', 'child-created', 'created',
     'attached', 'child-attached', 'grand-child-attached',
-    'grand-child-ready', 'child-ready', 'ready',
+    'grand-child-ready', 'child-ready', 'ready', 'moved',
     'grand-child-detached', 'child-detached', 'detached'
   ]);
 });
