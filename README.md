@@ -93,6 +93,10 @@ let id = jComponent.register({
 
 创建组件实例时，由组件接收的初始 properties 对象。
 
+```js
+let rootComp = jComponent.create(id);
+```
+
 ### Component
 
 组件。
@@ -163,7 +167,7 @@ comp.triggerLifeTime('moved');
 
 ### RootComponent
 
-根组件，继承自 [Component](#component)。
+根组件，继承自 [Component](#component)。亦即是说，所有 Component 支持的属性/接口，RootComponent 都支持。
 
 #### 方法
 
