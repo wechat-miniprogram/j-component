@@ -70,9 +70,9 @@ let id = jComponent.register({
     usingComponents: {
         'child': childId, // 声明要使用的组件，传入组件 id
     },
-    behaviors: [behavior], // behavior 的用法和小程序类似
+    behaviors: [behavior],
     options: {
-        classPrefix: 'xxx', // 组件样式的私有化前缀，默认是空串，即没有前缀
+        classPrefix: 'xxx',
 
         /* 其他小程序自定义组件支持的 option，比如 addGlobalClass 等 */
     },
