@@ -8,7 +8,7 @@ module.exports = {
    * 注册组件
    */
   register(definition = {}) {
-    let componentManager = new ComponentManager(definition);
+    const componentManager = new ComponentManager(definition);
 
     return componentManager.id;
   },
@@ -33,7 +33,7 @@ module.exports = {
    * 创建组件实例
    */
   create(id, properties) {
-    let componentManager = ComponentManager.get(id);
+    const componentManager = ComponentManager.get(id);
 
     if (!componentManager) return;
 

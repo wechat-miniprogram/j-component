@@ -4,7 +4,7 @@ const CONSTANT = require('./constant');
 const JNode = require('./jnode');
 const expr = require('./expr');
 const _ = require('./utils');
-const diff =require('./diff');
+const diff = require('./diff');
 const render = require('./render');
 
 const CACHE = {}; // componentManager 实例缓存
@@ -13,13 +13,13 @@ const CACHE = {}; // componentManager 实例缓存
  * 检查 if/for 语句
  */
 function filterAttrs(attrs) {
-  let statement = {};
-  let event = {};
-  let normalAttrs = [];
+  const statement = {};
+  const event = {};
+  const normalAttrs = [];
 
-  for (let attr of attrs) {
-    let name = attr.name;
-    let value = attr.value || '';
+  for (const attr of attrs) {
+    const name = attr.name;
+    const value = attr.value || '';
 
     if (name === 'wx:if') {
       statement.if = expr.getExpression(value);
@@ -36,13 +36,13 @@ function filterAttrs(attrs) {
     } else if (name === 'wx:key') {
       statement.forKey = value;
     } else {
-      let res = /^(capture-)?(bind|catch|)(?:\:)?(.*)$/ig.exec(name);
+      const res = /^(capture-)?(bind|catch|)(?::)?(.*)$/ig.exec(name);
 
       if (res[2] && res[3]) {
         // 事件绑定
-        let isCapture = !!res[1];
-        let isCatch = res[2] === 'catch';
-        let eventName = res[3];
+        const isCapture = !!res[1];
+        const isCatch = res[2] === 'catch';
+        const eventName = res[3];
 
         event[eventName] = {
           name: eventName,
@@ -98,10 +98,10 @@ class ComponentManager {
    * 解析模板
    */
   parse(template) {
-    let stack = [this.root];
-    let usingComponents = this.definition.usingComponents || {};
+    const stack = [this.root];
+    const usingComponents = this.definition.usingComponents || {};
 
-    stack.last = function() {
+    stack.last = function () {
       return this[this.length - 1];
     };
 
@@ -134,10 +134,10 @@ class ComponentManager {
           if (!componentManager) throw new Error(`component ${tagName} not found`);
         }
 
-        let { statement, event, normalAttrs } = filterAttrs(attrs);
+        const { statement, event, normalAttrs } = filterAttrs(attrs);
 
-        let parent = stack.last();
-        let node = new JNode({
+        const parent = stack.last();
+        const node = new JNode({
           type,
           tagName,
           componentId: id,
@@ -151,7 +151,7 @@ class ComponentManager {
 
         // for statement
         if (statement.for) {
-          let itemNode = new JNode({
+          const itemNode = new JNode({
             type: CONSTANT.TYPE_FORITEM,
             tagName: 'virtual',
             statement: {
@@ -164,7 +164,7 @@ class ComponentManager {
           });
           node.setParent(itemNode, 0); // 更新父节点
 
-          let forNode = new JNode({
+          const forNode = new JNode({
             type: CONSTANT.TYPE_FOR,
             tagName: 'wx:for',
             statement: {
@@ -180,7 +180,7 @@ class ComponentManager {
 
         // 条件语句
         if (statement.if || statement.elif || statement.else) {
-          let ifNode = new JNode({
+          const ifNode = new JNode({
             type: CONSTANT.TYPE_IF,
             tagName: 'wx:if',
             statement: {
@@ -203,14 +203,15 @@ class ComponentManager {
         appendNode.setParent(parent, parent.children.length); // 更新父节点
         parent.appendChild(appendNode);
       },
-      end: tagName => {
+      // eslint-disable-next-line no-unused-vars
+      end: (tagName) => {
         stack.pop();
       },
       text: content => {
         content = content.trim();
         if (!content) return;
 
-        let parent = stack.last();
+        const parent = stack.last();
         if (parent.type === CONSTANT.TYPE_WXS) {
           // wxs 节点
           parent.setWxsContent(content);
@@ -224,7 +225,7 @@ class ComponentManager {
             root: this.root,
           }));
         }
-      }
+      },
     });
 
     if (stack.length !== 1) throw new Error(`build ast error: ${template}`);
@@ -234,16 +235,16 @@ class ComponentManager {
    * 注册 exparser 组件
    */
   registerToExparser() {
-    let definition = this.definition;
-    let options = definition.options || {};
-    let usingComponents = definition.usingComponents || {};
-    let using = Object.keys(usingComponents).map(key => usingComponents[key]);
+    const definition = this.definition;
+    const options = definition.options || {};
+    const usingComponents = definition.usingComponents || {};
+    const using = Object.keys(usingComponents).map(key => usingComponents[key]);
     let methods = {};
 
     _.adjustExparserDefinition(definition);
 
-    let definitionFilter = exparser.Behavior.callDefinitionFilter(definition);
-    let exparserDef = {
+    const definitionFilter = exparser.Behavior.callDefinitionFilter(definition);
+    const exparserDef = {
       is: this.id,
       using,
       generics: [], // TODO
@@ -284,15 +285,15 @@ class ComponentManager {
       definitionFilter,
       initiator() {
         // 更新方法调用者，即自定义组件中的 this
-        let caller = Object.create(this);
+        const caller = Object.create(this);
 
         caller.data = _.copy(this.data);
         Object.keys(methods).forEach(name => caller[name] = methods[name]);
         exparser.Element.setMethodCaller(this, caller);
-      }
+      },
     };
 
-    let exparserReg = exparser.registerElement(exparserDef);
+    const exparserReg = exparser.registerElement(exparserDef);
     exparser.Behavior.prepare(exparserReg.behavior);
     methods = exparserReg.behavior.methods;
 
@@ -304,9 +305,9 @@ class ComponentManager {
  * exparser 的模板引擎封装
  */
 class TemplateEngine {
-  static create(behavior, initValues, componentOptions) {
-    let templateEngine = new TemplateEngine();
-    let data = Object.assign({}, initValues, behavior.template.data);
+  static create(behavior, initValues) {
+    const templateEngine = new TemplateEngine();
+    const data = Object.assign({}, initValues, behavior.template.data);
 
     templateEngine._data = data;
     templateEngine._generateFunc = behavior.template.func;
@@ -315,9 +316,9 @@ class TemplateEngine {
   }
 
   static collectIdMapAndSlots(exparserNode, idMap, slots) {
-    let children = exparserNode.childNodes;
+    const children = exparserNode.childNodes;
 
-    for (let child of children) {
+    for (const child of children) {
       if (child instanceof exparser.TextNode) continue;
       if (child.__id) idMap[child.__id] = child;
       if (child.__slotName !== undefined) slots[child.__slotName] = child;
@@ -330,7 +331,7 @@ class TemplateEngine {
     this._data = Object.assign(this._data, properties);
     this._vt = this._generateFunc({ data: this._data }); // 生成虚拟树
 
-    let instance = new TemplateEngineInstance();
+    const instance = new TemplateEngineInstance();
     instance._generateFunc = this._generateFunc;
     instance._vt = this._vt;
 
@@ -354,23 +355,23 @@ class TemplateEngineInstance {
    * 当遇到组件更新时，会触发此方法
    */
   updateValues(exparserNode, data, changedPaths, changedValues, changes) {
-    let newVt = this._generateFunc({ data }); // 生成新虚拟树
+    const newVt = this._generateFunc({ data }); // 生成新虚拟树
 
     // 合并到方法调用者的 data 中
     const callerData = exparser.Element.getMethodCaller(exparserNode).data;
     const hasOwnProperty = Object.prototype.hasOwnProperty;
-    for (let changeInfo of changes) {
+    for (const changeInfo of changes) {
       if (!changeInfo) continue;
 
-      let path = changeInfo[1];
-      let newData = changeInfo[2];
+      const path = changeInfo[1];
+      const newData = changeInfo[2];
       let currentData = callerData;
       let currentPath = path[0];
 
       // 检查更新路径
       for (let i = 1, len = path.length; i < len; i++) {
-        let nextPath = path[i];
-        let currentValue = currentData[currentPath];
+        const nextPath = path[i];
+        const currentValue = currentData[currentPath];
 
         if (!hasOwnProperty.call(currentData, currentPath)) {
           // 不存在，则进行初始化
@@ -387,9 +388,9 @@ class TemplateEngineInstance {
         currentPath = nextPath;
       }
 
-      let oldData = currentData[currentPath];
+      const oldData = currentData[currentPath];
       currentData[currentPath] = _.copy(newData);
-      changedValues  = [currentData[currentPath], oldData];
+      changedValues = [currentData[currentPath], oldData];
     }
 
     // 应用更新

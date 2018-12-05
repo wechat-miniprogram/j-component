@@ -7,8 +7,7 @@ module.exports = {
   getExpression(content) {
     let start = 0;
     let end = 0;
-    let length = content.length;
-    let res = [];
+    const res = [];
 
     while ((start = content.indexOf('{{', end)) >= 0) {
       let expression;
@@ -42,11 +41,13 @@ module.exports = {
       return arr;
     } if (arr.length === 1 && typeof arr[0] === 'function') {
       return arr[0](data);
-    } else {
-      return arr.map(item => {
-        if (typeof item === 'string') return item;
-        if (typeof item === 'function') return item(data);
-      }).join('')
     }
-  }
+
+    return arr.map(item => {
+      if (typeof item === 'string') return item;
+      if (typeof item === 'function') return item(data);
+
+      return '';
+    }).join('');
+  },
 };

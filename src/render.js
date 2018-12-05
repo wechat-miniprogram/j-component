@@ -8,13 +8,13 @@ const transitionKeys = ['transition', 'transitionProperty', 'transform', 'transf
  * 更新 exparser 节点的属性
  */
 function updateAttrs(exparserNode, attrs) {
-  let isComponentNode = exparserNode instanceof exparser.Component;
-  let dataProxy = exparser.Component.getDataProxy(exparserNode);
+  const isComponentNode = exparserNode instanceof exparser.Component;
+  const dataProxy = exparser.Component.getDataProxy(exparserNode);
   let needDoUpdate = false;
 
   exparserNode.dataset = exparserNode.dataset || {};
 
-  for (let { name, value } of attrs) {
+  for (const { name, value } of attrs) {
     if (name === 'id' || name === 'slot' || (isComponentNode && name === 'class')) {
       // 普通属性
       exparserNode[name] = value || '';
@@ -24,7 +24,7 @@ function updateAttrs(exparserNode, attrs) {
         let animationStyle = exparserNode.__animationStyle || {};
 
         animationStyle = transitionKeys.map(key => {
-          let styleValue = animationStyle[key.replace('webkitT', 't')];
+          const styleValue = animationStyle[key.replace('webkitT', 't')];
 
           return styleValue !== undefined ? `${key.replace(/([A-Z]{1})/g, char => `-${char.toLowerCase()}`)}:${styleValue}` : '';
         }).filter(item => !!item.trim()).join(';');
@@ -35,7 +35,7 @@ function updateAttrs(exparserNode, attrs) {
       // public 属性，延迟处理
       dataProxy.scheduleReplace([name], value);
       needDoUpdate = true;
-    } else if(/^data-/.test(name)) {
+    } else if (/^data-/.test(name)) {
       // dataset
       exparserNode.dataset[_.dashToCamelCase(name.slice(5).toLowerCase())] = value;
       exparserNode.setAttribute(name, value);
@@ -43,13 +43,13 @@ function updateAttrs(exparserNode, attrs) {
       // 动画
       if (exparserNode.$$ && value && value.actions && value.actions.length > 0) {
         let index = 0;
-        let actions = value.actions;
-        let length = value.actions.length;
-        let step = function() {
+        const actions = value.actions;
+        const length = actions.length;
+        const step = function () {
           if (index < length) {
-            let styleObject = _.animationToStyle(actions[index]);
-            let extraStyle = styleObject.style;
-            
+            const styleObject = _.animationToStyle(actions[index]);
+            const extraStyle = styleObject.style;
+
             transitionKeys.forEach(key => {
               exparserNode.$$.style[key] = styleObject[key.replace('webkitT', 't')];
             });
@@ -65,7 +65,7 @@ function updateAttrs(exparserNode, attrs) {
         exparserNode.addListener('transitionend', () => {
           index += 1;
           step();
-        })
+        });
         step();
       }
     } else if (isComponentNode && exparserNode.hasExternalClass(_.camelToDashCase(name))) {
@@ -81,7 +81,7 @@ function updateAttrs(exparserNode, attrs) {
  * 更新 exparser 节点的事件监听
  */
 function updateEvent(exparserNode, event) {
-  let convertEventTarget = (target, currentTarget) => {
+  const convertEventTarget = (target, currentTarget) => {
     if (currentTarget && (target instanceof exparser.VirtualNode) && !target.id && !Object.keys(target.dataset).length) {
       // 如果 target 是 slot 且 slot 未设置 id 和 dataset，则兼容以前的逻辑：target === currentTarget
       target = currentTarget;
@@ -96,19 +96,19 @@ function updateEvent(exparserNode, event) {
   };
 
   Object.keys(event).forEach(key => {
-    let { name, isCapture, isCatch, handler } = event[key];
+    const { name, isCapture, isCatch, handler } = event[key];
 
     if (!handler) return;
 
-    event[key].id = exparser.addListenerToElement(exparserNode, name, function(evt) {
-      let shadowRoot = exparserNode.ownerShadowRoot;
+    event[key].id = exparser.addListenerToElement(exparserNode, name, function (evt) {
+      const shadowRoot = exparserNode.ownerShadowRoot;
 
       if (shadowRoot) {
-        let host = shadowRoot.getHostNode();
-        let writeOnly = exparser.Component.getComponentOptions(host).writeOnly;
+        const host = shadowRoot.getHostNode();
+        const writeOnly = exparser.Component.getComponentOptions(host).writeOnly;
 
         if (!writeOnly) {
-          let caller = exparser.Element.getMethodCaller(host);
+          const caller = exparser.Element.getMethodCaller(host);
 
           if (typeof caller[handler] === 'function') {
             caller[handler]({
@@ -133,16 +133,17 @@ function updateEvent(exparserNode, event) {
  * 渲染成 exparser 节点
  */
 function renderExparserNode(options, shadowRootHost, shadowRoot) {
-  let type = options.type;
-  let tagName = options.tagName;
-  let componentId = options.componentId;
+  const type = options.type;
+  const tagName = options.tagName;
+  const componentId = options.componentId;
   let exparserNode;
 
   if (type === CONSTANT.TYPE_TEXT) {
     exparserNode = exparser.createTextNode(options.content); // save exparser node
   } else {
     if (type === CONSTANT.TYPE_ROOT) {
-      exparserNode = shadowRoot = exparser.ShadowRoot.create(shadowRootHost);
+      shadowRoot = exparser.ShadowRoot.create(shadowRootHost);
+      exparserNode = shadowRoot;
     } else if (type === CONSTANT.TYPE_SLOT) {
       exparserNode = exparser.VirtualNode.create(tagName);
       exparser.Element.setSlotName(exparserNode, options.slotName);
@@ -150,8 +151,8 @@ function renderExparserNode(options, shadowRootHost, shadowRoot) {
       exparserNode = exparser.VirtualNode.create(tagName);
       exparser.Element.setInheritSlots(exparserNode);
     } else {
-      let componentTagName = _.getTagName(componentId || tagName) || tagName;
-      let componentName = componentId || tagName;
+      const componentTagName = _.getTagName(componentId || tagName) || tagName;
+      const componentName = componentId || tagName;
       exparserNode = shadowRoot.createComponent(componentTagName, componentName, options.generics);
     }
 
@@ -160,10 +161,9 @@ function renderExparserNode(options, shadowRootHost, shadowRoot) {
 
     // children
     options.children.forEach(vt => {
-      let childExparserNode = renderExparserNode(vt, null, shadowRoot);
+      const childExparserNode = renderExparserNode(vt, null, shadowRoot);
       exparserNode.appendChild(childExparserNode);
     });
-
   }
 
   options.exparserNode = exparserNode; // 保存 exparser node

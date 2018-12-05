@@ -33,4 +33,4 @@ global.document = window.document;
 global.TouchEvent = window.TouchEvent;
 global.CustomEvent = window.CustomEvent;
 
-require('./component.test.js');
+require('./render.test.js');

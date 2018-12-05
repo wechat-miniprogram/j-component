@@ -193,3 +193,44 @@ test('block', () => {
 
   expect(comp.dom.innerHTML).toBe('<div>123</div>456<div>101112</div><div>0</div><div>a</div><div>1</div><div>b</div>');
 });
+
+test('animation', async () => {
+  let comp = jComponent.create(jComponent.register({
+    template: `<div id="a" animation="{{animationData}}" style="background: red; height: 100rpx; width: 100rpx;"></div>`,
+    data: {
+      animationData: {},
+    },
+    methods: {
+      animate() {
+        let animation = _.createAnimation({
+          duration: 200,
+          timingFunction: 'ease',
+        });
+
+        animation.scale(2,2).rotate(45).step();
+        animation.translate(30).step();
+        animation.width(50).step();
+
+        this.setData({
+          animationData: animation.export(),
+        });
+      },
+    }
+  }));
+
+  comp.instance.animate();
+  let a = comp.querySelector('#a');
+
+  expect(a.dom.style.cssText).toBe('background: red; height: 100px; width: 100px; transform: scale(2,2) rotate(45deg); -webkit-transition: 200ms ease 0ms; -webkit-transition-property: transform; -webkit-transform: scale(2,2) rotate(45deg); -webkit-transform-origin: 50% 50% 0;');
+
+  a.dispatchEvent('transitionend');
+  expect(a.dom.style.cssText).toBe('background: red; height: 100px; width: 100px; transform: scale(2,2) rotate(45deg) translate(30px,0px); -webkit-transition: 200ms ease 0ms; -webkit-transition-property: transform; -webkit-transform: scale(2,2) rotate(45deg) translate(30px,0px); -webkit-transform-origin: 50% 50% 0;');
+
+  a.dispatchEvent('transitionend');
+  expect(a.dom.style.cssText).toBe('background: red; height: 100px; width: 50px; transform: scale(2,2) rotate(45deg) translate(30px,0px); -webkit-transition: 200ms ease 0ms; -webkit-transition-property: transform,width; -webkit-transform: scale(2,2) rotate(45deg) translate(30px,0px); -webkit-transform-origin: 50% 50% 0;');
+
+  // 动画已结束，不再作任何变化
+  a.dispatchEvent('transitionend');
+  expect(a.dom.style.cssText).toBe('background: red; height: 100px; width: 50px; transform: scale(2,2) rotate(45deg) translate(30px,0px); -webkit-transition: 200ms ease 0ms; -webkit-transition-property: transform,width; -webkit-transform: scale(2,2) rotate(45deg) translate(30px,0px); -webkit-transform-origin: 50% 50% 0;');
+
+});

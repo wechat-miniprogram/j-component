@@ -42,6 +42,31 @@ test('register and create normal component', () => {
   expect(comp.dom.innerHTML).toBe('<wx-view><div>0-a</div></wx-view><wx-view><div>1-b</div></wx-view><span></span>');
 });
 
+test('instance', () => {
+  let data = {
+    a: 1,
+    c: 3,
+  };
+  let func = (a, b) => a + b;
+  let that = null;
+  let comp = jComponent.create(jComponent.register({
+    template: `<view class="a">123</view>`,
+    data,
+    attached() {
+      that = this;
+    },
+    methods: {
+      sum: func,
+    }
+  }));
+
+  let parent = document.createElement('div');
+  comp.attach(parent);
+  expect(comp.instance).toBe(that);
+  expect(comp.instance.data).toEqual(data);
+  expect(comp.instance.sum(95, 27)).toBe(122);
+});
+
 test('querySelector', () => {
   let compaId = jComponent.register({
     template: `<view class="item" wx:for="{{list}}">{{index + '-' + item}}</view><span><slot/></span>`,

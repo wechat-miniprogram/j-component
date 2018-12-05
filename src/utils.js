@@ -1,12 +1,10 @@
-const exparser = require('miniprogram-exparser');
-
 /**
  * 获取随机 id
  */
 let seed = +new Date();
-let charString = 'abcdefghij';
+const charString = 'abcdefghij';
 function getId(notNumber) {
-  let id = ++seed;
+  const id = ++seed;
   return notNumber ? id.toString().split('').map(item => charString[+item]).join('') : id;
 }
 
@@ -63,8 +61,85 @@ function camelToDashCase(camel) {
 /**
  * 转换动画对象为样式
  */
-function animationToStyle() {
-  // TODO
+function animationToStyle({ animates, option = {} }) {
+  const { transformOrigin, transition } = option;
+
+  if (transition === undefined || animates === undefined) {
+    return {
+      transformOrigin: '',
+      transform: '',
+      transition: '',
+    };
+  }
+
+  const addPx = value => typeof value === 'number' ? value + 'px' : value;
+  const transform = animates.filter(({ type }) => {
+    return type !== 'style';
+  }).map(({ type, args }) => {
+    switch (type) {
+      case 'matrix':
+        return `matrix(${args.join(',')})`;
+      case 'matrix3d':
+        return `matrix3d(${args.join(',')})`;
+
+      case 'rotate':
+        return `rotate(${args[0]}deg)`;
+      case 'rotate3d':
+        args[3] += 'deg';
+        return `rotate3d(${args.join(',')})`;
+      case 'rotateX':
+        return `rotateX(${args[0]}deg)`;
+      case 'rotateY':
+        return `rotateY(${args[0]}deg)`;
+      case 'rotateZ':
+        return `rotateZ(${args[0]}deg)`;
+
+      case 'scale':
+        return `scale(${args.join(',')})`;
+      case 'scale3d':
+        return `scale3d(${args.join(',')})`;
+      case 'scaleX':
+        return `scaleX(${args[0]})`;
+      case 'scaleY':
+        return `scaleY(${args[0]})`;
+      case 'scaleZ':
+        return `scaleZ(${args[0]})`;
+
+      case 'translate':
+        return `translate(${args.map(addPx).join(',')})`;
+      case 'translate3d':
+        return `translate3d(${args.map(addPx).join(',')})`;
+      case 'translateX':
+        return `translateX(${addPx(args[0])})`;
+      case 'translateY':
+        return `translateY(${addPx(args[0])})`;
+      case 'translateZ':
+        return `translateZ(${addPx(args[0])})`;
+
+      case 'skew':
+        return `skew(${args.map(value => value + 'deg').join(',')})`;
+      case 'skewX':
+        return `skewX(${args[0]}deg)`;
+      case 'skewY':
+        return `skewY(${args[0]}deg)`;
+      default:
+        return '';
+    }
+  }).join(' ');
+  const style = animates.filter(({ type }) => {
+    return type === 'style';
+  }).reduce((previous, current) => {
+    previous[current.args[0]] = current.args[1];
+    return previous;
+  }, {});
+
+  return {
+    style,
+    transformOrigin,
+    transform,
+    transitionProperty: ['transform', ...Object.keys(style)].join(','),
+    transition: `${transition.duration}ms ${transition.timingFunction} ${transition.delay}ms`,
+  };
 }
 
 /**
@@ -72,9 +147,9 @@ function animationToStyle() {
  */
 function adjustExparserDefinition(definition) {
   // 调整 properties
-  let properties = definition.properties || {};
+  const properties = definition.properties || {};
   Object.keys(properties).forEach(key => {
-    let value = properties[key];
+    const value = properties[key];
     if (value === null) {
       properties[key] = { type: null };
     } else if (value === Number || value === String || value === Boolean || value === Object || value === Array) {
@@ -93,7 +168,7 @@ function adjustExparserDefinition(definition) {
 /**
  * 存入标签名
  */
-let idTagNameMap = {};
+const idTagNameMap = {};
 function setTagName(id, tagName) {
   idTagNameMap[id] = tagName;
 }

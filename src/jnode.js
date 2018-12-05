@@ -33,13 +33,13 @@ class JNode {
    * 检查属性
    */
   checkAttrs() {
-    let type = this.type
-    let attrs = this.attrs
-    let filterAttrs = []
+    const type = this.type;
+    const attrs = this.attrs;
+    const filterAttrs = [];
 
-    for (let attr of attrs) {
-      let name = attr.name
-      let value = attr.value
+    for (const attr of attrs) {
+      const name = attr.name;
+      const value = attr.value;
 
       if (type === CONSTANT.TYPE_WXS && name === 'module') {
         // wxs 模块
@@ -79,9 +79,9 @@ class JNode {
   setWxsContent(content) {
     if (!this.wxsModuleName) return;
 
-    let func = new Function('require', 'module', content);
-    let req = () => {}; // require function
-    let mod = { exports: {} }; // modules
+    const func = new Function('require', 'module', content);
+    const req = () => {}; // require function
+    const mod = { exports: {} }; // modules
 
     func.call(null, req, mod);
 
@@ -106,7 +106,7 @@ class JNode {
    * 检查 if 语句
    */
   checkIf(data) {
-    let statement = this.statement;
+    const statement = this.statement;
 
     if (!statement.if) return true;
 
@@ -117,7 +117,7 @@ class JNode {
    * 检查 elif 语句
    */
   checkElif(data) {
-    let statement = this.statement;
+    const statement = this.statement;
 
     if (!statement.elif) return true;
 
@@ -127,8 +127,8 @@ class JNode {
   /**
    * 检查 else 语句
    */
-  checkElse(data) { 
-    let statement = this.statement;
+  checkElse(data) {
+    const statement = this.statement;
 
     if (!statement.else) return true;
 
@@ -142,10 +142,10 @@ class JNode {
     let previousSibling = this.previousSibling();
 
     while (previousSibling) {
-      let statement = previousSibling.statement;
+      const statement = previousSibling.statement;
 
       if (previousSibling.type !== CONSTANT.TYPE_IF) return false; // not if node
-      if (!statement.if && !statement.elif) return false; // not have condition statement 
+      if (!statement.if && !statement.elif) return false; // not have condition statement
       if (statement.if) return previousSibling.checkIf(data);
 
       if (statement.elif) {
@@ -164,9 +164,11 @@ class JNode {
    * 生成虚拟树
    */
   generate(options = {}) {
-    let data = options.data = options.data || {};
-    let statement = this.statement;
-    let key = options.key || '';
+    const data = options.data || {};
+    const statement = this.statement;
+    const key = options.key || '';
+
+    options.data = data;
 
     delete options.key; // 不能跨组件传递
 
@@ -179,7 +181,7 @@ class JNode {
     if (this.type === CONSTANT.TYPE_IMPORT) {
       return null;
     }
-    
+
     // 检查 template 节点
     if (this.type === CONSTANT.TYPE_TEMPLATE) {
       return null;
@@ -201,17 +203,17 @@ class JNode {
     if (this.children && this.children.length) {
       if (this.type === CONSTANT.TYPE_FOR) {
         // 检查 for 语句
-        let list = expr.calcExpression(statement.for, data);
+        const list = expr.calcExpression(statement.for, data);
         options.extra = options.extra || {};
 
         for (let i = 0, len = list.length; i < len; i++) {
-          let { forItem: bakItem, forIndex: bakIndex } = options.extra;
+          const { forItem: bakItem, forIndex: bakIndex } = options.extra;
 
           options.extra.forItem = list[i];
           options.extra.forIndex = i;
 
           this.children.forEach(node => {
-            let vt = node.generate(options);
+            const vt = node.generate(options);
             children.push(vt);
           });
 
@@ -221,8 +223,8 @@ class JNode {
       } else if (this.type === CONSTANT.TYPE_FORITEM) {
         // 检查 for 子节点
         options.extra = options.extra || {};
-        let { forItem, forIndex } = options.extra;
-        let { forItem: bakItem, forIndex: bakIndex } = data;
+        const { forItem, forIndex } = options.extra;
+        const { forItem: bakItem, forIndex: bakIndex } = data;
         data[statement.forItem] = forItem; // list item
         data[statement.forIndex] = forIndex; // list index
         if (statement.forKey) options.key = statement.forKey === '*this' ? forItem : forItem[statement.forKey]; // list key
@@ -238,14 +240,14 @@ class JNode {
     }
 
     // 过滤子节点
-    let filterChildren = [];
-    for (let child of children) {
+    const filterChildren = [];
+    for (const child of children) {
       if (!child) continue;
 
       if (child.type === CONSTANT.TYPE_BLOCK) {
         // block 节点
-        let grandChildren = child.children;
-        for (let grandChild of grandChildren) {
+        const grandChildren = child.children;
+        for (const grandChild of grandChildren) {
           filterChildren.push(grandChild);
         }
       } else {
@@ -254,8 +256,8 @@ class JNode {
     }
 
     // 检查属性
-    let attrs = [];
-    for (let { name, value } of this.attrs) {
+    const attrs = [];
+    for (const { name, value } of this.attrs) {
       attrs.push({
         name,
         value: value ? expr.calcExpression(value, data) : value,

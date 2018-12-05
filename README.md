@@ -107,6 +107,7 @@ let rootComp = jComponent.create(id);
 |---|---|---|
 | dom | Object | 组件实例对应的 dom 节点 |
 | data | Object | 组件实例对应的 data 对象 |
+| instance | Object | 组件实例中的 this，通过此字段可以访问组件实例的 methods 等定义段 |
 
 #### 方法
 
@@ -193,7 +194,6 @@ rootComp.detach()
 * template 支持
 * include 支持
 * import 支持
-* 动画支持
 * generics 支持
 * relations 和 moved 生命周期
 * 外部 wxs
