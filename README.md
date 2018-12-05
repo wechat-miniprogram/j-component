@@ -118,7 +118,7 @@ let rootComp = jComponent.create(id);
 > PS：支持 selector 同小程序自定义组件的 selectComponent 接口
 
 ```js
-let childComp = comp.querySelector('#a'); // 选取组件树中的节点
+let childComp = comp.querySelector('#a');
 ```
 
 ##### querySelectorAll(selector)
@@ -128,7 +128,7 @@ let childComp = comp.querySelector('#a'); // 选取组件树中的节点
 > PS：支持 selector 同小程序自定义组件的 selectAllComponents 接口
 
 ```js
-let childComps = comp.querySelectorAll('.a'); // 选取组件树中的节点
+let childComps = comp.querySelectorAll('.a');
 ```
 
 ##### setData(data, callback)
@@ -136,7 +136,7 @@ let childComps = comp.querySelectorAll('.a'); // 选取组件树中的节点
 调用组件实例的 setData 方法.
 
 ```js
-comp.setData({ text: 'a' }, () => {}); // 相当于组件内部的 this.setData 接口
+comp.setData({ text: 'a' }, () => {});
 ```
 
 ##### dispatchEvent(eventName, options)
@@ -177,8 +177,8 @@ comp.triggerLifeTime('moved');
 将根组件实例挂载在传入的 dom 节点上。
 
 ```js
-const parent = document.createElement('div')
-rootComp.attach(parent)
+const parent = document.createElement('div');
+rootComp.attach(parent);
 ```
 
 ##### detach
