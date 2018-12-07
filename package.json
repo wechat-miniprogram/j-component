@@ -4,9 +4,9 @@
   "description": "miniprogram custom component framework",
   "main": "index.js",
   "scripts": {
-    "test": "jest \"./test/(.*).test.js\" --silent --bail",
-    "coverage": "jest \"./test/(.*).test.js\" --coverage --bail",
-    "coveralls": "jest \"./test/(.*).test.js\" --coverage --coverageReporters=text-lcov | coveralls",
+    "test": "jest ./test/*.test.js --silent --bail",
+    "coverage": "jest ./test/*.test.js --coverage --bail",
+    "coveralls": "jest ./test/*.test.js --coverage --coverageReporters=text-lcov | coveralls",
     "lint": "eslint \"src/**/*.js\" --fix"
   },
   "jest": {
