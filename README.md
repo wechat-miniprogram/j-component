@@ -83,7 +83,7 @@ let id = jComponent.register({
 
 ### create(componentId, properties)
 
-创建自定义组件实例，返回 [RootComponent](#rootcomponent)。
+创建自定义组件实例，返回 [RootComponent](#class-rootcomponent)。
 
 #### componentId
 
@@ -97,7 +97,7 @@ let id = jComponent.register({
 let rootComp = jComponent.create(id);
 ```
 
-### Component
+### Class: Component
 
 组件。
 
@@ -113,7 +113,7 @@ let rootComp = jComponent.create(id);
 
 ##### querySelector(selector)
 
-获取符合给定匹配串的第一个节点，返回 [Component](#component) 实例。
+获取符合给定匹配串的第一个节点，返回 [Component](#class-component) 实例。
 
 > PS：支持 selector 同小程序自定义组件的 selectComponent 接口
 
@@ -123,7 +123,7 @@ let childComp = comp.querySelector('#a');
 
 ##### querySelectorAll(selector)
 
-获取符合给定匹配串的所有节点，返回 [Component](#component) 实例列表
+获取符合给定匹配串的所有节点，返回 [Component](#class-component) 实例列表
 
 > PS：支持 selector 同小程序自定义组件的 selectAllComponents 接口
 
@@ -166,9 +166,9 @@ comp.dispatchEvent('customevent', {
 comp.triggerLifeTime('moved');
 ```
 
-### RootComponent
+### Class: RootComponent
 
-根组件，继承自 [Component](#component)。亦即是说，所有 Component 支持的属性/接口，RootComponent 都支持。
+根组件，继承自 [Component](#class-component)。亦即是说，所有 Component 支持的属性/接口，RootComponent 都支持。
 
 #### 方法
 
