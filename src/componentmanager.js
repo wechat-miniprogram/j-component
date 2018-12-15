@@ -288,6 +288,16 @@ class ComponentManager {
         const caller = Object.create(this);
 
         caller.data = _.copy(this.data);
+        caller.properties = caller.data;
+        caller.selectComponent = (selector) => {
+          const exparserNode = this.shadowRoot.querySelector(selector);
+          return exparser.Element.getMethodCaller(exparserNode);
+        };
+        caller.selectAllComponents = (selector) => {
+          const exparserNodes = this.shadowRoot.querySelectorAll(selector);
+          return exparserNodes.map(item => exparser.Element.getMethodCaller(item));
+        };
+
         Object.keys(methods).forEach(name => caller[name] = methods[name]);
         exparser.Element.setMethodCaller(this, caller);
       },
