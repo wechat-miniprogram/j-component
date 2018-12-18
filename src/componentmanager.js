@@ -6,6 +6,7 @@ const expr = require('./expr');
 const _ = require('./utils');
 const diff = require('./diff');
 const render = require('./render');
+const SelectorQuery = require('./selectorquery');
 
 const CACHE = {}; // componentManager 实例缓存
 
@@ -287,15 +288,19 @@ class ComponentManager {
         // 更新方法调用者，即自定义组件中的 this
         const caller = Object.create(this);
 
+        caller._exparserNode = this; // 存入原本对应的 exparserNode 实例
         caller.data = _.copy(this.data);
         caller.properties = caller.data;
-        caller.selectComponent = (selector) => {
+        caller.selectComponent = selector => {
           const exparserNode = this.shadowRoot.querySelector(selector);
           return exparser.Element.getMethodCaller(exparserNode);
         };
-        caller.selectAllComponents = (selector) => {
+        caller.selectAllComponents = selector => {
           const exparserNodes = this.shadowRoot.querySelectorAll(selector);
           return exparserNodes.map(item => exparser.Element.getMethodCaller(item));
+        };
+        caller.createSelectorQuery = () => {
+          return new SelectorQuery(this);
         };
 
         Object.keys(methods).forEach(name => caller[name] = methods[name]);
