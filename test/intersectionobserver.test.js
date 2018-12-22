@@ -9,7 +9,7 @@ function simulateScroll(comp, scrollTop, times = 50) {
 
   for (let i = 0; i < times; i++) {
     if (i === times - 1) dom.scrollTop = scrollTop;
-    else dom.scrollTop += delta;
+    else dom.scrollTop += unit;
 
     dom.dispatchEvent(new Event('scroll', { bubbles: true, cancelable: false }));
   }
