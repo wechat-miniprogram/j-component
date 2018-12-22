@@ -37,8 +37,8 @@ class NodesRef {
 }
 
 class SelectorQuery {
-    constructor(exparserNode) {
-        this._exparserNode = exparserNode;
+    constructor(compInst) {
+        this._exparserNode = compInst && compInst._exparserNode || null;
         this._queue = [];
         this._queueCallback = [];
     }

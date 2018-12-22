@@ -1,5 +1,6 @@
 const exparser = require('miniprogram-exparser');
 const _ = require('./utils');
+const IntersectionObserver = require('./intersectionobserver');
 
 const MOVE_DELTA = 10;
 const LONGPRESS_TIME = 350;
@@ -231,6 +232,13 @@ class RootComponent extends Component {
 
     // 其他事件
     dom.addEventListener('scroll', evt => {
+      // 触发 intersectionObserver
+      const listenInfoMap = this._exparserNode._listenInfoMap || {};
+      Object.keys(listenInfoMap).forEach(key => {
+        const listenInfo = listenInfoMap[key];
+        IntersectionObserver.updateTargetIntersection(listenInfo);
+      });
+
       this._lastScrollTime = +new Date();
       this._triggerExparserEvent(evt, 'scroll');
     }, { capture: true, passive: false });

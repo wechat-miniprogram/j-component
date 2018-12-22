@@ -17,6 +17,7 @@ class Touch {
     });
   }
 }
+window.requestAnimationFrame = func => setTimeout(func, 0);
 
 /**
  * 环境准备

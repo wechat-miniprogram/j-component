@@ -7,6 +7,7 @@ const _ = require('./utils');
 const diff = require('./diff');
 const render = require('./render');
 const SelectorQuery = require('./selectorquery');
+const IntersectionObserver = require('./intersectionobserver');
 
 const CACHE = {}; // componentManager 实例缓存
 
@@ -300,7 +301,10 @@ class ComponentManager {
           return exparserNodes.map(item => exparser.Element.getMethodCaller(item));
         };
         caller.createSelectorQuery = () => {
-          return new SelectorQuery(this);
+          return new SelectorQuery(caller);
+        };
+        caller.createIntersectionObserver = (options) => {
+          return new IntersectionObserver(caller, options);
         };
 
         Object.keys(methods).forEach(name => caller[name] = methods[name]);
