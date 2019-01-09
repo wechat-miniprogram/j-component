@@ -78,7 +78,6 @@ module.exports = function (content, handler = {}) {
   parseEndTag();
 
   function parseStartTag(tag, tagName, rest, unary) {
-    tagName = tagName.toLowerCase();
     unary = !!unary;
 
     if (!unary) stack.push(tagName);
