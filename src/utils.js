@@ -158,6 +158,7 @@ function adjustExparserDefinition(definition) {
       properties[key] = {
         type: value.type === null ? null : value.type.name,
         value: value.value,
+        observer: value.observer,
       };
     }
   });
