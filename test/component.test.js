@@ -199,11 +199,13 @@ test('dispatchEvent', async () => {
 
   let node1 = comp.querySelector('.a');
   node1.dispatchEvent('tap');
+  await _.sleep(10);
   expect(eventList).toEqual([0]);
 
   // 触发 tap
   node1.dispatchEvent('touchstart');
   node1.dispatchEvent('touchend');
+  await _.sleep(10);
   expect(eventList).toEqual([0, 0]);
   expect(touchStartCount).toBe(1);
   expect(touchEndCount).toBe(1);
@@ -213,6 +215,7 @@ test('dispatchEvent', async () => {
   node1.dispatchEvent('touchmove', { touches: [{ x: 5, y: 5 }] });
   node1.dispatchEvent('touchmove', { touches: [{ x: 10, y: 10 }] });
   node1.dispatchEvent('touchend');
+  await _.sleep(10);
   expect(eventList).toEqual([0, 0]);
   expect(touchStartCount).toBe(2);
   expect(touchMoveCount).toBe(2);
@@ -222,6 +225,7 @@ test('dispatchEvent', async () => {
   node1.dispatchEvent('scroll');
   node1.dispatchEvent('touchstart');
   node1.dispatchEvent('touchend');
+  await _.sleep(10);
   expect(eventList).toEqual([0, 0]);
   expect(touchStartCount).toBe(3);
   expect(touchEndCount).toBe(3);
@@ -231,6 +235,7 @@ test('dispatchEvent', async () => {
   await _.sleep(200);
   node1.dispatchEvent('touchstart');
   node1.dispatchEvent('touchend');
+  await _.sleep(10);
   expect(eventList).toEqual([0, 0, 0]);
   expect(touchStartCount).toBe(4);
   expect(touchEndCount).toBe(4);
@@ -239,6 +244,7 @@ test('dispatchEvent', async () => {
   node1.dispatchEvent('touchstart');
   await _.sleep(400);
   node1.dispatchEvent('touchend');
+  await _.sleep(10);
   expect(eventList).toEqual([0, 0, 0]);
   expect(touchStartCount).toBe(5);
   expect(touchEndCount).toBe(5);
@@ -247,15 +253,18 @@ test('dispatchEvent', async () => {
   // touchcancel
   node1.dispatchEvent('touchstart');
   node1.dispatchEvent('touchcancel');
+  await _.sleep(10);
   expect(touchStartCount).toBe(6);
   expect(touchCancelCount).toBe(1);
 
   // blur
   node1.dispatchEvent('blur');
+  await _.sleep(10);
   expect(blurCount).toBe(1);
   node1.dispatchEvent('touchstart');
   node1.dispatchEvent('blur');
   node1.dispatchEvent('touchcancel');
+  await _.sleep(10);
   expect(touchStartCount).toBe(7);
   expect(touchCancelCount).toBe(2);
   expect(blurCount).toBe(2);
@@ -266,6 +275,7 @@ test('dispatchEvent', async () => {
   node1.dispatchEvent('touchmove');
   node1.dispatchEvent('touchend');
   node1.dispatchEvent('touchcancel');
+  await _.sleep(10);
   expect(touchStartCount).toBe(8);
   expect(touchMoveCount).toBe(3);
   expect(touchEndCount).toBe(6);
@@ -276,6 +286,7 @@ test('dispatchEvent', async () => {
   node1.dispatchEvent('touchstart', { touches: [{ x: 3, y: 3 }] });
   node1.dispatchEvent('touchmove', { touches: [{ x: 5, y: 5 }, { x: 10, y: 10 }] });
   node1.dispatchEvent('touchend', { touches: [{ x: 5, y: 5 }] });
+  await _.sleep(10);
   expect(eventList).toEqual([0, 0, 0]);
   expect(touchStartCount).toBe(10);
   expect(touchMoveCount).toBe(4);
@@ -285,6 +296,7 @@ test('dispatchEvent', async () => {
 
   let node2 = comp.querySelector('#compa');
   node2.dispatchEvent('tap');
+  await _.sleep(10);
   expect(comp.dom.innerHTML).toBe('<wx-view class="a" style="color: red;"><div>1</div></wx-view><wx-view><div>if</div></wx-view><compa><wx-view><div>0-2</div></wx-view><wx-view><div>1-3</div></wx-view><wx-view><div>2-4</div></wx-view><span>1</span></compa>');
 
   // 其他自定义事件
@@ -293,10 +305,11 @@ test('dispatchEvent', async () => {
     event = evt; 
   });
   comp.dispatchEvent('test');
+  await _.sleep(10);
   expect(event.type).toBe('test');
 });
 
-test('setData', () => {
+test('setData', async () => {
   let callbackCheck = [];
   let childId = jComponent.register({
     tagName: 'child',
@@ -319,10 +332,12 @@ test('setData', () => {
   comp.setData({ num: 2 }, () => {
     callbackCheck.push(0);
   });
+  await _.sleep(10);
   expect(callbackCheck.length).toBe(1);
   comp.querySelector('#a').setData({ show: 14 }, () => {
     callbackCheck.push(0);
   });
+  await _.sleep(10);
   expect(callbackCheck.length).toBe(2);
   expect(comp.dom.innerHTML).toBe('<child><wx-view><div>2-14</div></wx-view></child>');
 });
@@ -358,7 +373,7 @@ test('getData', () => {
   expect(child.data.show).toBe('do something');
 });
 
-test('update event', () => {
+test('update event', async () => {
   let comp = jComponent.create(jComponent.register({
     template: `
       <view class="a" wx:if="{{flag}}" bindtap="onTap">if-{{num}}</view>
@@ -380,10 +395,12 @@ test('update event', () => {
 
   expect(comp.dom.innerHTML).toBe('<wx-view class="a"><div>if-0</div></wx-view>');
   comp.querySelector('.a').dispatchEvent('tap');
+  await _.sleep(10);
   expect(comp.dom.innerHTML).toBe('<wx-view class="a"><div>if-1</div></wx-view>');
   comp.setData({ flag: false });
   expect(comp.dom.innerHTML).toBe('<wx-view class="a"><div>else-1</div></wx-view>');
   comp.querySelector('.a').dispatchEvent('tap');
+  await _.sleep(10);
   expect(comp.dom.innerHTML).toBe('<wx-view class="a"><div>else-2</div></wx-view>');
 });
 

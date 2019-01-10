@@ -288,6 +288,7 @@ class ComponentManager {
       initiator() {
         // 更新方法调用者，即自定义组件中的 this
         const caller = Object.create(this);
+        const originalSetData = caller.setData;
 
         caller._exparserNode = this; // 存入原本对应的 exparserNode 实例
         caller.data = _.copy(this.data);
@@ -306,6 +307,18 @@ class ComponentManager {
         caller.createIntersectionObserver = (options) => {
           return new IntersectionObserver(caller, options);
         };
+        caller.setData = (data, callback) => {
+          if (!originalSetData || typeof originalSetData !== 'function') return;
+
+          originalSetData.call(this, data);
+
+          if (typeof callback === 'function') {
+            // 模拟异步情况
+            setTimeout(() => {
+              callback();
+            }, 0);
+          }
+        }
 
         Object.keys(methods).forEach(name => caller[name] = methods[name]);
         exparser.Element.setMethodCaller(this, caller);

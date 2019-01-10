@@ -85,22 +85,29 @@ class Component {
         }),
       });
 
-      dom.dispatchEvent(touchEvent);
+      // 模拟异步情况
+      setTimeout(() => {
+        dom.dispatchEvent(touchEvent);
+      }, 0);
     } else {
       // 自定义事件
       const customEvent = new CustomEvent(eventName, options);
-      dom.dispatchEvent(customEvent);
 
-      exparser.Event.dispatchEvent(customEvent.target, exparser.Event.create(eventName, {}, {
-        originalEvent: customEvent,
-        bubbles: true,
-        capturePhase: true,
-        composed: true,
-        extraFields: {
-          touches: options.touches || {},
-          changedTouches: options.changedTouches || {},
-        },
-      }));
+      // 模拟异步情况
+      setTimeout(() => {
+        dom.dispatchEvent(customEvent);
+
+        exparser.Event.dispatchEvent(customEvent.target, exparser.Event.create(eventName, {}, {
+          originalEvent: customEvent,
+          bubbles: true,
+          capturePhase: true,
+          composed: true,
+          extraFields: {
+            touches: options.touches || {},
+            changedTouches: options.changedTouches || {},
+          },
+        }));
+      }, 0);
     }
   }
 
@@ -133,7 +140,12 @@ class Component {
     const caller = exparser.Element.getMethodCaller(this._exparserNode);
 
     if (caller && typeof caller.setData === 'function') caller.setData(data);
-    if (typeof callback === 'function') callback();
+    if (typeof callback === 'function') {
+      // 模拟异步情况
+      setTimeout(() => {
+        callback();
+      }, 0);
+    }
   }
 
   /**
@@ -253,16 +265,18 @@ class RootComponent extends Component {
    * 触发 exparser 节点事件
    */
   _triggerExparserEvent(evt, name, detail = {}) {
-    exparser.Event.dispatchEvent(evt.target, exparser.Event.create(name, detail, {
-      originalEvent: evt,
-      bubbles: true,
-      capturePhase: true,
-      composed: true,
-      extraFields: {
-        touches: evt.touches || {},
-        changedTouches: evt.changedTouches || {},
-      },
-    }));
+    setTimeout(() => {
+      exparser.Event.dispatchEvent(evt.target, exparser.Event.create(name, detail, {
+        originalEvent: evt,
+        bubbles: true,
+        capturePhase: true,
+        composed: true,
+        extraFields: {
+          touches: evt.touches || {},
+          changedTouches: evt.changedTouches || {},
+        },
+      }));
+    }, 0);
   }
 
   /**
