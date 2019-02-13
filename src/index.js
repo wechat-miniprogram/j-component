@@ -1,7 +1,8 @@
 const exparser = require('miniprogram-exparser');
 const ComponentManager = require('./componentmanager');
-const RootComponent = require('./component');
-const _ = require('./utils');
+const RootComponent = require('./render/component');
+const _ = require('./tool/utils');
+const CONSTANT = require('./tool/constant');
 
 module.exports = {
   /**
@@ -33,10 +34,13 @@ module.exports = {
    * 创建组件实例
    */
   create(id, properties) {
-    const componentManager = ComponentManager.get(id);
+    const componentManager = _.cache(id);
 
     if (!componentManager) return;
 
     return new RootComponent(componentManager, properties);
   },
+
+  // 常量
+  CONSTANT,
 };

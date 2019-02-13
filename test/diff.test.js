@@ -1,4 +1,4 @@
-const diff = require('../src/diff');
+const diff = require('../src/render/diff');
 
 test('diffAttrs', () => {
   expect(diff.diffAttrs([

@@ -1,236 +1,26 @@
 const exparser = require('miniprogram-exparser');
-const parse = require('./parse');
-const CONSTANT = require('./constant');
-const JNode = require('./jnode');
-const expr = require('./expr');
-const _ = require('./utils');
-const diff = require('./diff');
-const render = require('./render');
-const SelectorQuery = require('./selectorquery');
-const IntersectionObserver = require('./intersectionobserver');
-
-const CACHE = {}; // componentManager 实例缓存
-
-/**
- * 检查 if/for 语句
- */
-function filterAttrs(attrs) {
-  const statement = {};
-  const event = {};
-  const normalAttrs = [];
-
-  for (const attr of attrs) {
-    const name = attr.name;
-    const value = attr.value || '';
-
-    if (name === 'wx:if') {
-      statement.if = expr.getExpression(value);
-    } else if (name === 'wx:elif') {
-      statement.elif = expr.getExpression(value);
-    } else if (name === 'wx:else') {
-      statement.else = true;
-    } else if (name === 'wx:for') {
-      statement.for = expr.getExpression(value);
-    } else if (name === 'wx:for-item') {
-      statement.forItem = value;
-    } else if (name === 'wx:for-index') {
-      statement.forIndex = value;
-    } else if (name === 'wx:key') {
-      statement.forKey = value;
-    } else {
-      const res = /^(capture-)?(bind|catch|)(?::)?(.*)$/ig.exec(name);
-
-      if (res[2] && res[3]) {
-        // 事件绑定
-        const isCapture = !!res[1];
-        const isCatch = res[2] === 'catch';
-        const eventName = res[3];
-
-        event[eventName] = {
-          name: eventName,
-          isCapture,
-          isCatch,
-          handler: value,
-        };
-      } else {
-        // 普通属性
-        normalAttrs.push(attr);
-      }
-    }
-  }
-
-  return {
-    statement,
-    event,
-    normalAttrs,
-  };
-}
+const compile = require('./template/compile');
+const diff = require('./render/diff');
+const render = require('./render/render');
+const _ = require('./tool/utils');
+const SelectorQuery = require('./tool/selectorquery');
+const IntersectionObserver = require('./tool/intersectionobserver');
 
 class ComponentManager {
   constructor(definition) {
     this.id = definition.id || _.getId(true);
     this.isGlobal = !!definition.id; // 是否全局组件
     this.definition = definition;
-    this.root = new JNode({
-      type: CONSTANT.TYPE_ROOT,
-      componentManager: this,
-    });
 
     if (definition.tagName) _.setTagName(this.id, definition.tagName); // 保存标签名
 
     let template = definition.template;
-    if (!template || typeof template !== 'string' || !template.trim()) throw new Error('invalid template');
 
-    template = template.trim();
-    this.parse(template);
-
+    this.data = {};
+    this.generateFunc = typeof template === 'function' ? template : compile(template, this.data, definition.usingComponents || {}); // 解析编译模板
     this.exparserDef = this.registerToExparser();
 
-    CACHE[this.id] = this;
-  }
-
-  /**
-   * 根据 id 获取组件
-   */
-  static get(id) {
-    return CACHE[id];
-  }
-
-  /**
-   * 解析模板
-   */
-  parse(template) {
-    const stack = [this.root];
-    const usingComponents = this.definition.usingComponents || {};
-
-    stack.last = function () {
-      return this[this.length - 1];
-    };
-
-    parse(template, {
-      start: (tagName, attrs, unary) => {
-        let type;
-        let componentManager;
-        let id = '';
-
-        if (tagName === 'slot') {
-          type = CONSTANT.TYPE_SLOT;
-        } else if (tagName === 'template') {
-          type = CONSTANT.TYPE_TEMPLATE;
-          tagName = 'virtual';
-        } else if (tagName === 'block') {
-          type = CONSTANT.TYPE_BLOCK;
-        } else if (tagName === 'import') {
-          type = CONSTANT.TYPE_IMPORT;
-        } else if (tagName === 'include') {
-          type = CONSTANT.TYPE_INCLUDE;
-        } else if (tagName === 'wxs') {
-          type = CONSTANT.TYPE_WXS;
-        } else if (_.isHtmlTag(tagName)) {
-          type = CONSTANT.TYPE_NATIVE;
-        } else {
-          type = CONSTANT.TYPE_COMPONENT;
-          id = usingComponents[tagName];
-          componentManager = id ? ComponentManager.get(id) : ComponentManager.get(tagName);
-
-          if (!componentManager) throw new Error(`component ${tagName} not found`);
-        }
-
-        const { statement, event, normalAttrs } = filterAttrs(attrs);
-
-        const parent = stack.last();
-        const node = new JNode({
-          type,
-          tagName,
-          componentId: id,
-          attrs: normalAttrs,
-          event,
-          generics: {}, // TODO
-          componentManager,
-          root: this.root,
-        });
-        let appendNode = node;
-
-        // for statement
-        if (statement.for) {
-          const itemNode = new JNode({
-            type: CONSTANT.TYPE_FORITEM,
-            tagName: 'virtual',
-            statement: {
-              forItem: statement.forItem || 'item',
-              forIndex: statement.forIndex || 'index',
-              forKey: statement.forKey,
-            },
-            children: [node],
-            root: this.root,
-          });
-          node.setParent(itemNode, 0); // 更新父节点
-
-          const forNode = new JNode({
-            type: CONSTANT.TYPE_FOR,
-            tagName: 'wx:for',
-            statement: {
-              for: statement.for,
-            },
-            children: [itemNode],
-            root: this.root,
-          });
-          itemNode.setParent(forNode, 0); // 更新父节点
-
-          appendNode = forNode;
-        }
-
-        // 条件语句
-        if (statement.if || statement.elif || statement.else) {
-          const ifNode = new JNode({
-            type: CONSTANT.TYPE_IF,
-            tagName: 'wx:if',
-            statement: {
-              if: statement.if,
-              elif: statement.elif,
-              else: statement.else,
-            },
-            children: [node],
-            root: this.root,
-          });
-          node.setParent(ifNode, 0); // 更新父节点
-
-          appendNode = ifNode;
-        }
-
-        if (!unary) {
-          stack.push(node);
-        }
-
-        appendNode.setParent(parent, parent.children.length); // 更新父节点
-        parent.appendChild(appendNode);
-      },
-      // eslint-disable-next-line no-unused-vars
-      end: (tagName) => {
-        stack.pop();
-      },
-      text: content => {
-        content = content.trim();
-        if (!content) return;
-
-        const parent = stack.last();
-        if (parent.type === CONSTANT.TYPE_WXS) {
-          // wxs 节点
-          parent.setWxsContent(content);
-        } else {
-          parent.appendChild(new JNode({
-            type: CONSTANT.TYPE_TEXT,
-            content: content.replace(/[\n\r\t\s]+/g, ' '),
-            parent,
-            index: parent.children.length,
-            componentManager: this,
-            root: this.root,
-          }));
-        }
-      },
-    });
-
-    if (stack.length !== 1) throw new Error(`build ast error: ${template}`);
+    _.cache(this.id, this);
   }
 
   /**
@@ -251,8 +41,8 @@ class ComponentManager {
       using,
       generics: [], // TODO
       template: {
-        func: this.root.generate.bind(this.root),
-        data: this.root.data || {},
+        func: this.generateFunc,
+        data: this.data,
       },
       properties: definition.properties,
       data: definition.data,

@@ -1,7 +1,7 @@
-const CONSTANT = require('./constant');
 const expr = require('./expr');
+const CONSTANT = require('../tool/constant');
 
-class JNode {
+class VirtualNode {
   constructor(options = {}) {
     this.type = options.type;
     this.tagName = options.tagName || '';
@@ -18,7 +18,7 @@ class JNode {
     this.componentManager = options.componentManager; // 所属的 componentManager 实例
 
     // 根节点用
-    this.data = {};
+    this.data = options.data || {};
 
     // wxs 节点用
     this.wxsModuleName = '';
@@ -272,15 +272,15 @@ class JNode {
       type: this.type,
       tagName: this.tagName,
       componentId: this.componentId,
-      content,
-      key,
+      content, // 文本节点的内容
+      key, // 节点的 key，diff 用
       children: filterChildren,
       generics: this.generics,
       attrs,
       event: this.event,
-      slotName: this.slotName,
+      slotName: this.slotName, // slot 节点的 name 属性
     };
   }
 }
 
-module.exports = JNode;
+module.exports = VirtualNode;

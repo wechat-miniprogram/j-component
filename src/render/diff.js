@@ -1,6 +1,6 @@
 const exparser = require('miniprogram-exparser');
-const CONSTANT = require('./constant');
 const render = require('./render');
+const CONSTANT = require('../tool/constant');
 
 /**
  * diff 两棵虚拟树

@@ -1,6 +1,6 @@
 const exparser = require('miniprogram-exparser');
-const _ = require('./utils');
-const IntersectionObserver = require('./intersectionobserver');
+const _ = require('../tool/utils');
+const IntersectionObserver = require('../tool/intersectionobserver');
 
 const MOVE_DELTA = 10;
 const LONGPRESS_TIME = 350;

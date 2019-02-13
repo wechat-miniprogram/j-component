@@ -181,6 +181,20 @@ function getTagName(id) {
   return idTagNameMap[id];
 }
 
+/**
+ * 缓存 componentManager 实例
+ */
+const CACHE = {};
+function cache(id, instance) {
+  if (instance) {
+    // 存入缓存
+    CACHE[id] = instance;
+  } else {
+    // 取缓存
+    return CACHE[id];
+  }
+}
+
 module.exports = {
   getId,
   copy,
@@ -192,4 +206,5 @@ module.exports = {
   adjustExparserDefinition,
   setTagName,
   getTagName,
+  cache,
 };

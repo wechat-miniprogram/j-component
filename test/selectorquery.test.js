@@ -1,6 +1,6 @@
-const jComponent = require('../src/index');
 const _ = require('./utils');
-const SelectorQuery = require('../src/selectorquery');
+const jComponent = require('../src/index');
+const SelectorQuery = require('../src/tool/selectorquery');
 
 beforeAll(() => {
   _.env();

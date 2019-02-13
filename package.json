@@ -1,6 +1,6 @@
 {
   "name": "j-component",
-  "version": "1.0.7",
+  "version": "1.1.0",
   "description": "miniprogram custom component framework",
   "main": "index.js",
   "scripts": {
@@ -13,7 +13,7 @@
     "testEnvironment": "jsdom",
     "testURL": "https://jest.test",
     "collectCoverageFrom": [
-      "src/*.js"
+      "src/**/*.js"
     ]
   },
   "repository": {

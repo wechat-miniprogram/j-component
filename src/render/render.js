@@ -1,6 +1,6 @@
 const exparser = require('miniprogram-exparser');
-const CONSTANT = require('./constant');
-const _ = require('./utils');
+const CONSTANT = require('../tool/constant');
+const _ = require('../tool/utils');
 
 const transitionKeys = ['transition', 'transitionProperty', 'transform', 'transformOrigin', 'webkitTransition', 'webkitTransitionProperty', 'webkitTransform', 'webkitTransformOrigin'];
 

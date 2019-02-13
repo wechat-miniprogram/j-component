@@ -1,4 +1,4 @@
-const Expression = require('../src/expr');
+const Expression = require('../src/template/expr');
 
 test('get and calc expression', () => {
   let arr = Expression.getExpression('123-{{a + b}}-456-{{a - b}}-{{');

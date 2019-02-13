@@ -1,5 +1,5 @@
-const utils = require('../src/utils');
 const _ = require('./utils');
+const utils = require('../src/tool/utils');
 
 test('getId', () => {
     expect(typeof utils.getId()).toBe('number');

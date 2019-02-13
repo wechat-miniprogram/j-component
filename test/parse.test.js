@@ -1,4 +1,4 @@
-const parse = require('../src/parse');
+const parse = require('../src/template/parse');
 
 function getParseResult(content) {
   let startStack = [];

@@ -1,6 +1,6 @@
-const jComponent = require('../src/index');
 const _ = require('./utils');
-const IntersectionObserver = require('../src/intersectionobserver');
+const jComponent = require('../src/index');
+const IntersectionObserver = require('../src/tool/intersectionobserver');
 
 function simulateScroll(comp, scrollTop, times = 50) {
   const dom = comp.dom;
