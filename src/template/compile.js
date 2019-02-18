@@ -5,7 +5,7 @@ const _ = require('../tool/utils');
 const CONSTANT = require('../tool/constant');
 
 /**
- * 检查 if/for 语句
+ * 过滤属性
  */
 function filterAttrs(attrs) {
   const statement = {};
