@@ -1,5 +1,6 @@
 const exparser = require('miniprogram-exparser');
 const compile = require('./template/compile');
+const transform = require('./template/transform');
 const diff = require('./render/diff');
 const render = require('./render/render');
 const _ = require('./tool/utils');
@@ -17,7 +18,7 @@ class ComponentManager {
     let template = definition.template;
 
     this.data = {};
-    this.generateFunc = typeof template === 'function' ? template : compile(template, this.data, definition.usingComponents || {}); // 解析编译模板
+    this.generateFunc = typeof template === 'function' ? transform(template, definition.usingComponents || {}) : compile(template, this.data, definition.usingComponents || {}); // 解析编译模板
     this.exparserDef = this.registerToExparser();
 
     _.cache(this.id, this);

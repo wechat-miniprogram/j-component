@@ -40,7 +40,4 @@ module.exports = {
 
     return new RootComponent(componentManager, properties);
   },
-
-  // 常量
-  CONSTANT,
 };

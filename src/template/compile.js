@@ -31,20 +31,11 @@ function filterAttrs(attrs) {
     } else if (name === 'wx:key') {
       statement.forKey = value;
     } else {
-      const res = /^(capture-)?(bind|catch|)(?::)?(.*)$/ig.exec(name);
+      const eventObj = _.parseEvent(name, value);
 
-      if (res[2] && res[3]) {
+      if (eventObj) {
         // 事件绑定
-        const isCapture = !!res[1];
-        const isCatch = res[2] === 'catch';
-        const eventName = res[3];
-
-        event[eventName] = {
-          name: eventName,
-          isCapture,
-          isCatch,
-          handler: value,
-        };
+        event[eventObj.name] = eventObj;
       } else {
         // 普通属性
         normalAttrs.push(attr);

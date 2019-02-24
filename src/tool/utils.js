@@ -38,6 +38,23 @@ function isHtmlTag(tagName) {
 }
 
 /**
+ * 判断是否是小程序内置组件
+ */
+const officialTags = [
+  'view', 'scroll-view', 'swiper', 'movable-view', 'cover-view', 'cover-view',
+  'icon', 'text', 'rich-text', 'progress',
+  'button', 'checkbox', 'form', 'input', 'label', 'picker', 'picker', 'picker-view', 'radio', 'slider', 'switch', 'textarea',
+  'navigator', 'function-page-navigator',
+  'audio', 'image', 'video', 'camera', 'live-player', 'live-pusher',
+  'map',
+  'canvas',
+  'open-data', 'web-view', 'ad'
+];
+function isOfficialTag(tagName) {
+  return tags.indexOf(tagName) >= 0 || tags.indexOf(`wx-${tagName}`) >= 0;
+}
+
+/**
  * 转换 rpx 单位为 px 单位
  */
 function transformRpx(style) {
@@ -195,10 +212,32 @@ function cache(id, instance) {
   }
 }
 
+/**
+ * 解析事件语法
+ */
+function parseEvent(name, value) {
+  const res = /^(capture-)?(bind|catch|)(?::)?(.*)$/ig.exec(name);
+
+  if (res[2] && res[3]) {
+    // 事件绑定
+    const isCapture = !!res[1];
+    const isCatch = res[2] === 'catch';
+    const eventName = res[3];
+
+    return {
+      name: eventName,
+      isCapture,
+      isCatch,
+      handler: value,
+    };
+  }
+}
+
 module.exports = {
   getId,
   copy,
   isHtmlTag,
+  isOfficialTag,
   transformRpx,
   dashToCamelCase,
   camelToDashCase,
@@ -207,4 +246,5 @@ module.exports = {
   setTagName,
   getTagName,
   cache,
+  parseEvent,
 };
