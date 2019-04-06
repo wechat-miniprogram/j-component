@@ -148,6 +148,13 @@ test('dispatchEvent', async () => {
         value: [],
       }
     },
+    methods: {
+      triggerCustomA() {
+        this.triggerEvent('customa', {
+          index: 998,
+        });
+      }
+    },
   });
   let comp = jComponent.create(jComponent.register({
     template: `
@@ -155,7 +162,7 @@ test('dispatchEvent', async () => {
       <view wx:if="{{index !== 0}}">if</view>
       <view wx:elif="{{index === 0}}">elif</view>
       <view wx:else>else</view>
-      <compa id="compa" bindtap="onTap2" list="{{list}}">{{index}}</compa>
+      <compa id="compa" bindtap="onTap2" list="{{list}}" bindcustoma="onCustomA">{{index}}</compa>
     `,
     usingComponents: {
       'compa': compaId,
@@ -193,6 +200,11 @@ test('dispatchEvent', async () => {
       },
       onTouchCancel() {
         touchCancelCount++;
+      },
+      onCustomA(data) {
+        this.setData({
+          index: data.detail.index,
+        });
       },
     }
   }));
@@ -298,6 +310,11 @@ test('dispatchEvent', async () => {
   node2.dispatchEvent('tap');
   await _.sleep(10);
   expect(comp.dom.innerHTML).toBe('<wx-view class="a" style="color: red;"><div>1</div></wx-view><wx-view><div>if</div></wx-view><compa><wx-view><div>0-2</div></wx-view><wx-view><div>1-3</div></wx-view><wx-view><div>2-4</div></wx-view><span>1</span></compa>');
+
+  // 自组件事件
+  node2.instance.triggerCustomA();
+  await _.sleep(10);
+  expect(comp.dom.innerHTML).toBe('<wx-view class="a" style="color: red;"><div>998</div></wx-view><wx-view><div>if</div></wx-view><compa><wx-view><div>0-2</div></wx-view><wx-view><div>1-3</div></wx-view><wx-view><div>2-4</div></wx-view><span>998</span></compa>');
 
   // 其他自定义事件
   let event = null;
