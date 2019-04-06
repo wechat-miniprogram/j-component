@@ -109,7 +109,7 @@ class ComponentManager {
               callback();
             }, 0);
           }
-        }
+        };
 
         Object.keys(methods).forEach(name => caller[name] = methods[name]);
         exparser.Element.setMethodCaller(this, caller);

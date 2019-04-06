@@ -68,12 +68,16 @@ test('instance', () => {
 });
 
 test('querySelector', () => {
+  let observerArr = []
   let compaId = jComponent.register({
     template: `<view class="item" wx:for="{{list}}">{{index + '-' + item}}</view><span><slot/></span>`,
     properties: {
       list: {
         type: Array,
         value: [],
+        observer(newVal, oldVal) {
+          observerArr = [newVal, oldVal];
+        }
       }
     },
   });
@@ -123,6 +127,11 @@ test('querySelector', () => {
   expect(firstItem.dom.innerHTML).toBe(items[0].dom.innerHTML);
   expect(items[0].dom.innerHTML).toBe('<div>0-1</div>');
   expect(items[1].dom.innerHTML).toBe('<div>1-2</div>');
+
+  comp.setData({
+    list: [1, 2, 3],
+  });
+  expect(observerArr).toEqual([[1, 2, 3], [1, 2]]);
 });
 
 test('dispatchEvent', async () => {
