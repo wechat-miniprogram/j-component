@@ -201,9 +201,9 @@ test('dispatchEvent', async () => {
       onTouchCancel() {
         touchCancelCount++;
       },
-      onCustomA(data) {
+      onCustomA(evt) {
         this.setData({
-          index: data.detail.index,
+          index: evt.detail.index,
         });
       },
     }
