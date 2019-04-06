@@ -1,6 +1,6 @@
 {
   "name": "j-component",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "miniprogram custom component framework",
   "main": "index.js",
   "scripts": {

@@ -1,6 +1,7 @@
 const exparser = require('miniprogram-exparser');
 const _ = require('../tool/utils');
 const IntersectionObserver = require('../tool/intersectionobserver');
+const render = require('./render')
 
 const MOVE_DELTA = 10;
 const LONGPRESS_TIME = 350;
@@ -163,9 +164,16 @@ class RootComponent extends Component {
     const id = componentManager.id;
     const tagName = _.getTagName(id);
     const exparserDef = componentManager.exparserDef;
-    this._exparserNode = exparser.createElement(tagName || id, exparserDef, properties); // create exparser node and render
+    this._exparserNode = exparser.createElement(tagName || id, exparserDef); // create exparser node and render
     this._isTapCancel = false;
     this._lastScrollTime = 0;
+
+    if (properties && typeof properties === 'object') {
+      // 对齐 observer 逻辑，走 updateAttr 来更新 property
+      const propertyList = []
+      Object.keys(properties).forEach(key => propertyList.push({ name: key, value: properties[key] }))
+      render.updateAttrs(this._exparserNode, propertyList);
+    }
 
     this.parentNode = null;
 

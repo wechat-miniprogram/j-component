@@ -26,20 +26,37 @@ test('register and create global component', () => {
 
 test('register and create normal component', () => {
   let id = jComponent.register({
-    template: `<view wx:for="{{list}}">{{index + '-' + item}}</view><span><slot/></span>`,
+    template: `<view wx:for="{{list}}">{{index + '-' + item}}</view><span><slot/>{{a}}</span>`,
     properties: {
       list: {
         type: Array,
         public: true,
         value: [],
-      }
+        observer(newVal, oldVal) {
+          this.setData({
+            observerArr1: [newVal, oldVal],
+          });
+        },
+      },
+      a: {
+        type: String,
+        public: true,
+        value: '',
+        observer(newVal, oldVal) {
+          this.setData({
+            observerArr2: [newVal, oldVal],
+          });
+        },
+      },
     },
   });
-  let comp = jComponent.create(id, { list: ['a', 'b'] });
+  let comp = jComponent.create(id, { list: ['a', 'b'], a: 'test' });
 
   expect(id.length).toBe(13);
   expect(comp.dom.tagName.length).toBe(13);
-  expect(comp.dom.innerHTML).toBe('<wx-view><div>0-a</div></wx-view><wx-view><div>1-b</div></wx-view><span></span>');
+  expect(comp.dom.innerHTML).toBe('<wx-view><div>0-a</div></wx-view><wx-view><div>1-b</div></wx-view><span>test</span>');
+  expect(comp.instance.data.observerArr1).toEqual([['a', 'b'], []]);
+  expect(comp.instance.data.observerArr2).toEqual(['test', '']);
 });
 
 test('instance', () => {
