@@ -4,14 +4,17 @@
   "description": "miniprogram custom component framework",
   "main": "index.js",
   "scripts": {
-    "test": "jest ./test/*.test.js --silent --bail",
-    "coverage": "jest ./test/*.test.js --coverage --bail",
-    "coveralls": "jest ./test/*.test.js --coverage --coverageReporters=text-lcov | coveralls",
+    "test": "jest --silent --bail",
+    "coverage": "jest --coverage --bail",
+    "coveralls": "jest --coverage --coverageReporters=text-lcov | coveralls",
     "lint": "eslint \"src/**/*.js\" --fix"
   },
   "jest": {
     "testEnvironment": "jsdom",
     "testURL": "https://jest.test",
+    "testMatch": [
+      "**/test/**/*.test.js"
+    ],
     "collectCoverageFrom": [
       "src/**/*.js"
     ]
