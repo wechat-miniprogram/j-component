@@ -223,19 +223,19 @@ test('animation', async () => {
 
   await _.sleep(10);
 
-  expect(a.dom.style.cssText).toBe('background: red; height: 100px; width: 100px; transform: scale(2,2) rotate(45deg); -webkit-transition: 200ms ease 0ms; -webkit-transition-property: transform; -webkit-transform: scale(2,2) rotate(45deg); -webkit-transform-origin: 50% 50% 0;');
+  expect(a.dom.style.cssText).toBe('background: red; height: 100px; width: 100px; transition: 200ms ease 0ms; transition-property: transform; transform: scale(2,2) rotate(45deg); transform-origin: 50% 50% 0; webkit-transition: 200ms ease 0ms; webkit-transition-property: transform; webkit-transform: scale(2,2) rotate(45deg); webkit-transform-origin: 50% 50% 0;');
 
   a.dispatchEvent('transitionend');
   await _.sleep(10);
-  expect(a.dom.style.cssText).toBe('background: red; height: 100px; width: 100px; transform: scale(2,2) rotate(45deg) translate(30px,0px); -webkit-transition: 200ms ease 0ms; -webkit-transition-property: transform; -webkit-transform: scale(2,2) rotate(45deg) translate(30px,0px); -webkit-transform-origin: 50% 50% 0;');
+  expect(a.dom.style.cssText).toBe('background: red; height: 100px; width: 100px; transition: 200ms ease 0ms; transition-property: transform; transform: scale(2,2) rotate(45deg) translate(30px,0px); transform-origin: 50% 50% 0; webkit-transition: 200ms ease 0ms; webkit-transition-property: transform; webkit-transform: scale(2,2) rotate(45deg) translate(30px,0px); webkit-transform-origin: 50% 50% 0;');
 
   a.dispatchEvent('transitionend');
   await _.sleep(10);
-  expect(a.dom.style.cssText).toBe('background: red; height: 100px; width: 50px; transform: scale(2,2) rotate(45deg) translate(30px,0px); -webkit-transition: 200ms ease 0ms; -webkit-transition-property: transform,width; -webkit-transform: scale(2,2) rotate(45deg) translate(30px,0px); -webkit-transform-origin: 50% 50% 0;');
+  expect(a.dom.style.cssText).toBe('background: red; height: 100px; width: 50px; transition: 200ms ease 0ms; transition-property: transform,width; transform: scale(2,2) rotate(45deg) translate(30px,0px); transform-origin: 50% 50% 0; webkit-transition: 200ms ease 0ms; webkit-transition-property: transform,width; webkit-transform: scale(2,2) rotate(45deg) translate(30px,0px); webkit-transform-origin: 50% 50% 0;');
 
   // 动画已结束，不再作任何变化
   a.dispatchEvent('transitionend');
   await _.sleep(10);
-  expect(a.dom.style.cssText).toBe('background: red; height: 100px; width: 50px; transform: scale(2,2) rotate(45deg) translate(30px,0px); -webkit-transition: 200ms ease 0ms; -webkit-transition-property: transform,width; -webkit-transform: scale(2,2) rotate(45deg) translate(30px,0px); -webkit-transform-origin: 50% 50% 0;');
+  expect(a.dom.style.cssText).toBe('background: red; height: 100px; width: 50px; transition: 200ms ease 0ms; transition-property: transform,width; transform: scale(2,2) rotate(45deg) translate(30px,0px); transform-origin: 50% 50% 0; webkit-transition: 200ms ease 0ms; webkit-transition-property: transform,width; webkit-transform: scale(2,2) rotate(45deg) translate(30px,0px); webkit-transform-origin: 50% 50% 0;');
 
 });

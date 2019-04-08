@@ -35,7 +35,7 @@
     "eslint-config-airbnb-base": "13.1.0",
     "eslint-plugin-import": "^2.16.0",
     "jest": "^23.6.0",
-    "jsdom": "^11.12.0",
+    "jsdom": "^14.0.0",
     "miniprogram-compiler": "latest"
   },
   "dependencies": {
