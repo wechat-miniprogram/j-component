@@ -1,36 +1,37 @@
-const Expression = require('expr-parser');
+const Expression = require('expr-parser')
 
 module.exports = {
   /**
    * 获取表达式
    */
   getExpression(content) {
-    let start = 0;
-    let end = 0;
-    const res = [];
+    let start = content.indexOf('{{', end)
+    let end = 0
+    const res = []
 
-    while ((start = content.indexOf('{{', end)) >= 0) {
-      let expression;
+    while (start >= 0) {
+      let expression
 
-      res.push(content.substring(end, start)); // before
-      start += 2;
-      end = content.indexOf('}}', start);
+      res.push(content.substring(end, start)) // before
+      start += 2
+      end = content.indexOf('}}', start)
 
       if (end >= 0) {
-        expression = new Expression(content.substring(start, end));
-        end += 2;
+        expression = new Expression(content.substring(start, end))
+        end += 2
       } else {
         // without end
-        res.push(content.substring(start - 2));
-        end = content.length;
+        res.push(content.substring(start - 2))
+        end = content.length
       }
 
-      if (expression) res.push(expression.parse());
+      if (expression) res.push(expression.parse())
+      start = content.indexOf('{{', end)
     }
 
-    res.push(content.substring(end)); // after
+    res.push(content.substring(end)) // after
 
-    return res.filter(item => !!item);
+    return res.filter(item => !!item)
   },
 
   /**
@@ -38,16 +39,16 @@ module.exports = {
    */
   calcExpression(arr, data = {}) {
     if (!arr || typeof arr === 'string' || typeof arr === 'number' || typeof arr === 'boolean') {
-      return arr;
+      return arr
     } if (arr.length === 1 && typeof arr[0] === 'function') {
-      return arr[0](data);
+      return arr[0](data)
     }
 
     return arr.map(item => {
-      if (typeof item === 'string') return item;
-      if (typeof item === 'function') return item(data);
+      if (typeof item === 'string') return item
+      if (typeof item === 'function') return item(data)
 
-      return '';
-    }).join('');
+      return ''
+    }).join('')
   },
-};
+}

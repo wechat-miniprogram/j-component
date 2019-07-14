@@ -1,28 +1,28 @@
-const CONSTANT = require('../tool/constant');
-const _ = require('../tool/utils');
+const CONSTANT = require('../tool/constant')
+const _ = require('../tool/utils')
 
 /**
  * 过滤属性
  */
 function filterAttrs(attrs = {}) {
-  const event = {};
-  const normalAttrs = [];
-  let slotName = '';
+  const event = {}
+  const normalAttrs = []
+  let slotName = ''
 
-  const attrsKeyList = Object.keys(attrs);
+  const attrsKeyList = Object.keys(attrs)
 
   for (const name of attrsKeyList) {
-    const value = attrs[name] || '';
-    const eventObj = _.parseEvent(name, value);
+    const value = attrs[name] || ''
+    const eventObj = _.parseEvent(name, value)
 
     if (eventObj) {
       // 事件绑定
-      event[eventObj.name] = eventObj;
+      event[eventObj.name] = eventObj
     } else {
       // 普通属性
-      if (name === 'name') slotName = value;
+      if (name === 'name') slotName = value
 
-      normalAttrs.push({ name, value });
+      normalAttrs.push({name, value})
     }
   }
 
@@ -30,14 +30,14 @@ function filterAttrs(attrs = {}) {
     event,
     normalAttrs,
     slotName,
-  };
+  }
 }
 
 /**
  * 将 wcc 输出转化成 j-component 需要的结构
  */
 function transformCompileResTree(obj, parent, usingComponents) {
-  let node = null;
+  let node = null
 
   // 特别注意：使用 wcc 编译，不会产生 import、block、include、wxs、native（小程序不支持 div 等标签）；template 节点会当作 if 节点处理
 
@@ -54,22 +54,24 @@ function transformCompileResTree(obj, parent, usingComponents) {
       attrs: [],
       event: {},
       slotName: '', // slot 节点的 name 属性
-    };
+    }
   } else {
     // 其他节点
-    const children = [];
-    const { tag, wxKey, wxXCkey, wxVkey, attr } = obj;
-    const tagName = tag.indexOf('wx-') === 0 && (tag === 'wx-slot' || !_.isOfficialTag(tag)) ? tag.substr(3) : tag;
-    const key = wxKey !== undefined && wxKey !== null ? '' + wxKey : undefined;
-    const { event, normalAttrs, slotName } = filterAttrs(attr);
-    const isIf = wxXCkey === 1 || wxXCkey === 3;
-    const isFor = wxXCkey === 2 || wxXCkey === 4;
-    const isSlot = tagName === 'slot';
-    const isRoot = tagName === 'shadow';
-    let type = isRoot ? CONSTANT.TYPE_ROOT : isIf ? CONSTANT.TYPE_IF : isFor ? CONSTANT.TYPE_FOR : isSlot ? CONSTANT.TYPE_SLOT : CONSTANT.TYPE_COMPONENT;
+    const children = []
+    const {
+      tag, wxKey, wxXCkey, attr
+    } = obj
+    const tagName = tag.indexOf('wx-') === 0 && (tag === 'wx-slot' || !_.isOfficialTag(tag)) ? tag.substr(3) : tag
+    const key = wxKey !== undefined && wxKey !== null ? '' + wxKey : undefined
+    const {event, normalAttrs, slotName} = filterAttrs(attr)
+    const isIf = wxXCkey === 1 || wxXCkey === 3
+    const isFor = wxXCkey === 2 || wxXCkey === 4
+    const isSlot = tagName === 'slot'
+    const isRoot = tagName === 'shadow'
+    let type = isRoot ? CONSTANT.TYPE_ROOT : isIf ? CONSTANT.TYPE_IF : isFor ? CONSTANT.TYPE_FOR : isSlot ? CONSTANT.TYPE_SLOT : CONSTANT.TYPE_COMPONENT
 
     if (parent && parent.type === CONSTANT.TYPE_FOR) {
-      type = CONSTANT.TYPE_FORITEM;
+      type = CONSTANT.TYPE_FORITEM
     }
 
     node = {
@@ -83,25 +85,25 @@ function transformCompileResTree(obj, parent, usingComponents) {
       attrs: normalAttrs,
       event,
       slotName: isSlot ? slotName : '', // slot 节点的 name 属性
-    };
+    }
 
-    obj.children.forEach(child => children.push(transformCompileResTree(child, node, usingComponents)));
+    obj.children.forEach(child => children.push(transformCompileResTree(child, node, usingComponents)))
   }
 
-  return node;
+  return node
 }
 
 module.exports = function (generateFunc, usingComponents) {
   return function (options = {}) {
-    const data = options.data || {};
-    const compileRes = generateFunc(data);
+    const data = options.data || {}
+    const compileRes = generateFunc(data)
 
     if (compileRes.type !== CONSTANT.TYPE_ROOT && (compileRes.tag === 'wx-page' || compileRes.tag === 'shadow')) {
       // 进行 wcc 编译结果的转化
       compileRes.tag = 'shadow'
-      return transformCompileResTree(compileRes, null, usingComponents);
+      return transformCompileResTree(compileRes, null, usingComponents)
     } else {
-      return compileRes;
+      return compileRes
     }
   }
-};
+}

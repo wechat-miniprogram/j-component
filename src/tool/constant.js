@@ -13,4 +13,4 @@ module.exports = {
   TYPE_FOR: 20,
   TYPE_FORITEM: 21,
   TYPE_NATIVE: 22,
-};
+}

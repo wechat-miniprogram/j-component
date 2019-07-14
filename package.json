@@ -1,10 +1,10 @@
 {
   "name": "j-component",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "miniprogram custom component framework",
   "main": "index.js",
   "scripts": {
-    "test": "jest --silent --bail",
+    "test": "jest --bail",
     "coverage": "jest --coverage --bail",
     "coveralls": "jest --coverage --coverageReporters=text-lcov | coveralls",
     "lint": "eslint \"src/**/*.js\" --fix"
@@ -21,9 +21,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/JuneAndGreen/j-component.git"
+    "url": "https://github.com/wechat-miniprogram/j-component.git"
   },
-  "author": "june_01",
+  "author": "wechat-miniprogram",
   "license": "MIT",
   "devDependencies": {
     "babel-core": "^6.26.3",
@@ -33,7 +33,9 @@
     "coveralls": "^3.0.3",
     "eslint": "^5.3.0",
     "eslint-config-airbnb-base": "13.1.0",
-    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-node": "^7.0.1",
+    "eslint-plugin-promise": "^3.8.0",
     "jest": "^23.6.0",
     "jsdom": "^14.0.0",
     "miniprogram-compiler": "latest"

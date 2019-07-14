@@ -1,43 +1,42 @@
-const exparser = require('miniprogram-exparser');
-const ComponentManager = require('./componentmanager');
-const RootComponent = require('./render/component');
-const _ = require('./tool/utils');
-const CONSTANT = require('./tool/constant');
+const exparser = require('miniprogram-exparser')
+const ComponentManager = require('./componentmanager')
+const RootComponent = require('./render/component')
+const _ = require('./tool/utils')
 
 module.exports = {
   /**
    * 注册组件
    */
   register(definition = {}) {
-    const componentManager = new ComponentManager(definition);
+    const componentManager = new ComponentManager(definition)
 
-    return componentManager.id;
+    return componentManager.id
   },
 
   /**
    * 注册 behavior
    */
   behavior(definition) {
-    definition.is = _.getId(true);
+    definition.is = _.getId(true)
     definition.options = {
       lazyRegistration: true,
       publicProperties: true,
-    };
+    }
 
-    _.adjustExparserDefinition(definition);
-    exparser.registerBehavior(definition);
+    _.adjustExparserDefinition(definition)
+    exparser.registerBehavior(definition)
 
-    return definition.is;
+    return definition.is
   },
 
   /**
    * 创建组件实例
    */
   create(id, properties) {
-    const componentManager = _.cache(id);
+    const componentManager = _.cache(id)
 
-    if (!componentManager) return;
+    if (!componentManager) return
 
-    return new RootComponent(componentManager, properties);
+    return new RootComponent(componentManager, properties)
   },
-};
+}

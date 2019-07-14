@@ -1,11 +1,11 @@
 /**
  * 获取随机 id
  */
-let seed = +new Date();
-const charString = 'abcdefghij';
+let seed = +new Date()
+const charString = 'abcdefghij'
 function getId(notNumber) {
-  const id = ++seed;
-  return notNumber ? id.toString().split('').map(item => charString[+item]).join('') : id;
+  const id = ++seed
+  return notNumber ? id.toString().split('').map(item => charString[+item]).join('') : id
 }
 
 /**
@@ -13,28 +13,28 @@ function getId(notNumber) {
  */
 function copy(src) {
   if (typeof src === 'object' && src !== null) {
-    let dest;
+    let dest
 
     if (Array.isArray(src)) {
-      dest = src.map(item => copy(item));
+      dest = src.map(item => copy(item))
     } else {
-      dest = {};
-      Object.keys(src).forEach(key => dest[key] = copy(src[key]));
+      dest = {}
+      Object.keys(src).forEach(key => dest[key] = copy(src[key]))
     }
 
-    return dest;
+    return dest
   }
 
-  if (typeof src === 'symbol') return undefined;
-  return src;
+  if (typeof src === 'symbol') return undefined
+  return src
 }
 
 /**
  * 判断是否是 html 标签
  */
-const tags = ['a', 'abbr', 'address', 'area', 'article', 'aside', 'audio', 'b', 'base', 'bdi', 'bdo', 'blockquote', 'body', 'br', 'button', 'canvas', 'caption', 'cite', 'code', 'col', 'colgroup', 'data', 'datalist', 'dd', 'del', 'dfn', 'div', 'dl', 'dt', 'em', 'embed', 'fieldset', 'figcaption', 'figure', 'footer', 'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'head', 'header', 'hr', 'html', 'i', 'iframe', 'img', 'input', 'ins', 'kbd', 'keygen', 'label', 'legend', 'li', 'link', 'main', 'map', 'mark', 'meta', 'meter', 'nav', 'noscript', 'object', 'ol', 'optgroup', 'option', 'output', 'p', 'param', 'pre', 'progress', 'q', 'rb', 'rp', 'rt', 'rtc', 'ruby', 's', 'samp', 'script', 'section', 'select', 'small', 'source', 'span', 'strong', 'style', 'sub', 'sup', 'table', 'tbody', 'td', 'template', 'textarea', 'tfoot', 'th', 'thead', 'time', 'title', 'tr', 'track', 'u', 'ul', 'var', 'video', 'wbr'];
+const tags = ['a', 'abbr', 'address', 'area', 'article', 'aside', 'audio', 'b', 'base', 'bdi', 'bdo', 'blockquote', 'body', 'br', 'button', 'canvas', 'caption', 'cite', 'code', 'col', 'colgroup', 'data', 'datalist', 'dd', 'del', 'dfn', 'div', 'dl', 'dt', 'em', 'embed', 'fieldset', 'figcaption', 'figure', 'footer', 'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'head', 'header', 'hr', 'html', 'i', 'iframe', 'img', 'input', 'ins', 'kbd', 'keygen', 'label', 'legend', 'li', 'link', 'main', 'map', 'mark', 'meta', 'meter', 'nav', 'noscript', 'object', 'ol', 'optgroup', 'option', 'output', 'p', 'param', 'pre', 'progress', 'q', 'rb', 'rp', 'rt', 'rtc', 'ruby', 's', 'samp', 'script', 'section', 'select', 'small', 'source', 'span', 'strong', 'style', 'sub', 'sup', 'table', 'tbody', 'td', 'template', 'textarea', 'tfoot', 'th', 'thead', 'time', 'title', 'tr', 'track', 'u', 'ul', 'var', 'video', 'wbr']
 function isHtmlTag(tagName) {
-  return tags.indexOf(tagName) >= 0;
+  return tags.indexOf(tagName) >= 0
 }
 
 /**
@@ -49,106 +49,102 @@ const officialTags = [
   'map',
   'canvas',
   'open-data', 'web-view', 'ad'
-];
+]
 function isOfficialTag(tagName) {
-  return tags.indexOf(tagName) >= 0 || tags.indexOf(`wx-${tagName}`) >= 0;
+  return officialTags.indexOf(tagName) >= 0 || officialTags.indexOf(`wx-${tagName}`) >= 0
 }
 
 /**
  * 转换 rpx 单位为 px 单位
  */
 function transformRpx(style) {
-  return style.replace(/(\d+)rpx/ig, '$1px');
+  return style.replace(/(\d+)rpx/ig, '$1px')
 }
 
 /**
  * 转换连字符为驼峰
  */
 function dashToCamelCase(dash) {
-  return dash.replace(/-[a-z]/g, s => s[1].toUpperCase());
+  return dash.replace(/-[a-z]/g, s => s[1].toUpperCase())
 }
 
 /**
  * 转换驼峰为连字符
  */
 function camelToDashCase(camel) {
-  return camel.replace(/([A-Z])/g, '-$1').toLowerCase();
+  return camel.replace(/([A-Z])/g, '-$1').toLowerCase()
 }
 
 /**
  * 转换动画对象为样式
  */
-function animationToStyle({ animates, option = {} }) {
-  const { transformOrigin, transition } = option;
+function animationToStyle({animates, option = {}}) {
+  const {transformOrigin, transition} = option
 
   if (transition === undefined || animates === undefined) {
     return {
       transformOrigin: '',
       transform: '',
       transition: '',
-    };
+    }
   }
 
-  const addPx = value => typeof value === 'number' ? value + 'px' : value;
-  const transform = animates.filter(({ type }) => {
-    return type !== 'style';
-  }).map(({ type, args }) => {
+  const addPx = value => (typeof value === 'number' ? value + 'px' : value)
+  const transform = animates.filter(({type}) => type !== 'style').map(({type, args}) => {
     switch (type) {
       case 'matrix':
-        return `matrix(${args.join(',')})`;
+        return `matrix(${args.join(',')})`
       case 'matrix3d':
-        return `matrix3d(${args.join(',')})`;
+        return `matrix3d(${args.join(',')})`
 
       case 'rotate':
-        return `rotate(${args[0]}deg)`;
+        return `rotate(${args[0]}deg)`
       case 'rotate3d':
-        args[3] += 'deg';
-        return `rotate3d(${args.join(',')})`;
+        args[3] += 'deg'
+        return `rotate3d(${args.join(',')})`
       case 'rotateX':
-        return `rotateX(${args[0]}deg)`;
+        return `rotateX(${args[0]}deg)`
       case 'rotateY':
-        return `rotateY(${args[0]}deg)`;
+        return `rotateY(${args[0]}deg)`
       case 'rotateZ':
-        return `rotateZ(${args[0]}deg)`;
+        return `rotateZ(${args[0]}deg)`
 
       case 'scale':
-        return `scale(${args.join(',')})`;
+        return `scale(${args.join(',')})`
       case 'scale3d':
-        return `scale3d(${args.join(',')})`;
+        return `scale3d(${args.join(',')})`
       case 'scaleX':
-        return `scaleX(${args[0]})`;
+        return `scaleX(${args[0]})`
       case 'scaleY':
-        return `scaleY(${args[0]})`;
+        return `scaleY(${args[0]})`
       case 'scaleZ':
-        return `scaleZ(${args[0]})`;
+        return `scaleZ(${args[0]})`
 
       case 'translate':
-        return `translate(${args.map(addPx).join(',')})`;
+        return `translate(${args.map(addPx).join(',')})`
       case 'translate3d':
-        return `translate3d(${args.map(addPx).join(',')})`;
+        return `translate3d(${args.map(addPx).join(',')})`
       case 'translateX':
-        return `translateX(${addPx(args[0])})`;
+        return `translateX(${addPx(args[0])})`
       case 'translateY':
-        return `translateY(${addPx(args[0])})`;
+        return `translateY(${addPx(args[0])})`
       case 'translateZ':
-        return `translateZ(${addPx(args[0])})`;
+        return `translateZ(${addPx(args[0])})`
 
       case 'skew':
-        return `skew(${args.map(value => value + 'deg').join(',')})`;
+        return `skew(${args.map(value => value + 'deg').join(',')})`
       case 'skewX':
-        return `skewX(${args[0]}deg)`;
+        return `skewX(${args[0]}deg)`
       case 'skewY':
-        return `skewY(${args[0]}deg)`;
+        return `skewY(${args[0]}deg)`
       default:
-        return '';
+        return ''
     }
-  }).join(' ');
-  const style = animates.filter(({ type }) => {
-    return type === 'style';
-  }).reduce((previous, current) => {
-    previous[current.args[0]] = current.args[1];
-    return previous;
-  }, {});
+  }).join(' ')
+  const style = animates.filter(({type}) => type === 'style').reduce((previous, current) => {
+    previous[current.args[0]] = current.args[1]
+    return previous
+  }, {})
 
   return {
     style,
@@ -156,7 +152,7 @@ function animationToStyle({ animates, option = {} }) {
     transform,
     transitionProperty: ['transform', ...Object.keys(style)].join(','),
     transition: `${transition.duration}ms ${transition.timingFunction} ${transition.delay}ms`,
-  };
+  }
 }
 
 /**
@@ -164,51 +160,51 @@ function animationToStyle({ animates, option = {} }) {
  */
 function adjustExparserDefinition(definition) {
   // 调整 properties
-  const properties = definition.properties || {};
+  const properties = definition.properties || {}
   Object.keys(properties).forEach(key => {
-    const value = properties[key];
+    const value = properties[key]
     if (value === null) {
-      properties[key] = { type: null };
+      properties[key] = {type: null}
     } else if (value === Number || value === String || value === Boolean || value === Object || value === Array) {
-      properties[key] = { type: value.name };
+      properties[key] = {type: value.name}
     } else if (value.public === undefined || value.public) {
       properties[key] = {
         type: value.type === null ? null : value.type.name,
         value: value.value,
         observer: value.observer,
-      };
+      }
     }
-  });
+  })
 
-  return definition;
+  return definition
 }
 
 /**
  * 存入标签名
  */
-const idTagNameMap = {};
+const idTagNameMap = {}
 function setTagName(id, tagName) {
-  idTagNameMap[id] = tagName;
+  idTagNameMap[id] = tagName
 }
 
 /**
  * 根据 id 获取标签名
  */
 function getTagName(id) {
-  return idTagNameMap[id];
+  return idTagNameMap[id]
 }
 
 /**
  * 缓存 componentManager 实例
  */
-const CACHE = {};
+const CACHE = {}
 function cache(id, instance) {
   if (instance) {
     // 存入缓存
-    CACHE[id] = instance;
+    CACHE[id] = instance
   } else {
     // 取缓存
-    return CACHE[id];
+    return CACHE[id]
   }
 }
 
@@ -216,20 +212,20 @@ function cache(id, instance) {
  * 解析事件语法
  */
 function parseEvent(name, value) {
-  const res = /^(capture-)?(bind|catch|)(?::)?(.*)$/ig.exec(name);
+  const res = /^(capture-)?(bind|catch|)(?::)?(.*)$/ig.exec(name)
 
   if (res[2] && res[3]) {
     // 事件绑定
-    const isCapture = !!res[1];
-    const isCatch = res[2] === 'catch';
-    const eventName = res[3];
+    const isCapture = !!res[1]
+    const isCatch = res[2] === 'catch'
+    const eventName = res[3]
 
     return {
       name: eventName,
       isCapture,
       isCatch,
       handler: value,
-    };
+    }
   }
 }
 
@@ -247,4 +243,4 @@ module.exports = {
   getTagName,
   cache,
   parseEvent,
-};
+}
