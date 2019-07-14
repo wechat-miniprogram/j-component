@@ -3,7 +3,7 @@
 [![](https://img.shields.io/npm/v/j-component.svg?style=flat)](https://www.npmjs.org/package/wechat-miniprogram)
 [![](https://img.shields.io/travis/wechat-miniprogram/j-component.svg)](https://github.com/wechat-miniprogram/j-component)
 [![](https://img.shields.io/github/license/wechat-miniprogram/j-component.svg)](https://github.com/wechat-miniprogram/j-component)
-[![](https://img.shields.io/codecov/github/wechat-miniprogram/j-component.svg)](https://github.com/wechat-miniprogram/j-component)
+[![](https://img.shields.io/codecov/c/github/wechat-miniprogram/j-component.svg)](https://github.com/wechat-miniprogram/j-component)
 
 ## 简介
 
