@@ -1,9 +1,9 @@
 # j-component
 
-[![](https://img.shields.io/npm/v/j-component.svg?style=flat)](https://www.npmjs.org/package/j-component)
-[![](https://img.shields.io/travis/JuneAndGreen/j-component.svg)](https://github.com/JuneAndGreen/j-component)
-[![](https://img.shields.io/github/license/juneandgreen/j-component.svg)](https://github.com/JuneAndGreen/j-component)
-[![](https://img.shields.io/coveralls/github/JuneAndGreen/j-component.svg)](https://github.com/JuneAndGreen/j-component)
+[![](https://img.shields.io/npm/v/j-component.svg?style=flat)](https://www.npmjs.org/package/wechat-miniprogram)
+[![](https://img.shields.io/travis/wechat-miniprogram/j-component.svg)](https://github.com/wechat-miniprogram/j-component)
+[![](https://img.shields.io/github/license/wechat-miniprogram/j-component.svg)](https://github.com/wechat-miniprogram/j-component)
+[![](https://img.shields.io/coveralls/github/wechat-miniprogram/j-component.svg)](https://github.com/wechat-miniprogram/j-component)
 
 ## 简介
 
@@ -13,7 +13,7 @@
 
 * 此框架的性能比不上小程序的实现。
 * 此框架的功能会比小程序略微弱一点。
-* 此框架不是小程序的子集，是完全独立的实现，请勿将此等价于小程序内的实现，若出现问题概不负责。
+* 此框架不是小程序的子集，是完全独立的实现，请勿将此等价于小程序内的实现。
 
 ## 安装
 
