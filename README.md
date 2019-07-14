@@ -24,7 +24,7 @@ npm install --save j-component
 ## 使用
 
 ```js
-const jComponent = require('j-component');
+const jComponent = require('j-component')
 ```
 
 ### behavior(definition)
@@ -34,7 +34,7 @@ const jComponent = require('j-component');
 ```js
 let behavior = jComponent.behavior({
     /* 小程序 behavior 支持的定义段 */
-});
+})
 ```
 
 ### register(definition)
@@ -58,12 +58,12 @@ jComponent.register({
     id: 'view',
     tagName: 'wx-view',
     template: '<div><slot/></div>'
-}); 
+})
 
 let childId = jComponent.register({
     tagName: 'xxx',
     template: '<view><slot/></view>', // 直接使用全局组件
-});
+})
 
 let id = jComponent.register({
     template: '<child>123</child>',
@@ -78,7 +78,7 @@ let id = jComponent.register({
     },
 
     /* 其他小程序自定义组件支持的定义段，比如 methods 定义段等 */
-});
+})
 ```
 
 ### create(componentId, properties)
@@ -94,7 +94,7 @@ let id = jComponent.register({
 创建组件实例时，由组件接收的初始 properties 对象。
 
 ```js
-let rootComp = jComponent.create(id);
+let rootComp = jComponent.create(id)
 ```
 
 ### Class: Component
@@ -118,7 +118,7 @@ let rootComp = jComponent.create(id);
 > PS：支持 selector 同小程序自定义组件的 selectComponent 接口
 
 ```js
-let childComp = comp.querySelector('#a');
+let childComp = comp.querySelector('#a')
 ```
 
 ##### querySelectorAll(selector)
@@ -128,7 +128,7 @@ let childComp = comp.querySelector('#a');
 > PS：支持 selector 同小程序自定义组件的 selectAllComponents 接口
 
 ```js
-let childComps = comp.querySelectorAll('.a');
+let childComps = comp.querySelectorAll('.a')
 ```
 
 ##### setData(data, callback)
@@ -136,7 +136,7 @@ let childComps = comp.querySelectorAll('.a');
 调用组件实例的 setData 方法.
 
 ```js
-comp.setData({ text: 'a' }, () => {});
+comp.setData({ text: 'a' }, () => {})
 ```
 
 ##### dispatchEvent(eventName, options)
@@ -148,14 +148,14 @@ comp.setData({ text: 'a' }, () => {});
 comp.dispatchEvent('touchstart', {
   touches: [{ x: 0, y: 0 }],
   changedTouches: [{ x: 0, y: 0 }],
-});
+})
 
 // 触发组件树中的节点自定义事件
 comp.dispatchEvent('customevent', {
   touches: [{ x: 0, y: 0 }],
   changedTouches: [{ x: 0, y: 0 }],
   /* 其他 CustomEvent 构造器支持的 option */
-});
+})
 ```
 
 ##### triggerLifeTime(lifeTime)
@@ -163,7 +163,7 @@ comp.dispatchEvent('customevent', {
 触发组件实例的生命周期钩子。
 
 ```js
-comp.triggerLifeTime('moved');
+comp.triggerLifeTime('moved')
 ```
 
 ### Class: RootComponent
@@ -177,8 +177,8 @@ comp.triggerLifeTime('moved');
 将根组件实例挂载在传入的 dom 节点上。
 
 ```js
-const parent = document.createElement('div');
-rootComp.attach(parent);
+const parent = document.createElement('div')
+rootComp.attach(parent)
 ```
 
 ##### detach
