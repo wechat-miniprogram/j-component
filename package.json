@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest --bail",
     "coverage": "jest --coverage --bail",
-    "coveralls": "jest --coverage --coverageReporters=text-lcov | coveralls",
+    "codecov": "jest --coverage && codecov",
     "lint": "eslint \"src/**/*.js\" --fix"
   },
   "jest": {
@@ -30,7 +30,7 @@
     "babel-loader": "^7.1.5",
     "babel-plugin-module-resolver": "^3.2.0",
     "babel-preset-es2015": "^6.24.1",
-    "coveralls": "^3.0.3",
+    "codecov": "^3.2.0",
     "eslint": "^5.3.0",
     "eslint-config-airbnb-base": "13.1.0",
     "eslint-plugin-import": "^2.14.0",
