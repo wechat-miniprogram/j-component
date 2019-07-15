@@ -5,8 +5,8 @@ module.exports = {
    * 获取表达式
    */
   getExpression(content) {
-    let start = content.indexOf('{{', end)
     let end = 0
+    let start = content.indexOf('{{', end)
     const res = []
 
     while (start >= 0) {
