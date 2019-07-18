@@ -42,6 +42,6 @@
   },
   "dependencies": {
     "expr-parser": "^1.0.0",
-    "miniprogram-exparser": "latest"
+    "miniprogram-exparser": "0.0.6"
   }
 }

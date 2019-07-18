@@ -182,8 +182,8 @@ class TemplateEngineInstance {
     for (const changeInfo of changes) {
       if (!changeInfo) continue
 
-      const path = changeInfo[1]
-      const newData = changeInfo[2]
+      const path = changeInfo[0]
+      const newData = changeInfo[1]
       let currentData = callerData
       let currentPath = path[0]
 
