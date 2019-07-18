@@ -75,6 +75,7 @@ class ComponentManager {
       },
       lifetimes: definition.lifetimes,
       pageLifetimes: definition.pageLifetimes,
+      observers: definition.observers,
       definitionFilter,
       initiator() {
         // 更新方法调用者，即自定义组件中的 this
