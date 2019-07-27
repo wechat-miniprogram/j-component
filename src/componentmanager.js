@@ -83,7 +83,7 @@ class ComponentManager {
         const originalSetData = caller.setData
 
         caller._exparserNode = this // 存入原本对应的 exparserNode 实例
-        caller.data = _.copy(this.data)
+        caller.data = this.data
         caller.properties = caller.data
         caller.selectComponent = selector => {
           const exparserNode = this.shadowRoot.querySelector(selector)
