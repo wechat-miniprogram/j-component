@@ -205,7 +205,8 @@ test('dispatchEvent', async () => {
       onBlur() {
         blurCount++;
       },
-      onTap2() {
+      onTap2(e) {
+        expect(e.detail.userInfo.nickName).toBe('hello');
         this.setData({
           index: ++this.data.index,
           'styleObject.style': 'color: red;',
@@ -333,7 +334,7 @@ test('dispatchEvent', async () => {
   expect(longPressCount).toBe(1);
 
   let node2 = comp.querySelector('#compa');
-  node2.dispatchEvent('tap');
+  node2.dispatchEvent('tap', { detail: { userInfo: { nickName: 'hello' } } });
   await _.sleep(10);
   expect(comp.dom.innerHTML).toBe('<wx-view class="a" style="color: red;"><div>1</div></wx-view><wx-view><div>if</div></wx-view><compa><wx-view><div>0-2</div></wx-view><wx-view><div>1-3</div></wx-view><wx-view><div>2-4</div></wx-view><span>1</span></compa>');
 
@@ -345,7 +346,7 @@ test('dispatchEvent', async () => {
   // 其他自定义事件
   let event = null;
   comp.dom.addEventListener('test', evt => {
-    event = evt; 
+    event = evt;
   });
   comp.dispatchEvent('test');
   await _.sleep(10);
