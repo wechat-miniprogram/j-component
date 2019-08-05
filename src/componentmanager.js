@@ -34,6 +34,18 @@ class ComponentManager {
     const using = Object.keys(usingComponents).map(key => usingComponents[key])
     let methods = {}
 
+    definition.behaviors = definition.behaviors || []
+    definition.behaviors = definition.behaviors.map((item) => {
+      // 支持内置 behavior
+      if (item === 'wx://form-field') {
+        return global.wxFormField
+      }
+
+      return item
+    })
+
+    // console.log(definition.behaviors)
+
     _.adjustExparserDefinition(definition)
 
     const definitionFilter = exparser.Behavior.callDefinitionFilter(definition)
