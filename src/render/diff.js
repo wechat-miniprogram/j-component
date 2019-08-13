@@ -51,7 +51,7 @@ function diffVt(oldVt, newVt) {
       // 检查子节点
       const oldChildren = oldVt.children
       const newChildren = newVt.children
-      const diffs = oldVt.type === CONSTANT.TYPE_IF || oldVt.type === CONSTANT.TYPE_FOR || oldVt.type === CONSTANT.TYPE_FORITEM ? diffList(oldChildren, newChildren) : {children: newChildren, moves: null} // only statement need diff
+      const diffs = oldVt.type === CONSTANT.TYPE_IF || oldVt.type === CONSTANT.TYPE_FOR || oldVt.type === CONSTANT.TYPE_FORITEM || oldVt.type === CONSTANT.TYPE_ROOT ? diffList(oldChildren, newChildren) : {children: newChildren, moves: null} // only statement need diff
 
       // diff 子节点树
       for (let i = 0, len = oldChildren.length; i < len; i++) {
