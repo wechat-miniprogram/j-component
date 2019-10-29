@@ -40,3 +40,15 @@ module.exports = {
     return new RootComponent(componentManager, properties)
   },
 }
+
+global.wxFormField = module.exports.behavior({
+  id: 'wx://form-field',
+  properties: {
+    name: {
+      type: String
+    },
+    value: {
+      type: null
+    }
+  }
+})
