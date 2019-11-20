@@ -94,7 +94,7 @@ class Component {
       setTimeout(() => {
         dom.dispatchEvent(customEvent)
 
-        exparser.Event.dispatchEvent(customEvent.target, exparser.Event.create(eventName, options.detail || {}, {
+        if (customEvent.target.__wxElement) exparser.Event.dispatchEvent(customEvent.target.__wxElement, exparser.Event.create(eventName, options.detail || {}, {
           originalEvent: customEvent,
           bubbles: true,
           capturePhase: true,

@@ -358,6 +358,14 @@ test('dispatchEvent', async () => {
   await _.sleep(10)
   expect(comp.dom.innerHTML).toBe('<wx-view class="a" style="color: red;"><div>998</div></wx-view><wx-view><div>if</div></wx-view><compa><wx-view><div>0-2</div></wx-view><wx-view><div>1-3</div></wx-view><wx-view><div>2-4</div></wx-view><span>998</span></compa>')
 
+  node2.instance.triggerEvent('customa', {index: 999});
+  await _.sleep(10)
+  expect(comp.dom.innerHTML).toBe('<wx-view class="a" style="color: red;"><div>999</div></wx-view><wx-view><div>if</div></wx-view><compa><wx-view><div>0-2</div></wx-view><wx-view><div>1-3</div></wx-view><wx-view><div>2-4</div></wx-view><span>999</span></compa>')
+
+  node2.dispatchEvent('customa', {detail: {index: 990}});
+  await _.sleep(10)
+  expect(comp.dom.innerHTML).toBe('<wx-view class="a" style="color: red;"><div>990</div></wx-view><wx-view><div>if</div></wx-view><compa><wx-view><div>0-2</div></wx-view><wx-view><div>1-3</div></wx-view><wx-view><div>2-4</div></wx-view><span>990</span></compa>')
+
   // 其他自定义事件
   let event = null
   comp.dom.addEventListener('test', evt => {
