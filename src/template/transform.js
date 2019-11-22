@@ -12,7 +12,7 @@ function filterAttrs(attrs = {}) {
   const attrsKeyList = Object.keys(attrs)
 
   for (const name of attrsKeyList) {
-    const value = attrs[name] || ''
+    const value = attrs[name] === undefined ? '' : attrs[name]
     const eventObj = _.parseEvent(name, value)
 
     if (eventObj) {
