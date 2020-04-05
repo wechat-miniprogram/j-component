@@ -52,3 +52,15 @@ global.wxFormField = module.exports.behavior({
     }
   }
 })
+
+global.wxFormFieldButton = module.exports.behavior({
+  is: 'wx://form-field-button',
+  listeners: {
+    formSubmit(data) {
+      this.triggerEvent('formSubmit', data, {bubbles: true})
+    },
+    formReset(data) {
+      this.triggerEvent('formReset', data, {bubbles: true})
+    },
+  }
+})

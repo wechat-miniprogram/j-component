@@ -40,11 +40,12 @@ class ComponentManager {
       if (item === 'wx://form-field') {
         return global.wxFormField
       }
+      if (item === 'wx://form-field-button') {
+        return global.wxFormFieldButton
+      }
 
       return item
     })
-
-    // console.log(definition.behaviors)
 
     _.adjustExparserDefinition(definition)
 
