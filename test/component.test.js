@@ -568,6 +568,28 @@ test('life time', () => {
   ])
 })
 
+test('wx://component-export', () => {
+  const compaId = jComponent.register({
+    template: '<view>123</view>',
+    behaviors: ['wx://component-export'],
+    export() {
+      return {myField: 'myValue'}
+    },
+  })
+  const comp = jComponent.create(jComponent.register({
+    tagName: 'compb',
+    template: `
+      <view>header</view>
+      <compa id="compa"></compa>
+      <view>footer</view>
+    `,
+    usingComponents: {
+      compa: compaId,
+    },
+  }))
+  expect(comp.instance.selectComponent('#compa')).toEqual({myField: 'myValue'})
+})
+
 test('error', () => {
   let catchErr = null
   try {

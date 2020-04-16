@@ -64,3 +64,18 @@ global.wxFormFieldButton = module.exports.behavior({
     },
   }
 })
+
+global.wxComponentExport = module.exports.behavior({
+  is: 'wx://component-export',
+  definitionFilter(def) {
+    if (typeof def.export === 'function') {
+      if (typeof def.methods === 'object') {
+        def.methods.__export__ = def.export
+      } else {
+        def.methods = {
+          __export__: def.export,
+        }
+      }
+    }
+  }
+})

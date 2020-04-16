@@ -141,16 +141,16 @@ function renderExparserNode(options, shadowRootHost, shadowRoot) {
   let exparserNode
 
   if (type === CONSTANT.TYPE_TEXT) {
-    exparserNode = exparser.createTextNode(options.content) // save exparser node
+    exparserNode = shadowRoot.createTextNode(options.content) // save exparser node
   } else {
     if (type === CONSTANT.TYPE_ROOT) {
       shadowRoot = exparser.ShadowRoot.create(shadowRootHost)
       exparserNode = shadowRoot
     } else if (type === CONSTANT.TYPE_SLOT) {
-      exparserNode = exparser.VirtualNode.create(tagName)
+      exparserNode = shadowRoot.createVirtualNode(tagName)
       exparser.Element.setSlotName(exparserNode, options.slotName)
     } else if (type === CONSTANT.TYPE_TEMPLATE || type === CONSTANT.TYPE_IF || type === CONSTANT.TYPE_FOR || type === CONSTANT.TYPE_FORITEM) {
-      exparserNode = exparser.VirtualNode.create(tagName)
+      exparserNode = shadowRoot.createVirtualNode(tagName)
       exparser.Element.setInheritSlots(exparserNode)
     } else {
       const componentTagName = _.getTagName(componentId || tagName) || tagName

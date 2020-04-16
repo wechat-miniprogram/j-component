@@ -37,6 +37,9 @@ class ComponentManager {
     definition.behaviors = definition.behaviors || []
     definition.behaviors = definition.behaviors.map((item) => {
       // 支持内置 behavior
+      if (item === 'wx://component-export') {
+        return global.wxComponentExport
+      }
       if (item === 'wx://form-field') {
         return global.wxFormField
       }
@@ -94,17 +97,26 @@ class ComponentManager {
         // 更新方法调用者，即自定义组件中的 this
         const caller = Object.create(this)
         const originalSetData = caller.setData
+        const getSelectComponentResult = selected => {
+          const selectedFilter = exparser.Component.getMethod(selected, '__export__')
+          const defaultResult = exparser.Element.getMethodCaller(selected)
+          if (selectedFilter) {
+            const res = selectedFilter.call(exparser.Element.getMethodCaller(selected), caller)
+            return res === undefined ? defaultResult : res
+          }
+          return defaultResult
+        }
 
         caller._exparserNode = this // 存入原本对应的 exparserNode 实例
         caller.data = this.data
         caller.properties = caller.data
         caller.selectComponent = selector => {
           const exparserNode = this.shadowRoot.querySelector(selector)
-          return exparser.Element.getMethodCaller(exparserNode)
+          return getSelectComponentResult(exparserNode)
         }
         caller.selectAllComponents = selector => {
           const exparserNodes = this.shadowRoot.querySelectorAll(selector)
-          return exparserNodes.map(item => exparser.Element.getMethodCaller(item))
+          return exparserNodes.map(item => getSelectComponentResult(item))
         }
         caller.createSelectorQuery = () => new SelectorQuery(caller)
         caller.createIntersectionObserver = (options) => new IntersectionObserver(caller, options)

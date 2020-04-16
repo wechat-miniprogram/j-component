@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest --bail",
+    "test-debug": "node --inspect-brk ./node_modules/jest/bin/jest.js --runInBand --bail",
     "coverage": "jest --coverage --bail",
     "codecov": "jest --coverage && codecov",
     "lint": "eslint \"src/**/*.js\" --fix"
@@ -42,6 +43,6 @@
   },
   "dependencies": {
     "expr-parser": "^1.0.0",
-    "miniprogram-exparser": "0.0.6"
+    "miniprogram-exparser": "2.10.4"
   }
 }
