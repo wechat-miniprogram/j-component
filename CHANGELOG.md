@@ -1,5 +1,10 @@
 # 更新日志
 
+## 1.2.0
+
+* 支持内置 behavior wx://component-export
+* 更新 exparser 版本为 2.10.4
+
 ## 1.1.11
 
 * 支持内置 behavior wx://form-field-button
