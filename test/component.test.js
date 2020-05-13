@@ -617,3 +617,23 @@ test('error', () => {
 
   expect(jComponent.create(123456)).toBe(undefined)
 })
+
+test('toJSON', () => {
+  const comp = jComponent.create(jComponent.register({
+    tagName: 'test',
+    data: {
+      value: '123',
+      text: 'foo',
+    },
+    methods: {
+      onInput(e) { console.log(e) }
+    },
+    template: `
+      <view class="te">
+        <input name="password" value="{{value}}" bindinput="onInput"></input>
+        <view>hello {{text}}</view>
+      </view>
+    `
+  }))
+  expect(comp.toJSON()).toMatchSnapshot()
+})

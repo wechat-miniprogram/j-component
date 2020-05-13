@@ -1,6 +1,7 @@
 const exparser = require('miniprogram-exparser')
 const _ = require('../tool/utils')
 const IntersectionObserver = require('../tool/intersectionobserver')
+const CONSTANT = require('../tool/constant')
 const render = require('./render')
 
 const MOVE_DELTA = 10
@@ -20,6 +21,36 @@ function dfsExparserTree(node, callback, fromTopToBottom) {
   node.childNodes.forEach(child => {
     if (child instanceof exparser.Element) dfsExparserTree(child, callback, fromTopToBottom)
   })
+}
+
+/**
+ * 将 exparser 树转换为 JSON 对象
+ */
+function exparserTreeToJSON(node) {
+  const _inner = (node, array) => {
+    let children = array
+    const vt = node._vt
+
+    if (vt) {
+      if (vt.type === CONSTANT.TYPE_TEXT) {
+        array.push(vt.content)
+      } else if (vt.type === CONSTANT.TYPE_NATIVE) {
+        children = []
+        array.push({
+          tagName: vt.tagName,
+          event: vt.event,
+          attrs: vt.attrs,
+          children,
+        })
+      }
+    }
+
+    (node.__wxSlotChildren || []).forEach(child => _inner(child, children))
+
+    return array
+  }
+
+  return _inner(node, [])
 }
 
 class Component {
@@ -150,6 +181,13 @@ class Component {
    */
   triggerLifeTime(lifeTime) {
     this._exparserNode.triggerLifeTime(lifeTime)
+  }
+
+  /**
+   * 生成JSON
+   */
+  toJSON() {
+    return exparserTreeToJSON(this._exparserNode)
   }
 }
 
