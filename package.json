@@ -3,6 +3,7 @@
   "version": "1.2.0",
   "description": "miniprogram custom component framework",
   "main": "index.js",
+  "types": "index.d.ts",
   "scripts": {
     "test": "jest --bail",
     "test-debug": "node --inspect-brk ./node_modules/jest/bin/jest.js --runInBand --bail",
@@ -43,6 +44,7 @@
   },
   "dependencies": {
     "expr-parser": "^1.0.0",
+    "miniprogram-api-typings": "^2.10.4",
     "miniprogram-exparser": "2.10.4"
   }
 }
