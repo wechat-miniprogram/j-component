@@ -169,6 +169,7 @@ function renderExparserNode(options, shadowRootHost, shadowRoot) {
   }
 
   options.exparserNode = exparserNode // 保存 exparser node
+  exparserNode._vt = options
 
   return exparserNode
 }

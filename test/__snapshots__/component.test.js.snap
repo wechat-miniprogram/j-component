@@ -1,0 +1,44 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`toJSON 1`] = `
+Array [
+  Object {
+    "attrs": Array [],
+    "children": Array [
+      Object {
+        "attrs": Array [
+          Object {
+            "name": "name",
+            "value": "password",
+          },
+          Object {
+            "name": "value",
+            "value": "123",
+          },
+        ],
+        "children": Array [],
+        "event": Object {
+          "input": Object {
+            "handler": "onInput",
+            "id": 1,
+            "isCapture": false,
+            "isCatch": false,
+            "name": "input",
+          },
+        },
+        "tagName": "input",
+      },
+      Object {
+        "attrs": Array [],
+        "children": Array [
+          "hello foo",
+        ],
+        "event": Object {},
+        "tagName": "div",
+      },
+    ],
+    "event": Object {},
+    "tagName": "div",
+  },
+]
+`;
