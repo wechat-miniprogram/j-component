@@ -1,5 +1,10 @@
 # 更新日志
 
+## 1.2.1
+
+* 支持 Component.prototype.toJSON
+* 添加 typescript 类型声明
+
 ## 1.2.0
 
 * 支持内置 behavior wx://component-export

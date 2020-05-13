@@ -1,9 +1,13 @@
 {
   "name": "j-component",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "miniprogram custom component framework",
   "main": "index.js",
   "types": "index.d.ts",
+  "files": [
+    "src",
+    "index.d.ts"
+  ],
   "scripts": {
     "test": "jest --bail",
     "test-debug": "node --inspect-brk ./node_modules/jest/bin/jest.js --runInBand --bail",
