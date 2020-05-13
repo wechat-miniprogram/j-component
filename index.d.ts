@@ -1,3 +1,5 @@
+import 'miniprogram-api-typings'
+
 export const behavior: WechatMiniprogram.Behavior.Constructor
 
 export interface ComponentId<
@@ -28,7 +30,7 @@ export function create<
 >(
     componentId: ComponentId<TData, TProperty, TMethod>,
     properties?: Partial<WechatMiniprogram.Component.PropertyOptionToData<TProperty>>,
-): Component<TData, TProperty, TMethod>
+): RootComponent<TData, TProperty, TMethod>
 export function create(componentId: string, properties?: any): Component<any, any, any>
 
 export interface ComponentJSON {
@@ -43,15 +45,15 @@ export class Component<
     TProperty extends WechatMiniprogram.Component.PropertyOption,
     TMethod extends Partial<WechatMiniprogram.Component.MethodOption>
 > {
-    readonly dom: Node;
+    readonly dom: HTMLElement | undefined;
     readonly data: Readonly<TData>;
     readonly instance: WechatMiniprogram.Component.Instance<TData, TProperty, TMethod>;
 
     dispatchEvent(eventName: string, options?: any): void;
 
-    querySelector(selector: string): Component | undefined;
+    querySelector(selector: string): Component<any, any, any> | undefined;
 
-    querySelectorAll(selector: string): Component[];
+    querySelectorAll(selector: string): Component<any, any, any>[];
 
     setData(data: Partial<TData> & {[x: string]: any}, callback?: () => void): void;
 
