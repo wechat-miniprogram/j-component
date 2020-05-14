@@ -49,6 +49,21 @@ test('properties', () => {
   expect(outer.dom.innerHTML).toBe('<inner><div></div></inner>');
 });
 
+test('properties with dash', () => {
+  const inner = jComponent.register({
+    properties: {
+      a: Number,
+      bC: String,
+    },
+    template: '<div>{{a}} {{bC}}</div>',
+  })
+  const outer = jComponent.create(jComponent.register({
+    template: '<inner a="123" b-c="321"></inner>',
+    usingComponents: {inner},
+  }))
+  expect(outer.dom.innerHTML).toBe('<inner><div>123 321</div></inner>')
+})
+
 test('dataset', () => {
   let inner = jComponent.register({
     template: '<div></div>',

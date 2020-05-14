@@ -26,14 +26,14 @@ function updateAttrs(exparserNode, attrs) {
         animationStyle = transitionKeys.map(key => {
           const styleValue = animationStyle[key.replace('webkitT', 't')]
 
-          return styleValue !== undefined ? `${key.replace(/([A-Z]{1})/g, char => `-${char.toLowerCase()}`)}:${styleValue}` : ''
+          return styleValue !== undefined ? `${_.camelToDashCase(key)}:${styleValue}` : ''
         }).filter(item => !!item.trim()).join(';')
 
         exparserNode.setNodeStyle(_.transformRpx(value || '', true) + animationStyle)
       }
-    } else if (isComponentNode && exparser.Component.hasPublicProperty(exparserNode, name)) {
+    } else if (isComponentNode && exparser.Component.hasPublicProperty(exparserNode, _.dashToCamelCase(name))) {
       // public 属性，延迟处理
-      dataProxy.scheduleReplace([name], value)
+      dataProxy.scheduleReplace([_.dashToCamelCase(name)], value)
       needDoUpdate = true
     } else if (/^data-/.test(name)) {
       // dataset
