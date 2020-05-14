@@ -97,13 +97,17 @@ function updateEvent(exparserNode, event) {
 
   Object.keys(event).forEach(key => {
     const {
-      name, isCapture, isCatch, handler
+      name, isCapture, isMutated, isCatch, handler
     } = event[key]
 
     if (!handler) return
 
     event[key].id = exparser.addListenerToElement(exparserNode, name, function (evt) {
       const shadowRoot = exparserNode.ownerShadowRoot
+
+      const mutatedMarked = evt.mutatedMarked()
+      if (isMutated && evt.mutatedMarked()) return // 已经被标记为互斥的事件，不再触发 mut- 绑定的事件回调
+      if (isMutated) evt.markMutated()
 
       if (shadowRoot) {
         const host = shadowRoot.getHostNode()
@@ -121,6 +125,7 @@ function updateEvent(exparserNode, event) {
               detail: evt.detail,
               touches: evt.touches,
               changedTouches: evt.changedTouches,
+              mut: mutatedMarked,
             })
           }
         }

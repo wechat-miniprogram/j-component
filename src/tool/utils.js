@@ -212,16 +212,18 @@ function cache(id, instance) {
  * 解析事件语法
  */
 function parseEvent(name, value) {
-  const res = /^(capture-)?(bind|catch|)(?::)?(.*)$/ig.exec(name)
+  const res = /^(capture-)?(mut-)?(bind|catch|)(?::)?(.*)$/ig.exec(name)
 
-  if (res[2] && res[3]) {
+  if (res[3] && res[4]) {
     // 事件绑定
     const isCapture = !!res[1]
-    const isCatch = res[2] === 'catch'
-    const eventName = res[3]
+    const isMutated = !!res[2]
+    const isCatch = res[3] === 'catch'
+    const eventName = res[4]
 
     return {
       name: eventName,
+      isMutated,
       isCapture,
       isCatch,
       handler: value,

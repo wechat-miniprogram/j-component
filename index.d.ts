@@ -36,7 +36,7 @@ export function create(componentId: string, properties?: any): Component<any, an
 export interface ComponentJSON {
     tagName: string;
     attrs: { name: string; value: any }[];
-    event: { [event: string]: { handler: string; isCapture: boolean; isCatch: boolean; name: string } };
+    event: { [event: string]: { handler: string; isMutated: boolean; isCapture: boolean; isCatch: boolean; name: string } };
     children: ComponentJSON[];
 }
 

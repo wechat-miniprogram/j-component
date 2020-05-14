@@ -143,23 +143,73 @@ test('externalClasses', () => {
   expect(outer.dom.innerHTML).toBe('<inner><comp class="abc"><div>123</div></comp></inner>');
 });
 
-test('event', () => {
-  let inner = jComponent.register({
+test('event', async () => {
+  const inner = jComponent.register({
     template: '<div><slot/></div>',
-  });
-  let outer = jComponent.create(jComponent.register({
-    template: '<inner class="inner" binda="onA" catchb="onB" bindc="onC" bindtouchstart=""><div>123</div></inner>',
-    usingComponents: { inner },
-    methods: {
-      onA() {},
-      onB() {},
+  })
+  const outer = jComponent.create(jComponent.register({
+    template: '<inner class="inner" binda="onA" catchb="onB" bind:c="onC" bindtouchstart=""><div>{{text}}</div></inner>',
+    usingComponents: {inner},
+    data: {
+      text: '123'
     },
-  }));
-  outer.querySelector('.inner').dispatchEvent('a');
-  outer.querySelector('.inner').dispatchEvent('b');
-  outer.querySelector('.inner').dispatchEvent('c');
-  expect(outer.dom.innerHTML).toBe('<inner class="inner"><div><div>123</div></div></inner>');
-});
+    methods: {
+      onA() { this.setData({text: 'a'}) },
+      onB() { this.setData({text: 'b'}) },
+      onC() { this.setData({text: 'c'}) },
+    },
+  }))
+  expect(outer.dom.innerHTML).toBe('<inner class="inner"><div><div>123</div></div></inner>')
+  outer.querySelector('.inner').dispatchEvent('a')
+  await _.sleep(0)
+  expect(outer.dom.innerHTML).toBe('<inner class="inner"><div><div>a</div></div></inner>')
+  outer.querySelector('.inner').dispatchEvent('b')
+  await _.sleep(0)
+  expect(outer.dom.innerHTML).toBe('<inner class="inner"><div><div>b</div></div></inner>')
+  outer.querySelector('.inner').dispatchEvent('c')
+  await _.sleep(0)
+  expect(outer.dom.innerHTML).toBe('<inner class="inner"><div><div>c</div></div></inner>')
+})
+
+test('mut event', async () => {
+  let eventList = []
+  const view = jComponent.register({
+    template: '<div><slot/></div>',
+  })
+  const comp = jComponent.create(jComponent.register({
+    usingComponents: {view},
+    template: `
+      <view id="outer" mut-bind:tap="handleTap1">
+        outer view
+        <view id="middle" bindtap="handleTap2">
+          middle view
+          <view id="inner" mut-bind:tap="handleTap3">
+            inner view
+          </view>
+        </view>
+      </view>
+    `,
+    methods: {
+      handleTap1() {
+        eventList.push('tap1')
+      },
+      handleTap2() {
+        eventList.push('tap2')
+      },
+      handleTap3() {
+        eventList.push('tap3')
+      },
+    }
+  }))
+
+  comp.querySelector('#inner').dispatchEvent('tap')
+  await _.sleep(10)
+  expect(eventList).toEqual(['tap3', 'tap2'])
+  eventList = []
+  comp.querySelector('#middle').dispatchEvent('tap')
+  await _.sleep(0)
+  expect(eventList).toEqual(['tap2', 'tap1'])
+})
 
 test('wxs', () => {
   let comp = jComponent.create(jComponent.register({
