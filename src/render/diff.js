@@ -74,6 +74,7 @@ function diffVt(oldVt, newVt) {
         removes.forEach(index => node.removeChild(children[index]))
         inserts.forEach(({newNode, index}) => node.insertBefore(newNode, children[index]))
       }
+      node._vt = newVt
     } else if (parent) {
       const newNode = render.renderExparserNode(newVt, null, parent.ownerShadowRoot)
       parent.replaceChild(newNode, node)
