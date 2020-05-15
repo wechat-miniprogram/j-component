@@ -78,7 +78,7 @@ class SelectorQuery {
   }
 
   exec(callback) {
-    setTimeout(() => {
+    Promise.resolve().then(() => {
       const res = []
 
       this._queue.forEach((item, index) => {
@@ -177,7 +177,7 @@ class SelectorQuery {
       // reset
       this._queue = []
       this._queueCallback = []
-    }, 0)
+    })
   }
 }
 

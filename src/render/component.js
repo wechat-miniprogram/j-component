@@ -198,9 +198,9 @@ class Component {
     if (caller && typeof caller.setData === 'function') caller.setData(data)
     if (typeof callback === 'function') {
       // 模拟异步情况
-      setTimeout(() => {
+      Promise.resolve().then(() => {
         callback()
-      }, 0)
+      })
     }
   }
 

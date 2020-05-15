@@ -127,9 +127,9 @@ class ComponentManager {
 
           if (typeof callback === 'function') {
             // 模拟异步情况
-            setTimeout(() => {
+            Promise.resolve().then(() => {
               callback()
-            }, 0)
+            })
           }
         }
 
