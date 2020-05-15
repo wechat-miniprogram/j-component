@@ -140,15 +140,15 @@ class Component {
       })
 
       // 模拟异步情况
-      setTimeout(() => {
+      Promise.resolve().then(() => {
         dom.dispatchEvent(touchEvent)
-      }, 0)
+      })
     } else {
       // 自定义事件
       const customEvent = new CustomEvent(eventName, options)
 
       // 模拟异步情况
-      setTimeout(() => {
+      Promise.resolve().then(() => {
         dom.dispatchEvent(customEvent)
 
         if (customEvent.target.__wxElement) {
@@ -163,7 +163,7 @@ class Component {
             },
           }))
         }
-      }, 0)
+      })
     }
   }
 

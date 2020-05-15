@@ -253,13 +253,13 @@ test('dispatchEvent', async () => {
 
   const node1 = comp.querySelector('.a')
   node1.dispatchEvent('tap')
-  await _.sleep(50)
+  await _.sleep(10)
   expect(eventList).toEqual([0])
 
   // 触发 tap
   node1.dispatchEvent('touchstart')
   node1.dispatchEvent('touchend')
-  await _.sleep(50)
+  await _.sleep(10)
   expect(eventList).toEqual([0, 0])
   expect(touchStartCount).toBe(1)
   expect(touchEndCount).toBe(1)
@@ -269,7 +269,7 @@ test('dispatchEvent', async () => {
   node1.dispatchEvent('touchmove', {touches: [{x: 5, y: 5}]})
   node1.dispatchEvent('touchmove', {touches: [{x: 10, y: 10}]})
   node1.dispatchEvent('touchend')
-  await _.sleep(50)
+  await _.sleep(10)
   expect(eventList).toEqual([0, 0])
   expect(touchStartCount).toBe(2)
   expect(touchMoveCount).toBe(2)
@@ -279,7 +279,7 @@ test('dispatchEvent', async () => {
   node1.dispatchEvent('scroll')
   node1.dispatchEvent('touchstart')
   node1.dispatchEvent('touchend')
-  await _.sleep(50)
+  await _.sleep(10)
   expect(eventList).toEqual([0, 0])
   expect(touchStartCount).toBe(3)
   expect(touchEndCount).toBe(3)
@@ -289,7 +289,7 @@ test('dispatchEvent', async () => {
   await _.sleep(200)
   node1.dispatchEvent('touchstart')
   node1.dispatchEvent('touchend')
-  await _.sleep(50)
+  await _.sleep(10)
   expect(eventList).toEqual([0, 0, 0])
   expect(touchStartCount).toBe(4)
   expect(touchEndCount).toBe(4)
@@ -298,7 +298,7 @@ test('dispatchEvent', async () => {
   node1.dispatchEvent('touchstart')
   await _.sleep(400)
   node1.dispatchEvent('touchend')
-  await _.sleep(50)
+  await _.sleep(10)
   expect(eventList).toEqual([0, 0, 0])
   expect(touchStartCount).toBe(5)
   expect(touchEndCount).toBe(5)
@@ -307,18 +307,18 @@ test('dispatchEvent', async () => {
   // touchcancel
   node1.dispatchEvent('touchstart')
   node1.dispatchEvent('touchcancel')
-  await _.sleep(50)
+  await _.sleep(10)
   expect(touchStartCount).toBe(6)
   expect(touchCancelCount).toBe(1)
 
   // blur
   node1.dispatchEvent('blur')
-  await _.sleep(50)
+  await _.sleep(10)
   expect(blurCount).toBe(1)
   node1.dispatchEvent('touchstart')
   node1.dispatchEvent('blur')
   node1.dispatchEvent('touchcancel')
-  await _.sleep(50)
+  await _.sleep(10)
   expect(touchStartCount).toBe(7)
   expect(touchCancelCount).toBe(2)
   expect(blurCount).toBe(2)
@@ -329,7 +329,7 @@ test('dispatchEvent', async () => {
   node1.dispatchEvent('touchmove')
   node1.dispatchEvent('touchend')
   node1.dispatchEvent('touchcancel')
-  await _.sleep(50)
+  await _.sleep(10)
   expect(touchStartCount).toBe(8)
   expect(touchMoveCount).toBe(3)
   expect(touchEndCount).toBe(6)
@@ -340,7 +340,7 @@ test('dispatchEvent', async () => {
   node1.dispatchEvent('touchstart', {touches: [{x: 3, y: 3}]})
   node1.dispatchEvent('touchmove', {touches: [{x: 5, y: 5}, {x: 10, y: 10}]})
   node1.dispatchEvent('touchend', {touches: [{x: 5, y: 5}]})
-  await _.sleep(50)
+  await _.sleep(10)
   expect(eventList).toEqual([0, 0, 0])
   expect(touchStartCount).toBe(10)
   expect(touchMoveCount).toBe(4)
@@ -355,15 +355,15 @@ test('dispatchEvent', async () => {
 
   // 自组件事件
   node2.instance.triggerCustomA()
-  await _.sleep(50)
+  await _.sleep(10)
   expect(comp.dom.innerHTML).toBe('<wx-view class="a" style="color: red;"><div>998</div></wx-view><wx-view><div>if</div></wx-view><compa><wx-view><div>0-2</div></wx-view><wx-view><div>1-3</div></wx-view><wx-view><div>2-4</div></wx-view><span>998</span></compa>')
 
   node2.instance.triggerEvent('customa', {index: 999})
-  await _.sleep(50)
+  await _.sleep(10)
   expect(comp.dom.innerHTML).toBe('<wx-view class="a" style="color: red;"><div>999</div></wx-view><wx-view><div>if</div></wx-view><compa><wx-view><div>0-2</div></wx-view><wx-view><div>1-3</div></wx-view><wx-view><div>2-4</div></wx-view><span>999</span></compa>')
 
   node2.dispatchEvent('customa', {detail: {index: 990}})
-  await _.sleep(50)
+  await _.sleep(10)
   expect(comp.dom.innerHTML).toBe('<wx-view class="a" style="color: red;"><div>990</div></wx-view><wx-view><div>if</div></wx-view><compa><wx-view><div>0-2</div></wx-view><wx-view><div>1-3</div></wx-view><wx-view><div>2-4</div></wx-view><span>990</span></compa>')
 
   // 其他自定义事件
@@ -372,7 +372,7 @@ test('dispatchEvent', async () => {
     event = evt
   })
   comp.dispatchEvent('test')
-  await _.sleep(50)
+  await _.sleep(10)
   expect(event.type).toBe('test')
 })
 
