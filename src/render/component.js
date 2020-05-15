@@ -335,7 +335,7 @@ class RootComponent extends Component {
    * 触发 exparser 节点事件
    */
   _triggerExparserEvent(evt, name, detail = {}) {
-    setTimeout(() => {
+    Promise.resolve().then(() => {
       exparser.Event.dispatchEvent(evt.target, exparser.Event.create(name, detail, {
         originalEvent: evt,
         bubbles: true,
@@ -346,7 +346,7 @@ class RootComponent extends Component {
           changedTouches: evt.changedTouches || {},
         },
       }))
-    }, 0)
+    })
   }
 
   /**
