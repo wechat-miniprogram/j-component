@@ -1,44 +1,192 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`toJSON 1`] = `
-Array [
-  Object {
-    "attrs": Array [],
-    "children": Array [
-      Object {
-        "attrs": Array [
-          Object {
-            "name": "name",
-            "value": "password",
-          },
-          Object {
-            "name": "value",
-            "value": "123",
-          },
-        ],
-        "children": Array [],
-        "event": Object {
-          "input": Object {
-            "handler": "onInput",
-            "id": 1,
-            "isCapture": false,
-            "isCatch": false,
-            "name": "input",
-          },
+Object {
+  "attrs": Array [
+    Object {
+      "name": "class",
+      "value": "comp",
+    },
+  ],
+  "children": Array [
+    Object {
+      "attrs": Array [
+        Object {
+          "name": "class",
+          "value": "weui-actionsheet",
         },
-        "tagName": "input",
-      },
-      Object {
-        "attrs": Array [],
-        "children": Array [
-          "hello foo",
-        ],
-        "event": Object {},
-        "tagName": "div",
-      },
-    ],
-    "event": Object {},
-    "tagName": "div",
+      ],
+      "children": Array [
+        Object {
+          "attrs": Array [
+            Object {
+              "name": "class",
+              "value": "weui-actionsheet__title",
+            },
+          ],
+          "children": Array [
+            Object {
+              "attrs": Array [
+                Object {
+                  "name": "class",
+                  "value": "weui-actionsheet__title-text",
+                },
+              ],
+              "children": Array [
+                "actionsheet title",
+              ],
+              "event": Object {},
+              "tagName": "view",
+            },
+          ],
+          "event": Object {},
+          "tagName": "view",
+        },
+        Object {
+          "attrs": Array [
+            Object {
+              "name": "class",
+              "value": "weui-actionsheet__action",
+            },
+          ],
+          "children": Array [
+            Object {
+              "attrs": Array [
+                Object {
+                  "name": "class",
+                  "value": "weui-actionsheet__cell ",
+                },
+                Object {
+                  "name": "data-groupindex",
+                  "value": 0,
+                },
+                Object {
+                  "name": "data-index",
+                  "value": 0,
+                },
+                Object {
+                  "name": "data-value",
+                  "value": 1,
+                },
+              ],
+              "children": Array [
+                "item 1",
+              ],
+              "event": Object {
+                "tap": Object {
+                  "handler": "buttonTap",
+                  "id": 0,
+                  "isCapture": false,
+                  "isCatch": false,
+                  "isMutated": false,
+                  "name": "tap",
+                },
+              },
+              "tagName": "view",
+            },
+            Object {
+              "attrs": Array [
+                Object {
+                  "name": "class",
+                  "value": "weui-actionsheet__cell ",
+                },
+                Object {
+                  "name": "data-groupindex",
+                  "value": 0,
+                },
+                Object {
+                  "name": "data-index",
+                  "value": 1,
+                },
+                Object {
+                  "name": "data-value",
+                  "value": 2,
+                },
+              ],
+              "children": Array [
+                "item 2",
+              ],
+              "event": Object {
+                "tap": Object {
+                  "handler": "buttonTap",
+                  "id": 0,
+                  "isCapture": false,
+                  "isCatch": false,
+                  "isMutated": false,
+                  "name": "tap",
+                },
+              },
+              "tagName": "view",
+            },
+            Object {
+              "attrs": Array [
+                Object {
+                  "name": "class",
+                  "value": "weui-actionsheet__cell weui-actionsheet__cell_warn",
+                },
+                Object {
+                  "name": "data-groupindex",
+                  "value": 0,
+                },
+                Object {
+                  "name": "data-index",
+                  "value": 2,
+                },
+                Object {
+                  "name": "data-value",
+                  "value": 3,
+                },
+              ],
+              "children": Array [
+                "item 3",
+              ],
+              "event": Object {
+                "tap": Object {
+                  "handler": "buttonTap",
+                  "id": 0,
+                  "isCapture": false,
+                  "isCatch": false,
+                  "isMutated": false,
+                  "name": "tap",
+                },
+              },
+              "tagName": "view",
+            },
+          ],
+          "event": Object {},
+          "tagName": "view",
+        },
+      ],
+      "event": Object {},
+      "tagName": "view",
+    },
+  ],
+  "event": Object {
+    "actiontap": Object {
+      "handler": "actiontap",
+      "id": 1,
+      "isCapture": false,
+      "isCatch": false,
+      "isMutated": false,
+      "name": "actiontap",
+    },
+    "close": Object {
+      "handler": "close",
+      "id": 1,
+      "isCapture": false,
+      "isCatch": false,
+      "isMutated": false,
+      "name": "close",
+    },
+    "tab": Object {
+      "handler": "actiontap",
+      "id": 1,
+      "isCapture": false,
+      "isCatch": true,
+      "isMutated": false,
+      "name": "tab",
+    },
   },
-]
+  "tagName": "mp-actionsheet",
+}
 `;

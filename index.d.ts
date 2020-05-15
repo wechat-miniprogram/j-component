@@ -59,7 +59,7 @@ export class Component<
 
     triggerLifeTime(lifetime: 'created' | 'ready' | 'attached' | 'moved' | 'detached' | 'saved' | 'restored' | 'error' | 'listenerChanged'): void;
 
-    toJSON(): ComponentJSON[];
+    toJSON(): ComponentJSON;
 }
 
 export class RootComponent<

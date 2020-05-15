@@ -23,6 +23,26 @@ function dfsExparserTree(node, callback, fromTopToBottom) {
   })
 }
 
+const JSONSymbol = typeof Symbol === 'function' && Symbol.for ? Symbol.for('j-component.json') : 0xd846fe
+
+function exparserNodeEventToJSON(node) {
+  return node._vt ? node._vt.event : {}
+}
+
+function exparserNodeAttrsToJSON(node) {
+  const attrs = []
+  const vt = node._vt
+
+  if (vt) {
+    vt.attrs.forEach(attr => {
+      if (!exparser.Component.hasPublicProperty(node, _.dashToCamelCase(attr.name))) {
+        attrs.push(attr)
+      }
+    })
+  }
+  return attrs
+}
+
 /**
  * 将 exparser 树转换为 JSON 对象
  */
@@ -34,14 +54,20 @@ function exparserTreeToJSON(node) {
     if (vt) {
       if (vt.type === CONSTANT.TYPE_TEXT) {
         array.push(vt.content)
-      } else if (vt.type === CONSTANT.TYPE_NATIVE) {
+      } else if (vt.type === CONSTANT.TYPE_NATIVE || vt.type === CONSTANT.TYPE_COMPONENT) {
         children = []
-        array.push({
-          tagName: vt.tagName,
-          event: vt.event,
-          attrs: vt.attrs,
+        const child = {
+          tagName: _.getTagName(vt.componentId || vt.tagName) || vt.tagName,
+          event: exparserNodeEventToJSON(node),
+          attrs: exparserNodeAttrsToJSON(node),
           children,
+        }
+        Object.defineProperty(child, '$$typeof', {
+          get() {
+            return JSONSymbol
+          }
         })
+        array.push(child)
       }
     }
 
@@ -50,7 +76,7 @@ function exparserTreeToJSON(node) {
     return array
   }
 
-  return _inner(node, [])
+  return _inner(node, [])[0]
 }
 
 class Component {

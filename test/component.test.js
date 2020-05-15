@@ -358,11 +358,11 @@ test('dispatchEvent', async () => {
   await _.sleep(10)
   expect(comp.dom.innerHTML).toBe('<wx-view class="a" style="color: red;"><div>998</div></wx-view><wx-view><div>if</div></wx-view><compa><wx-view><div>0-2</div></wx-view><wx-view><div>1-3</div></wx-view><wx-view><div>2-4</div></wx-view><span>998</span></compa>')
 
-  node2.instance.triggerEvent('customa', {index: 999});
+  node2.instance.triggerEvent('customa', {index: 999})
   await _.sleep(10)
   expect(comp.dom.innerHTML).toBe('<wx-view class="a" style="color: red;"><div>999</div></wx-view><wx-view><div>if</div></wx-view><compa><wx-view><div>0-2</div></wx-view><wx-view><div>1-3</div></wx-view><wx-view><div>2-4</div></wx-view><span>999</span></compa>')
 
-  node2.dispatchEvent('customa', {detail: {index: 990}});
+  node2.dispatchEvent('customa', {detail: {index: 990}})
   await _.sleep(10)
   expect(comp.dom.innerHTML).toBe('<wx-view class="a" style="color: red;"><div>990</div></wx-view><wx-view><div>if</div></wx-view><compa><wx-view><div>0-2</div></wx-view><wx-view><div>1-3</div></wx-view><wx-view><div>2-4</div></wx-view><span>990</span></compa>')
 
@@ -618,21 +618,93 @@ test('error', () => {
   expect(jComponent.create(123456)).toBe(undefined)
 })
 
-test('toJSON', () => {
-  const comp = jComponent.create(jComponent.register({
-    tagName: 'test',
-    data: {
-      value: '123',
-      text: 'foo',
-    },
-    methods: {
-      onInput(e) { console.log(e) }
+test.only('toJSON', () => {
+  const view = jComponent.register({
+    template: '<slot />',
+  })
+
+  const mpActionsheet = jComponent.register({
+    usingComponents: {
+      view,
     },
     template: `
-      <view class="te">
-        <input name="password" value="{{value}}" bindinput="onInput"></input>
-        <view>hello {{text}}</view>
-      </view>
+      <view class="weui-actionsheet">
+        <view class="weui-actionsheet__title">
+          <view class="weui-actionsheet__title-text">{{title}}</view>
+        </view>
+        <view 
+          class="{{ index === actions.length-1 ? 'weui-actionsheet__action' : 'weui-actionsheet__menu' }}"
+          wx:key="index"
+          wx:for-item="actionItem" 
+          wx:for-index="index"
+          wx:for="{{actions}}"
+        >
+          <view
+            class="weui-actionsheet__cell {{item.type === 'warn' ? 'weui-actionsheet__cell_warn' : '' }}" 
+            wx:key="actionIndex" 
+            wx:for="{{actionItem}}"
+            wx:for-index="actionIndex"
+            data-groupindex="{{index}}"
+            data-index="{{actionIndex}}" 
+            data-value="{{item.value}}"
+            bindtap="buttonTap"
+          >
+            {{item.text}}
+          </view>  
+        </view>
+      </view>    
+    `,
+    properties: {
+      title: {
+        // 标题
+        type: String,
+        value: ''
+      },
+      actions: {
+        // actions 列表
+        type: Array,
+        value: [],
+        observer: '_groupChange',
+      }
+    },
+    methods: {
+      _groupChange(e) {
+        // 支持 一维数组 写法
+        if (e.length > 0 && typeof e[0] !== 'string' && !(e[0] instanceof Array)) {
+          this.setData({
+            actions: [this.data.actions]
+          })
+        }
+      },
+      buttonTap() {},
+    }
+  })
+
+  const comp = jComponent.create(jComponent.register({
+    usingComponents: {
+      'mp-actionsheet': mpActionsheet,
+    },
+    data: {
+      actions: [
+        {text: 'item 1', value: 1},
+        {text: 'item 2', value: 2},
+        {text: 'item 3', type: 'warn', value: 3}
+      ]
+    },
+    methods: {
+      actiontap() {},
+      close() {},
+    },
+    template: `
+      <mp-actionsheet
+        class="comp"
+        title="actionsheet title"
+        actions="{{actions}}"
+        bindactiontap="actiontap"
+        bindclose="close"
+        catchtab="actiontap"
+      >
+      </mp-actionsheet>
     `
   }))
   expect(comp.toJSON()).toMatchSnapshot()
