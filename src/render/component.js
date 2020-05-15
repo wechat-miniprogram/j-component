@@ -151,16 +151,18 @@ class Component {
       setTimeout(() => {
         dom.dispatchEvent(customEvent)
 
-        if (customEvent.target.__wxElement) exparser.Event.dispatchEvent(customEvent.target.__wxElement, exparser.Event.create(eventName, options.detail || {}, {
-          originalEvent: customEvent,
-          bubbles: true,
-          capturePhase: true,
-          composed: true,
-          extraFields: {
-            touches: options.touches || {},
-            changedTouches: options.changedTouches || {},
-          },
-        }))
+        if (customEvent.target.__wxElement) {
+          exparser.Event.dispatchEvent(customEvent.target.__wxElement, exparser.Event.create(eventName, options.detail || {}, {
+            originalEvent: customEvent,
+            bubbles: true,
+            capturePhase: true,
+            composed: true,
+            extraFields: {
+              touches: options.touches || {},
+              changedTouches: options.changedTouches || {},
+            },
+          }))
+        }
       }, 0)
     }
   }
