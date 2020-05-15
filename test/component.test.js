@@ -1,5 +1,6 @@
 const jComponent = require('../src/index')
 const _ = require('./utils')
+const {getId} = require('../src/tool/utils')
 
 beforeAll(() => {
   _.env()
@@ -708,4 +709,61 @@ test('toJSON', () => {
     `
   }))
   expect(comp.toJSON()).toMatchSnapshot()
+})
+
+test('relations', () => {
+  // TODO
+  // const customUlId = getId()
+  // const customLiId = getId()
+  // let link = 0
+
+  // jComponent.register({
+  //   id: customUlId,
+  //   template: '<view><slot></slot></view>',
+  //   relations: {
+  //     [customLiId]: {
+  //       target: customLiId,
+  //       type: 'child',
+  //       linked(target) {
+  //         console.log('[custom-ul] a child is linked: ', target)
+  //         link++
+  //       },
+  //       linkChanged(target) {},
+  //       unlinked(target) {}
+  //     }
+  //   },
+  //   methods: {
+  //     getAllLi() {
+  //       return this.getRelationNodes(customLiId)
+  //     },
+  //   },
+  // })
+  // jComponent.register({
+  //   id: customLiId,
+  //   template: '<view>li</view>',
+  //   relations: {
+  //     [customUlId]: {
+  //       target: customUlId,
+  //       type: 'parent',
+  //       linked(target) {},
+  //       linkChanged(target) {},
+  //       unlinked(target) {}
+  //     }
+  //   },
+  // })
+  // const comp = jComponent.create(jComponent.register({
+  //   tagName: 'comp',
+  //   template: `
+  //     <custom-ul>
+  //       <custom-li> item 1 </custom-li>
+  //       <custom-li> item 2 </custom-li>
+  //     </custom-ul>
+  //   `,
+  //   usingComponents: {
+  //     'custom-ul': customUlId,
+  //     'custom-li': customLiId,
+  //   },
+  // }))
+  // console.log(comp.dom.innerHTML)
+  // expect(link).toEqual(0)
 })
