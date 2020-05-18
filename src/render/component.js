@@ -23,12 +23,21 @@ function dfsExparserTree(node, callback, fromTopToBottom) {
   })
 }
 
+/**
+ * 用于 miniprogram-simulate/jest-snapshot-plugin 的识别
+ */
 const JSONSymbol = typeof Symbol === 'function' && Symbol.for ? Symbol.for('j-component.json') : 0xd846fe
 
+/**
+ * 序列化 exparser 树节点上绑定的事件监听
+ */
 function exparserNodeEventToJSON(node) {
   return node._vt ? node._vt.event : {}
 }
 
+/**
+ * 序列化 exparser 树节点的属性
+ */
 function exparserNodeAttrsToJSON(node) {
   const attrs = []
   const vt = node._vt
