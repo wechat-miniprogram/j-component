@@ -7,13 +7,17 @@ const _ = require('./tool/utils')
 const SelectorQuery = require('./tool/selectorquery')
 const IntersectionObserver = require('./tool/intersectionobserver')
 
+const PATH_TO_ID_MAP = []
+
 class ComponentManager {
   constructor(definition) {
     this.id = definition.id || _.getId(true)
+    this.path = _.normalizeAbsolute(definition.path)
     this.isGlobal = !!definition.id // 是否全局组件
     this.definition = definition
 
     if (definition.tagName) _.setTagName(this.id, definition.tagName) // 保存标签名
+    if (this.path) PATH_TO_ID_MAP[this.path] = this.id // 保存 path 到 id 的映射
 
     const template = definition.template
 
@@ -52,6 +56,7 @@ class ComponentManager {
 
     _.adjustExparserDefinition(definition)
 
+    const path = this.path
     const definitionFilter = exparser.Behavior.callDefinitionFilter(definition)
     const exparserDef = {
       is: this.id,
@@ -119,7 +124,7 @@ class ComponentManager {
           return exparserNodes.map(item => getSelectComponentResult(item))
         }
         caller.createSelectorQuery = () => new SelectorQuery(caller)
-        caller.createIntersectionObserver = (options) => new IntersectionObserver(caller, options)
+        caller.createIntersectionObserver = options => new IntersectionObserver(caller, options)
         caller.setData = (data, callback) => {
           if (!originalSetData || typeof originalSetData !== 'function') return
 
@@ -127,10 +132,18 @@ class ComponentManager {
 
           if (typeof callback === 'function') {
             // 模拟异步情况
-            Promise.resolve().then(() => {
-              callback()
-            })
+            Promise.resolve().then(callback).catch(console.error)
           }
+        }
+        caller.getRelationNodes = relationKey => {
+          if (!path || !relationKey) return null
+
+          const id = PATH_TO_ID_MAP[_.relativeToAbsolute(path, relationKey)]
+          if (!id) return null
+
+          const res = this.getRelationNodes(id)
+          if (!res) return null
+          return res.map(exparserNode => exparser.Element.getMethodCaller(exparserNode))
         }
 
         Object.keys(methods).forEach(name => caller[name] = methods[name])

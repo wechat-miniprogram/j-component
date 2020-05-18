@@ -165,7 +165,7 @@ module.exports = function (template, data, usingComponents) {
       parent.appendChild(appendNode)
     },
     // eslint-disable-next-line no-unused-vars
-    end: (tagName) => {
+    end: tagName => {
       stack.pop()
     },
     text: content => {

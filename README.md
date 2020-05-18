@@ -47,6 +47,7 @@ let behavior = jComponent.behavior({
 |---|---|---|
 | id | String | 可选字段，如果传了此字段，则表明注册为全局组件，其他组件可直接在 template 中使用而无需在 usingComponents 里引入 |
 | tagName | String | 可选字段，指定组件对应的 dom 节点的 tagName，默认取 usingComponents 里的定义或组件自身的 id |
+| path | String | 可选字段，该组件在文件系统中的绝对路径，用于需要涉及到组件路径的方法中，如 getRelationNodes 方法 |
 | template | String | 组件模板，即组件对应的 wxml 内容 |
 | usingComponents | Object | 使用到的自定义组件映射表 |
 | behaviors | Array<Behavior> | behavior 的用法和小程序类似 |

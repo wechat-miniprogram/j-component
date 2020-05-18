@@ -1,31 +1,31 @@
-const parse = require('../src/template/parse');
+const parse = require('../src/template/parse')
 
 function getParseResult(content) {
-  let startStack = [];
-  let endStack = [];
-  let textStack = [];
+  const startStack = []
+  const endStack = []
+  const textStack = []
 
   parse(content, {
     start(tagName, attrs, unary) {
-      startStack.push({ tagName, attrs, unary });
+      startStack.push({tagName, attrs, unary})
     },
     end(tagName) {
-      endStack.push(tagName);
+      endStack.push(tagName)
     },
     text(content) {
-      content = content.trim();
-      if (content) textStack.push(content);
+      content = content.trim()
+      if (content) textStack.push(content)
     },
-  });
+  })
 
-  return { startStack, endStack, textStack };
+  return {startStack, endStack, textStack}
 }
 
 test('parse template', () => {
-  let res = getParseResult('<div><slot/></div>');
-  expect(res.startStack).toEqual([{ tagName: 'div', attrs: [], unary: false }, { tagName: 'slot', attrs: [], unary: true }]);
-  expect(res.endStack).toEqual(['div']);
-  expect(res.textStack).toEqual([]);
+  let res = getParseResult('<div><slot/></div>')
+  expect(res.startStack).toEqual([{tagName: 'div', attrs: [], unary: false}, {tagName: 'slot', attrs: [], unary: true}])
+  expect(res.endStack).toEqual(['div'])
+  expect(res.textStack).toEqual([])
 
   res = getParseResult(`
     <div><slot/></div>
@@ -38,39 +38,39 @@ test('parse template', () => {
         <li><span>567</span></li>
       </ul>
     </div>
-  `);
+  `)
   expect(res.startStack).toEqual([
-    { tagName: 'div', attrs: [], unary: false },
-    { tagName: 'slot', attrs: [], unary: true },
-    { tagName: 'div', attrs: [{ name: 'id', value: 'a' }, { name: 'class', value: 'xx' }], unary: false },
-    { tagName: 'input', attrs: [{ name: 'id', value: 'b' }, { name: 'type', value: 'checkbox' }, { name: 'checked', value: undefined }], unary: true },
-    { tagName: 'div', attrs: [], unary: false },
-    { tagName: 'ul', attrs: [], unary: false },
-    { tagName: 'li', attrs: [], unary: false },
-    { tagName: 'span', attrs: [], unary: false },
-    { tagName: 'li', attrs: [], unary: false },
-    { tagName: 'span', attrs: [], unary: false },
-    { tagName: 'li', attrs: [], unary: false },
-    { tagName: 'span', attrs: [], unary: false }
-  ]);
-  expect(res.endStack).toEqual(['div', 'div', 'span', 'li', 'span', 'li', 'span', 'li', 'ul', 'div']);
-  expect(res.textStack).toEqual(['123123', '123', '321', '567']);
+    {tagName: 'div', attrs: [], unary: false},
+    {tagName: 'slot', attrs: [], unary: true},
+    {tagName: 'div', attrs: [{name: 'id', value: 'a'}, {name: 'class', value: 'xx'}], unary: false},
+    {tagName: 'input', attrs: [{name: 'id', value: 'b'}, {name: 'type', value: 'checkbox'}, {name: 'checked', value: undefined}], unary: true},
+    {tagName: 'div', attrs: [], unary: false},
+    {tagName: 'ul', attrs: [], unary: false},
+    {tagName: 'li', attrs: [], unary: false},
+    {tagName: 'span', attrs: [], unary: false},
+    {tagName: 'li', attrs: [], unary: false},
+    {tagName: 'span', attrs: [], unary: false},
+    {tagName: 'li', attrs: [], unary: false},
+    {tagName: 'span', attrs: [], unary: false}
+  ])
+  expect(res.endStack).toEqual(['div', 'div', 'span', 'li', 'span', 'li', 'span', 'li', 'ul', 'div'])
+  expect(res.textStack).toEqual(['123123', '123', '321', '567'])
 
-  res = getParseResult(`<div><span>123</div>`);
+  res = getParseResult('<div><span>123</div>')
   expect(res.startStack).toEqual([
-    { tagName: 'div', attrs: [], unary: false },
-    { tagName: 'span', attrs: [], unary: false }
-  ]);
-  expect(res.endStack).toEqual(['span', 'div']);
-  expect(res.textStack).toEqual(['123']);
+    {tagName: 'div', attrs: [], unary: false},
+    {tagName: 'span', attrs: [], unary: false}
+  ])
+  expect(res.endStack).toEqual(['span', 'div'])
+  expect(res.textStack).toEqual(['123'])
 
-  res = getParseResult(`<div>123</h1>`);
+  res = getParseResult('<div>123</h1>')
   expect(res.startStack).toEqual([
-    { tagName: 'div', attrs: [], unary: false }
-  ]);
-  expect(res.endStack).toEqual(['div']);
-  expect(res.textStack).toEqual(['123']);
-});
+    {tagName: 'div', attrs: [], unary: false}
+  ])
+  expect(res.endStack).toEqual(['div'])
+  expect(res.textStack).toEqual(['123'])
+})
 
 test('parse wxs', () => {
   let res = getParseResult(`
@@ -81,56 +81,56 @@ test('parse wxs', () => {
     </wxs>
     <view>{{m1.message}}</view>
     <div>321</div>
-  `);
+  `)
   expect(res.startStack).toEqual([
-    { tagName: 'div', attrs: [], unary: false },
-    { tagName: 'wxs', attrs: [{ name: 'module', value: 'm1' }], unary: false },
-    { tagName: 'view', attrs: [], unary: false },
-    { tagName: 'div', attrs: [], unary: false }
-  ]);
-  expect(res.endStack).toEqual(['div', 'wxs', 'view', 'div']);
-  expect(res.textStack).toEqual(['123', 'var msg = "hello world";\n      module.exports.message = msg;', '{{m1.message}}', '321']);
+    {tagName: 'div', attrs: [], unary: false},
+    {tagName: 'wxs', attrs: [{name: 'module', value: 'm1'}], unary: false},
+    {tagName: 'view', attrs: [], unary: false},
+    {tagName: 'div', attrs: [], unary: false}
+  ])
+  expect(res.endStack).toEqual(['div', 'wxs', 'view', 'div'])
+  expect(res.textStack).toEqual(['123', 'var msg = "hello world";\n      module.exports.message = msg;', '{{m1.message}}', '321'])
 
-  res = getParseResult(`<wxs></wxs>`);
+  res = getParseResult('<wxs></wxs>')
   expect(res.startStack).toEqual([
-    { tagName: 'wxs', attrs: [], unary: false }
-  ]);
-  expect(res.endStack).toEqual(['wxs']);
-  expect(res.textStack).toEqual([]);
-});
+    {tagName: 'wxs', attrs: [], unary: false}
+  ])
+  expect(res.endStack).toEqual(['wxs'])
+  expect(res.textStack).toEqual([])
+})
 
 test('parse comment', () => {
-  let res = getParseResult(`<!-- 123 -->`);
-  expect(res.startStack).toEqual([]);
-  expect(res.startStack).toEqual([]);
-  expect(res.startStack).toEqual([]);
-});
+  const res = getParseResult('<!-- 123 -->')
+  expect(res.startStack).toEqual([])
+  expect(res.startStack).toEqual([])
+  expect(res.startStack).toEqual([])
+})
 
 test('parse without options', () => {
-  let catchErr = null;
+  let catchErr = null
   try {
-    parse('<div>123</div>');
+    parse('<div>123</div>')
   } catch (err) {
-    catchErr = err;
+    catchErr = err
   }
 
-  expect(catchErr).toBe(null);
-});
+  expect(catchErr).toBe(null)
+})
 
 test('parse error', () => {
   function getErr(str) {
-    let catchErr = null;
+    let catchErr = null
     try {
-      getParseResult(str);
+      getParseResult(str)
     } catch (err) {
-      catchErr = err;
+      catchErr = err
     }
 
-    return catchErr && catchErr.message || '';
+    return catchErr && catchErr.message || ''
   }
 
-  expect(getErr('<div')).toBe('parse error: <div');
-  expect(getErr('<wxs>123')).toBe('parse error: 123');
-  expect(getErr('<!-- 123')).toBe('parse error: <!-- 123');
-  expect(getErr('<div>123</%%^6.....>')).toBe('parse error: </%%^6.....>');
-});
+  expect(getErr('<div')).toBe('parse error: <div')
+  expect(getErr('<wxs>123')).toBe('parse error: 123')
+  expect(getErr('<!-- 123')).toBe('parse error: <!-- 123')
+  expect(getErr('<div>123</%%^6.....>')).toBe('parse error: </%%^6.....>')
+})

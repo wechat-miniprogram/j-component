@@ -167,7 +167,7 @@ class VirtualNode {
   generate(options = {}) {
     const data = options.data || {}
     const statement = this.statement
-    const key = options.key || ''
+    let key = options.key || ''
 
     options.data = data
 
@@ -229,7 +229,7 @@ class VirtualNode {
         const {forItem: bakItem, forIndex: bakIndex} = data
         data[statement.forItem] = forItem // list item
         data[statement.forIndex] = forIndex // list index
-        if (statement.forKey) options.key = statement.forKey === '*this' ? forItem : forItem[statement.forKey] // list key
+        if (statement.forKey) key = statement.forKey === '*this' ? forItem : forItem[statement.forKey] // list key
 
         children = this.children.map(node => node.generate(options))
 

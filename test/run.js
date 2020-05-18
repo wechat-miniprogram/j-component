@@ -1,19 +1,17 @@
-const { JSDOM } = require('jsdom');
+const {JSDOM} = require('jsdom')
 
-global.beforeAll = cb => cb();
-global.test = (desc, cb) => cb();
-global.expect = a => {
-  return {
-    toBe(b) {
-      console.log('expect --> ', a, b);
-    },
-    toEqual(b) {
-      console.log('expect --> ', a, b);
-    },
-  };
-};
+global.beforeAll = cb => cb()
+global.test = (desc, cb) => cb()
+global.expect = a => ({
+  toBe(b) {
+    console.log('expect --> ', a, b)
+  },
+  toEqual(b) {
+    console.log('expect --> ', a, b)
+  },
+})
 
-let { window } = new JSDOM(`
+const {window} = new JSDOM(`
   <!DOCTYPE html>
   <html>
     <head>
@@ -27,10 +25,10 @@ let { window } = new JSDOM(`
 `, {
   runScripts: 'dangerously',
   userAgent: 'miniprogram test',
-});
-global.window = window;
-global.document = window.document;
-global.TouchEvent = window.TouchEvent;
-global.CustomEvent = window.CustomEvent;
+})
+global.window = window
+global.document = window.document
+global.TouchEvent = window.TouchEvent
+global.CustomEvent = window.CustomEvent
 
-require('./render.test.js');
+require('./render.test.js')

@@ -1,5 +1,9 @@
 # 更新日志
 
+## 1.2.2
+
+* 支持 relations
+
 ## 1.2.1
 
 * 支持 Component.prototype.toJSON

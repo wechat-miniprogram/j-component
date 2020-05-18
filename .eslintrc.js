@@ -98,6 +98,7 @@ module.exports = {
     'camelcase': 'off',
     'no-control-regex': 'off',
     'no-await-in-loop': 'off',
+    'promise/no-callback-in-promise': 'off',
   },
   'globals': {
     'window': true,
@@ -105,5 +106,7 @@ module.exports = {
     'TouchEvent': true,
     'Touch': true,
     'CustomEvent': true,
+    'Event': true,
+    'Component': true,
   }
 }

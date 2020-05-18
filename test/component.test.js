@@ -177,7 +177,7 @@ test('dispatchEvent', async () => {
   let longPressCount = 0
   const behavior = jComponent.behavior({
     methods: {
-      onTap1(evt) {
+      onTap1() {
         eventList.push(this.data.index)
       },
     }
@@ -712,58 +712,153 @@ test('toJSON', () => {
 })
 
 test('relations', () => {
-  // TODO
-  // const customUlId = getId()
-  // const customLiId = getId()
-  // let link = 0
+  const customUlId = getId()
+  const customLiId = getId()
+  let ulLink = 0
+  const ulLinkTargetList = []
+  let ulUnlink = 0
+  const ulUnlinkTargetList = []
+  let liLink = 0
+  const liLinkTargetList = []
+  let liUnlink = 0
+  const liUnlinkTargetList = []
 
-  // jComponent.register({
-  //   id: customUlId,
-  //   template: '<view><slot></slot></view>',
-  //   relations: {
-  //     [customLiId]: {
-  //       target: customLiId,
-  //       type: 'child',
-  //       linked(target) {
-  //         console.log('[custom-ul] a child is linked: ', target)
-  //         link++
-  //       },
-  //       linkChanged(target) {},
-  //       unlinked(target) {}
-  //     }
-  //   },
-  //   methods: {
-  //     getAllLi() {
-  //       return this.getRelationNodes(customLiId)
-  //     },
-  //   },
-  // })
-  // jComponent.register({
-  //   id: customLiId,
-  //   template: '<view>li</view>',
-  //   relations: {
-  //     [customUlId]: {
-  //       target: customUlId,
-  //       type: 'parent',
-  //       linked(target) {},
-  //       linkChanged(target) {},
-  //       unlinked(target) {}
-  //     }
-  //   },
-  // })
-  // const comp = jComponent.create(jComponent.register({
-  //   tagName: 'comp',
-  //   template: `
-  //     <custom-ul>
-  //       <custom-li> item 1 </custom-li>
-  //       <custom-li> item 2 </custom-li>
-  //     </custom-ul>
-  //   `,
-  //   usingComponents: {
-  //     'custom-ul': customUlId,
-  //     'custom-li': customLiId,
-  //   },
-  // }))
-  // console.log(comp.dom.innerHTML)
-  // expect(link).toEqual(0)
+  jComponent.register({
+    id: customUlId,
+    template: '<view><slot></slot></view>',
+    path: '/mp/component/ul',
+    relations: {
+      [customLiId]: {
+        target: customLiId,
+        type: 'child',
+        linked(target) {
+          ulLink++
+          ulLinkTargetList.push(target)
+        },
+        unlinked(target) {
+          ulUnlink++
+          ulUnlinkTargetList.push(target)
+        },
+      },
+    },
+  })
+  jComponent.register({
+    id: customLiId,
+    template: '<view>li-<slot></slot></view>',
+    path: '/mp/component/li',
+    relations: {
+      [customUlId]: {
+        target: customUlId,
+        type: 'parent',
+        linked(target) {
+          liLink++
+          liLinkTargetList.push(target)
+        },
+        unlinked(target) {
+          liUnlink++
+          liUnlinkTargetList.push(target)
+        },
+      },
+    },
+  })
+  const comp = jComponent.create(jComponent.register({
+    tagName: 'comp',
+    template: `
+      <custom-ul class="ul">
+        <custom-li class="li" wx:for="{{list}}" wx:key="*this">{{item}}</custom-li>
+      </custom-ul>
+    `,
+    usingComponents: {
+      'custom-ul': customUlId,
+      'custom-li': customLiId,
+    },
+    data: {
+      list: [1, 2],
+    },
+  }))
+  const parent = document.createElement('parent-wrapper')
+  comp.attach(parent)
+
+  const ul = comp.querySelectorAll('.ul')[0].instance
+
+  // link
+  expect(ulLink).toEqual(2)
+  expect(ulLinkTargetList.length).toBe(2)
+  expect(ulLinkTargetList[0]).toBe(comp.querySelectorAll('.li')[0].instance)
+  expect(ulLinkTargetList[1]).toBe(comp.querySelectorAll('.li')[1].instance)
+  expect(liLink).toEqual(2)
+  expect(liLinkTargetList.length).toBe(2)
+  expect(liLinkTargetList[0]).toBe(ul)
+  expect(liLinkTargetList[1]).toBe(ul)
+
+  let relationNodes = ul.getRelationNodes('./li')
+  expect(relationNodes.length).toBe(2)
+  expect(relationNodes[0]).toBe(ulLinkTargetList[0])
+  expect(relationNodes[1]).toBe(ulLinkTargetList[1])
+
+  let relationNodes2 = relationNodes[0].getRelationNodes('./ul')
+  expect(relationNodes2.length).toBe(1)
+  expect(relationNodes2[0]).toBe(ul)
+  relationNodes2 = relationNodes[1].getRelationNodes('./ul')
+  expect(relationNodes2.length).toBe(1)
+  expect(relationNodes2[0]).toBe(ul)
+
+  // unlink
+  ulLinkTargetList.length = 0
+  liLinkTargetList.length = 0
+  comp.setData({list: [2, 3, 4]})
+  expect(ulLink).toEqual(4)
+  expect(ulLinkTargetList.length).toBe(2)
+  expect(ulLinkTargetList[0]).toBe(comp.querySelectorAll('.li')[1].instance)
+  expect(ulLinkTargetList[1]).toBe(comp.querySelectorAll('.li')[2].instance)
+  expect(ulUnlink).toEqual(1)
+  expect(ulUnlinkTargetList.length).toBe(1)
+  expect(ulUnlinkTargetList[0]).toBe(relationNodes[0])
+  expect(liLink).toEqual(4)
+  expect(liLinkTargetList.length).toBe(2)
+  expect(liLinkTargetList[0]).toBe(ul)
+  expect(liLinkTargetList[1]).toBe(ul)
+  expect(liUnlink).toEqual(1)
+  expect(liUnlinkTargetList.length).toBe(1)
+  expect(liUnlinkTargetList[0]).toBe(ul)
+
+  relationNodes = ul.getRelationNodes('./li')
+  expect(relationNodes.length).toBe(3)
+  expect(relationNodes[0]).toBe(comp.querySelectorAll('.li')[0].instance)
+  expect(relationNodes[1]).toBe(ulLinkTargetList[0])
+  expect(relationNodes[2]).toBe(ulLinkTargetList[1])
+
+  relationNodes2 = relationNodes[0].getRelationNodes('./ul')
+  expect(relationNodes2.length).toBe(1)
+  expect(relationNodes2[0]).toBe(ul)
+  relationNodes2 = relationNodes[1].getRelationNodes('./ul')
+  expect(relationNodes2.length).toBe(1)
+  expect(relationNodes2[0]).toBe(ul)
+  relationNodes2 = relationNodes[2].getRelationNodes('./ul')
+  expect(relationNodes2.length).toBe(1)
+  expect(relationNodes2[0]).toBe(ul)
+
+  // detach
+  ulLinkTargetList.length = 0
+  ulUnlinkTargetList.length = 0
+  liLinkTargetList.length = 0
+  liUnlinkTargetList.length = 0
+  comp.detach()
+  expect(ulLink).toEqual(4)
+  expect(ulLinkTargetList.length).toBe(0)
+  expect(ulUnlink).toEqual(4)
+  expect(ulUnlinkTargetList.length).toBe(3)
+  expect(ulUnlinkTargetList[0]).toBe(relationNodes[0])
+  expect(ulUnlinkTargetList[1]).toBe(relationNodes[1])
+  expect(ulUnlinkTargetList[2]).toBe(relationNodes[2])
+  expect(liLink).toEqual(4)
+  expect(liLinkTargetList.length).toBe(0)
+  expect(liUnlink).toEqual(4)
+  expect(liUnlinkTargetList.length).toBe(3)
+  expect(liUnlinkTargetList[0]).toBe(ul)
+  expect(liUnlinkTargetList[1]).toBe(ul)
+  expect(liUnlinkTargetList[2]).toBe(ul)
+
+  relationNodes = ul.getRelationNodes('./li')
+  expect(relationNodes.length).toBe(0)
 })

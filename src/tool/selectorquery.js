@@ -177,7 +177,7 @@ class SelectorQuery {
       // reset
       this._queue = []
       this._queueCallback = []
-    })
+    }).catch(console.error)
   }
 }
 

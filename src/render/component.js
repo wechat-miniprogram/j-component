@@ -151,7 +151,7 @@ class Component {
       // 模拟异步情况
       Promise.resolve().then(() => {
         dom.dispatchEvent(touchEvent)
-      })
+      }).catch(console.error)
     } else {
       // 自定义事件
       const customEvent = new CustomEvent(eventName, options)
@@ -172,7 +172,7 @@ class Component {
             },
           }))
         }
-      })
+      }).catch(console.error)
     }
   }
 
@@ -207,9 +207,7 @@ class Component {
     if (caller && typeof caller.setData === 'function') caller.setData(data)
     if (typeof callback === 'function') {
       // 模拟异步情况
-      Promise.resolve().then(() => {
-        callback()
-      })
+      Promise.resolve().then(callback).catch(console.error)
     }
   }
 
@@ -355,7 +353,7 @@ class RootComponent extends Component {
           changedTouches: evt.changedTouches || {},
         },
       }))
-    })
+    }).catch(console.error)
   }
 
   /**

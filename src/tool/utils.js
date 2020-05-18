@@ -231,6 +231,36 @@ function parseEvent(name, value) {
   }
 }
 
+/**
+ * 标准化文件绝对路径
+ */
+function normalizeAbsolute(absolutePath) {
+  if (!absolutePath) return null
+
+  absolutePath = absolutePath.replace(/\\/g, '/')
+  return absolutePath.split('/').filter(item => !!item).join('/')
+}
+
+/**
+ * 文件相对路径转绝对路径，其中 basePath 路径必须是文件路径
+ */
+function relativeToAbsolute(basePath, relativePath) {
+  let baseDirPath = normalizeAbsolute(basePath).split('/')
+  baseDirPath.pop()
+  baseDirPath = baseDirPath.join('/')
+
+  const pathList = []
+  normalizeAbsolute(`${baseDirPath}/${relativePath}`).split('/').forEach(item => {
+    if (item === '..') {
+      pathList.pop()
+    } else if (item !== '.') {
+      pathList.push(item)
+    }
+  })
+
+  return pathList.join('/')
+}
+
 module.exports = {
   getId,
   copy,
@@ -245,4 +275,6 @@ module.exports = {
   getTagName,
   cache,
   parseEvent,
+  normalizeAbsolute,
+  relativeToAbsolute,
 }
