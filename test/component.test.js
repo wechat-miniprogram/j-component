@@ -782,11 +782,11 @@ test('relations', () => {
   const ul = comp.querySelectorAll('.ul')[0].instance
 
   // link
-  expect(ulLink).toEqual(2)
+  expect(ulLink).toBe(2)
   expect(ulLinkTargetList.length).toBe(2)
   expect(ulLinkTargetList[0]).toBe(comp.querySelectorAll('.li')[0].instance)
   expect(ulLinkTargetList[1]).toBe(comp.querySelectorAll('.li')[1].instance)
-  expect(liLink).toEqual(2)
+  expect(liLink).toBe(2)
   expect(liLinkTargetList.length).toBe(2)
   expect(liLinkTargetList[0]).toBe(ul)
   expect(liLinkTargetList[1]).toBe(ul)
@@ -807,18 +807,18 @@ test('relations', () => {
   ulLinkTargetList.length = 0
   liLinkTargetList.length = 0
   comp.setData({list: [2, 3, 4]})
-  expect(ulLink).toEqual(4)
+  expect(ulLink).toBe(4)
   expect(ulLinkTargetList.length).toBe(2)
   expect(ulLinkTargetList[0]).toBe(comp.querySelectorAll('.li')[1].instance)
   expect(ulLinkTargetList[1]).toBe(comp.querySelectorAll('.li')[2].instance)
-  expect(ulUnlink).toEqual(1)
+  expect(ulUnlink).toBe(1)
   expect(ulUnlinkTargetList.length).toBe(1)
   expect(ulUnlinkTargetList[0]).toBe(relationNodes[0])
-  expect(liLink).toEqual(4)
+  expect(liLink).toBe(4)
   expect(liLinkTargetList.length).toBe(2)
   expect(liLinkTargetList[0]).toBe(ul)
   expect(liLinkTargetList[1]).toBe(ul)
-  expect(liUnlink).toEqual(1)
+  expect(liUnlink).toBe(1)
   expect(liUnlinkTargetList.length).toBe(1)
   expect(liUnlinkTargetList[0]).toBe(ul)
 
@@ -844,16 +844,16 @@ test('relations', () => {
   liLinkTargetList.length = 0
   liUnlinkTargetList.length = 0
   comp.detach()
-  expect(ulLink).toEqual(4)
+  expect(ulLink).toBe(4)
   expect(ulLinkTargetList.length).toBe(0)
-  expect(ulUnlink).toEqual(4)
+  expect(ulUnlink).toBe(4)
   expect(ulUnlinkTargetList.length).toBe(3)
   expect(ulUnlinkTargetList[0]).toBe(relationNodes[0])
   expect(ulUnlinkTargetList[1]).toBe(relationNodes[1])
   expect(ulUnlinkTargetList[2]).toBe(relationNodes[2])
-  expect(liLink).toEqual(4)
+  expect(liLink).toBe(4)
   expect(liLinkTargetList.length).toBe(0)
-  expect(liUnlink).toEqual(4)
+  expect(liUnlink).toBe(4)
   expect(liUnlinkTargetList.length).toBe(3)
   expect(liUnlinkTargetList[0]).toBe(ul)
   expect(liUnlinkTargetList[1]).toBe(ul)
