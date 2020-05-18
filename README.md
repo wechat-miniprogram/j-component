@@ -205,5 +205,5 @@ rootComp.detach()
 * 内置 wxml 解析器的 import 支持
 * 内置 wxml 解析器的 外部 wxs
 * generics 支持
-* relations 和 moved 生命周期
+* moved 生命周期
 * ......
