@@ -13,7 +13,6 @@ class ComponentManager {
   constructor(definition) {
     this.id = definition.id || _.getId(true)
     this.path = _.normalizeAbsolute(definition.path)
-    this.isGlobal = !!definition.id // 是否全局组件
     this.definition = definition
 
     if (definition.tagName) _.setTagName(this.id, definition.tagName) // 保存标签名

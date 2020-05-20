@@ -1,5 +1,9 @@
 # 更新日志
 
+## next version
+
+* 修复部分场景 diff 失败问题
+
 ## 1.2.2
 
 * 支持 relations
