@@ -48,7 +48,7 @@ class VirtualNode {
         // slot 名
         this.slotName = value || ''
       } else {
-        if (value) attr.value = expr.getExpression(value)
+        if (value && typeof value === 'string') attr.value = expr.getExpression(value)
         filterAttrs.push(attr)
       }
     }

@@ -30,7 +30,7 @@ test('parse template', () => {
   res = getParseResult(`
     <div><slot/></div>
     <div id="a" class="xx">123123</div>
-    <input id="b" type="checkbox" checked/>
+    <input id="b" type="checkbox" checked url=""/>
     <div>
       <ul>
         <li><span>123</span></li>
@@ -43,7 +43,7 @@ test('parse template', () => {
     {tagName: 'div', attrs: [], unary: false},
     {tagName: 'slot', attrs: [], unary: true},
     {tagName: 'div', attrs: [{name: 'id', value: 'a'}, {name: 'class', value: 'xx'}], unary: false},
-    {tagName: 'input', attrs: [{name: 'id', value: 'b'}, {name: 'type', value: 'checkbox'}, {name: 'checked', value: undefined}], unary: true},
+    {tagName: 'input', attrs: [{name: 'id', value: 'b'}, {name: 'type', value: 'checkbox'}, {name: 'checked', value: true}, {name: 'url', value: ''}], unary: true},
     {tagName: 'div', attrs: [], unary: false},
     {tagName: 'ul', attrs: [], unary: false},
     {tagName: 'li', attrs: [], unary: false},
