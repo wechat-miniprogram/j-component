@@ -815,3 +815,47 @@ test('relations', () => {
   relationNodes = ul.getRelationNodes('./li')
   expect(relationNodes.length).toBe(0)
 })
+
+test('diff children', async () => {
+  const view = jComponent.register({
+    tagName: 'wx-view',
+    template: '<slot />'
+  })
+  const text = jComponent.register({
+    tagName: 'wx-text',
+    template: '<slot />'
+  })
+  const comp = jComponent.create(jComponent.register({
+    usingComponents: {view, text},
+    template: `
+        <text wx:if="{{condition}}" class="parent" data-tag="text"></text>
+        <view wx:else class="parent" data-tag="view">
+          <view class="child">{{text}}</view>
+          <view />
+        </view>
+      `,
+    data: {
+      condition: true,
+      text: '123'
+    }
+  }))
+  comp.attach(document.createElement('parent-wrapper'))
+
+  let parent = comp.querySelectorAll('.parent')
+  let child = comp.querySelector('.child')
+  expect(parent).toHaveLength(1)
+  expect(parent[0].dom.tagName).toBe('WX-TEXT')
+  expect(parent[0].dom.dataset.tag).toBe('text')
+  expect(child).toBe(undefined)
+
+  comp.setData({condition: false})
+  comp.setData({text: '233'})
+
+  parent = comp.querySelectorAll('.parent')
+  child = comp.querySelector('.child')
+  expect(parent).toHaveLength(1)
+  expect(parent[0].dom.tagName).toBe('WX-VIEW')
+  expect(parent[0].dom.dataset.tag).toBe('view')
+  expect(child).not.toBe(undefined)
+  expect(child.dom.innerHTML).toBe('233')
+})
