@@ -196,6 +196,7 @@ class TemplateEngine {
     instance.idMap = {}
     instance.slots = {}
     instance.shadowRoot = render.renderExparserNode(instance._vt, exparserNode, null) // 渲染成 exparser 树
+    instance.shadowRoot._vt = instance._vt
     instance.listeners = []
 
     TemplateEngine.collectIdMapAndSlots(instance.shadowRoot, instance.idMap, instance.slots)

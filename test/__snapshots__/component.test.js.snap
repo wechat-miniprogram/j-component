@@ -2,191 +2,161 @@
 
 exports[`toJSON 1`] = `
 Object {
-  "attrs": Array [
-    Object {
-      "name": "class",
-      "value": "comp",
-    },
-  ],
+  "attrs": Array [],
   "children": Array [
     Object {
       "attrs": Array [
         Object {
-          "name": "class",
-          "value": "weui-actionsheet",
+          "name": "data-index",
+          "value": false,
         },
       ],
+      "children": Array [],
+      "event": Object {},
+      "tagName": "view",
+    },
+    Object {
+      "attrs": Array [],
       "children": Array [
         Object {
           "attrs": Array [
             Object {
               "name": "class",
-              "value": "weui-actionsheet__title",
+              "value": "child",
             },
           ],
           "children": Array [
-            Object {
-              "attrs": Array [
-                Object {
-                  "name": "class",
-                  "value": "weui-actionsheet__title-text",
-                },
-              ],
-              "children": Array [
-                "actionsheet title",
-              ],
-              "event": Object {},
-              "tagName": "view",
-            },
-          ],
-          "event": Object {},
-          "tagName": "view",
-        },
-        Object {
-          "attrs": Array [
-            Object {
-              "name": "class",
-              "value": "weui-actionsheet__action",
-            },
-          ],
-          "children": Array [
-            Object {
-              "attrs": Array [
-                Object {
-                  "name": "class",
-                  "value": "weui-actionsheet__cell ",
-                },
-                Object {
-                  "name": "data-groupindex",
-                  "value": 0,
-                },
-                Object {
-                  "name": "data-index",
-                  "value": 0,
-                },
-                Object {
-                  "name": "data-value",
-                  "value": 1,
-                },
-              ],
-              "children": Array [
-                "item 1",
-              ],
-              "event": Object {
-                "tap": Object {
-                  "handler": "buttonTap",
-                  "id": 0,
-                  "isCapture": false,
-                  "isCatch": false,
-                  "isMutated": false,
-                  "name": "tap",
-                },
-              },
-              "tagName": "view",
-            },
-            Object {
-              "attrs": Array [
-                Object {
-                  "name": "class",
-                  "value": "weui-actionsheet__cell ",
-                },
-                Object {
-                  "name": "data-groupindex",
-                  "value": 0,
-                },
-                Object {
-                  "name": "data-index",
-                  "value": 1,
-                },
-                Object {
-                  "name": "data-value",
-                  "value": 2,
-                },
-              ],
-              "children": Array [
-                "item 2",
-              ],
-              "event": Object {
-                "tap": Object {
-                  "handler": "buttonTap",
-                  "id": 0,
-                  "isCapture": false,
-                  "isCatch": false,
-                  "isMutated": false,
-                  "name": "tap",
-                },
-              },
-              "tagName": "view",
-            },
-            Object {
-              "attrs": Array [
-                Object {
-                  "name": "class",
-                  "value": "weui-actionsheet__cell weui-actionsheet__cell_warn",
-                },
-                Object {
-                  "name": "data-groupindex",
-                  "value": 0,
-                },
-                Object {
-                  "name": "data-index",
-                  "value": 2,
-                },
-                Object {
-                  "name": "data-value",
-                  "value": 3,
-                },
-              ],
-              "children": Array [
-                "item 3",
-              ],
-              "event": Object {
-                "tap": Object {
-                  "handler": "buttonTap",
-                  "id": 0,
-                  "isCapture": false,
-                  "isCatch": false,
-                  "isMutated": false,
-                  "name": "tap",
-                },
-              },
-              "tagName": "view",
-            },
+            "1",
           ],
           "event": Object {},
           "tagName": "view",
         },
       ],
       "event": Object {},
+      "tagName": "child",
+    },
+    Object {
+      "attrs": Array [],
+      "children": Array [
+        Object {
+          "attrs": Array [
+            Object {
+              "name": "class",
+              "value": "child",
+            },
+          ],
+          "children": Array [
+            "2",
+          ],
+          "event": Object {},
+          "tagName": "view",
+        },
+      ],
+      "event": Object {},
+      "tagName": "child",
+    },
+    Object {
+      "attrs": Array [],
+      "children": Array [
+        Object {
+          "attrs": Array [
+            Object {
+              "name": "class",
+              "value": "child",
+            },
+          ],
+          "children": Array [
+            "3",
+          ],
+          "event": Object {},
+          "tagName": "view",
+        },
+      ],
+      "event": Object {},
+      "tagName": "child",
+    },
+    Object {
+      "attrs": Array [],
+      "children": Array [
+        Object {
+          "attrs": Array [
+            Object {
+              "name": "class",
+              "value": "child",
+            },
+          ],
+          "children": Array [],
+          "event": Object {},
+          "tagName": "view",
+        },
+      ],
+      "event": Object {
+        "longtap": Object {
+          "handler": "onCaptureMutatedLongTap",
+          "id": 1,
+          "isCapture": true,
+          "isCatch": false,
+          "isMutated": true,
+          "name": "longtap",
+        },
+        "tap": Object {
+          "handler": "onTap",
+          "id": 1,
+          "isCapture": false,
+          "isCatch": false,
+          "isMutated": false,
+          "name": "tap",
+        },
+        "touchend": Object {
+          "handler": "onMutatedtouchend",
+          "id": 1,
+          "isCapture": false,
+          "isCatch": true,
+          "isMutated": true,
+          "name": "touchend",
+        },
+        "touchmove": Object {
+          "handler": "onCaptureTouchMove",
+          "id": 1,
+          "isCapture": true,
+          "isCatch": false,
+          "isMutated": false,
+          "name": "touchmove",
+        },
+        "touchstart": Object {
+          "handler": "onCatchTouchStart",
+          "id": 1,
+          "isCapture": false,
+          "isCatch": true,
+          "isMutated": false,
+          "name": "touchstart",
+        },
+      },
+      "tagName": "child",
+    },
+  ],
+  "event": Object {},
+  "tagName": "main",
+}
+`;
+
+exports[`toJSON 2`] = `
+Object {
+  "attrs": Array [],
+  "children": Array [
+    Object {
+      "attrs": Array [
+        Object {
+          "name": "data-index",
+          "value": true,
+        },
+      ],
+      "children": Array [],
+      "event": Object {},
       "tagName": "view",
     },
   ],
-  "event": Object {
-    "actiontap": Object {
-      "handler": "actiontap",
-      "id": 1,
-      "isCapture": false,
-      "isCatch": false,
-      "isMutated": false,
-      "name": "actiontap",
-    },
-    "close": Object {
-      "handler": "close",
-      "id": 1,
-      "isCapture": false,
-      "isCatch": false,
-      "isMutated": false,
-      "name": "close",
-    },
-    "tab": Object {
-      "handler": "actiontap",
-      "id": 1,
-      "isCapture": false,
-      "isCatch": true,
-      "isMutated": false,
-      "name": "tab",
-    },
-  },
-  "tagName": "mp-actionsheet",
+  "event": Object {},
+  "tagName": "main",
 }
 `;
