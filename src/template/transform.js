@@ -77,7 +77,7 @@ function transformCompileResTree(obj, parent, usingComponents) {
     node = {
       type,
       tagName,
-      componentId: usingComponents[tagName],
+      componentId: usingComponents[tagName] || tagName,
       content: '', // 文本节点的内容
       key, // 节点的 key，diff 用
       children,

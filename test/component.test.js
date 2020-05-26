@@ -624,90 +624,43 @@ test('toJSON', () => {
     template: '<slot />',
   })
 
-  const mpActionsheet = jComponent.register({
-    usingComponents: {
-      view,
-    },
-    template: `
-      <view class="weui-actionsheet">
-        <view class="weui-actionsheet__title">
-          <view class="weui-actionsheet__title-text">{{title}}</view>
-        </view>
-        <view 
-          class="{{ index === actions.length-1 ? 'weui-actionsheet__action' : 'weui-actionsheet__menu' }}"
-          wx:key="index"
-          wx:for-item="actionItem" 
-          wx:for-index="index"
-          wx:for="{{actions}}"
-        >
-          <view
-            class="weui-actionsheet__cell {{item.type === 'warn' ? 'weui-actionsheet__cell_warn' : '' }}" 
-            wx:key="actionIndex" 
-            wx:for="{{actionItem}}"
-            wx:for-index="actionIndex"
-            data-groupindex="{{index}}"
-            data-index="{{actionIndex}}" 
-            data-value="{{item.value}}"
-            bindtap="buttonTap"
-          >
-            {{item.text}}
-          </view>  
-        </view>
-      </view>    
-    `,
-    properties: {
-      title: {
-        // 标题
-        type: String,
-        value: ''
-      },
-      actions: {
-        // actions 列表
-        type: Array,
-        value: [],
-        observer: '_groupChange',
-      }
-    },
-    methods: {
-      _groupChange(e) {
-        // 支持 一维数组 写法
-        if (e.length > 0 && typeof e[0] !== 'string' && !(e[0] instanceof Array)) {
-          this.setData({
-            actions: [this.data.actions]
-          })
-        }
-      },
-      buttonTap() {},
-    }
+  const child = jComponent.register({
+    template: '<view class="child"><slot /></view>',
+    usingComponents: {view}
   })
 
   const comp = jComponent.create(jComponent.register({
-    usingComponents: {
-      'mp-actionsheet': mpActionsheet,
-    },
+    usingComponents: {view, child},
+    template: `
+      <wxs module="test">
+        module.exports.hasLength = function (arr) { return arr.length > 0; }
+      </wxs>
+      <view wx:if="{{condition}}" data-index="{{true}}" />
+      <view wx:else data-index="{{false}}" />
+      <child wx:for="{{items}}" wx:key="index" wx:for-item="item" wx:for-index="index">{{item}}</child>
+      <child
+        wx:if={{test.hasLength(items)}}
+        bindtap="onTap"
+        catchtouchstart="onCatchTouchStart"
+        capture-bind:touchmove="onCaptureTouchMove"
+        mut-catch:touchend="onMutatedtouchend"
+        capture-mut-bind:longtap="onCaptureMutatedLongTap"
+      />
+    `,
     data: {
-      actions: [
-        {text: 'item 1', value: 1},
-        {text: 'item 2', value: 2},
-        {text: 'item 3', type: 'warn', value: 3}
-      ]
+      condition: false,
+      items: [1, 2, 3]
     },
     methods: {
-      actiontap() {},
-      close() {},
+      onTap() {},
+      onCatchTouchStart() {},
+      onCaptureTouchMove() {},
+      onMutatedtouchend() {},
+      onCaptureMutatedLongTap() {},
     },
-    template: `
-      <mp-actionsheet
-        class="comp"
-        title="actionsheet title"
-        actions="{{actions}}"
-        bindactiontap="actiontap"
-        bindclose="close"
-        catchtab="actiontap"
-      >
-      </mp-actionsheet>
-    `
   }))
+  expect(comp.toJSON()).toMatchSnapshot()
+  comp.setData({condition: true, items: []})
   expect(comp.toJSON()).toMatchSnapshot()
 })
 

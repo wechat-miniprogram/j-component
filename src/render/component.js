@@ -237,11 +237,18 @@ class RootComponent extends Component {
     this._isTapCancel = false
     this._lastScrollTime = 0
 
-    if (properties && typeof properties === 'object') {
+    const attrs = Object.keys(properties || {}).map(key => ({name: key, value: properties[key]}))
+    if (attrs.length) {
       // 对齐 observer 逻辑，走 updateAttr 来更新 property
-      const propertyList = []
-      Object.keys(properties).forEach(key => propertyList.push({name: key, value: properties[key]}))
-      render.updateAttrs(this._exparserNode, propertyList)
+      render.updateAttrs(this._exparserNode, attrs)
+    }
+
+    this._exparserNode._vt = {
+      type: CONSTANT.TYPE_COMPONENT,
+      tagName: tagName || 'main',
+      attrs,
+      event: {},
+      children: []
     }
 
     this.parentNode = null

@@ -86,11 +86,9 @@ module.exports = function (content, handler = {}) {
       const attrs = []
 
       rest.replace(attrReg, (all, $1, $2, $3, $4) => {
-        const value = $2 || $3 || $4
-
         attrs.push({
           name: $1,
-          value,
+          value: $2 !== undefined ? $2 : $3 !== undefined ? $3 : $4 !== undefined ? $4 : true,
         })
       })
 

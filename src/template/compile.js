@@ -87,12 +87,14 @@ module.exports = function (template, data, usingComponents) {
         type = CONSTANT.TYPE_WXS
       } else if (_.isHtmlTag(tagName)) {
         type = CONSTANT.TYPE_NATIVE
+        id = tagName
       } else {
         type = CONSTANT.TYPE_COMPONENT
         id = usingComponents[tagName]
         componentManager = id ? _.cache(id) : _.cache(tagName)
 
         if (!componentManager) throw new Error(`component ${tagName} not found`)
+        else id = componentManager.id
       }
 
       const {statement, event, normalAttrs} = filterAttrs(attrs)

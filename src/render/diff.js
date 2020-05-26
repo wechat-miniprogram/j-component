@@ -19,6 +19,7 @@ function diffVt(oldVt, newVt) {
     if (newVt.type !== CONSTANT.TYPE_TEXT || newVt.content !== oldVt.content) {
       if (parent) {
         const newNode = render.renderExparserNode(newVt, null, parent.ownerShadowRoot)
+        newNode._vt = newVt
         parent.replaceChild(newNode, node)
       }
     }
@@ -29,6 +30,7 @@ function diffVt(oldVt, newVt) {
       // 新节点是文本节点
       if (parent) {
         const newNode = render.renderExparserNode(newVt, null, parent.ownerShadowRoot)
+        newNode._vt = newVt
         parent.replaceChild(newNode, node)
       }
     } else if (newVt.type === oldVt.type && newVt.componentId === oldVt.componentId && newVt.key === oldVt.key) {
@@ -51,7 +53,7 @@ function diffVt(oldVt, newVt) {
       // 检查子节点
       const oldChildren = oldVt.children
       const newChildren = newVt.children
-      const diffs = oldVt.type === CONSTANT.TYPE_IF || oldVt.type === CONSTANT.TYPE_FOR || oldVt.type === CONSTANT.TYPE_FORITEM || oldVt.type === CONSTANT.TYPE_ROOT ? diffList(oldChildren, newChildren) : {children: newChildren, moves: null} // only statement need diff
+      const diffs = diffList(oldChildren, newChildren)
 
       // diff 子节点树
       for (let i = 0, len = oldChildren.length; i < len; i++) {
@@ -66,10 +68,15 @@ function diffVt(oldVt, newVt) {
         const {removes} = diffs.moves
         const children = node.childNodes
 
-        inserts = inserts.map(({oldIndex, index}) => ({
-          newNode: children[oldIndex] || render.renderExparserNode(newChildren[index], null, node.ownerShadowRoot),
-          index,
-        }))
+        inserts = inserts.map(({oldIndex, index}) => {
+          const newNode = children[oldIndex] || render.renderExparserNode(newChildren[index], null, node.ownerShadowRoot)
+          newNode._vt = newChildren[index]
+
+          return {
+            newNode,
+            index,
+          }
+        })
 
         removes.forEach(index => node.removeChild(children[index]))
         inserts.forEach(({newNode, index}) => node.insertBefore(newNode, children[index]))
@@ -77,6 +84,7 @@ function diffVt(oldVt, newVt) {
       node._vt = newVt
     } else if (parent) {
       const newNode = render.renderExparserNode(newVt, null, parent.ownerShadowRoot)
+      newNode._vt = newVt
       parent.replaceChild(newNode, node)
     }
   }

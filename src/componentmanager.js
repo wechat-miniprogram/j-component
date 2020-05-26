@@ -13,7 +13,6 @@ class ComponentManager {
   constructor(definition) {
     this.id = definition.id || _.getId(true)
     this.path = _.normalizeAbsolute(definition.path)
-    this.isGlobal = !!definition.id // 是否全局组件
     this.definition = definition
 
     if (definition.tagName) _.setTagName(this.id, definition.tagName) // 保存标签名
@@ -197,6 +196,7 @@ class TemplateEngine {
     instance.idMap = {}
     instance.slots = {}
     instance.shadowRoot = render.renderExparserNode(instance._vt, exparserNode, null) // 渲染成 exparser 树
+    instance.shadowRoot._vt = instance._vt
     instance.listeners = []
 
     TemplateEngine.collectIdMapAndSlots(instance.shadowRoot, instance.idMap, instance.slots)
