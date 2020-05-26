@@ -71,6 +71,7 @@ function diffVt(oldVt, newVt) {
         inserts = inserts.map(({oldIndex, index}) => {
           const newNode = children[oldIndex] || render.renderExparserNode(newChildren[index], null, node.ownerShadowRoot)
           newNode._vt = newChildren[index]
+
           return {
             newNode,
             index,
