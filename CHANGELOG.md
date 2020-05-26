@@ -1,5 +1,9 @@
 # 更新日志
 
+## next version
+
+* 随机 id 生成使用 Math.random
+
 ## 1.3.0
 
 * 更新基础库 exparser 到 2.11.2

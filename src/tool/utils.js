@@ -1,7 +1,7 @@
 /**
- * 获取随机 id
+ * 获取随机 id，生成 15 位
  */
-let seed = +new Date()
+let seed = 1e14 + Math.floor(Math.random() * 9e14)
 const charString = 'abcdefghij'
 function getId(notNumber) {
   const id = ++seed

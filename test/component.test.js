@@ -9,7 +9,7 @@ beforeAll(() => {
 test('register behavior', () => {
   const behavior = jComponent.behavior({})
 
-  expect(behavior.length).toBe(13)
+  expect(behavior.length).toBe(15)
 })
 
 test('register and create global component', () => {
@@ -53,8 +53,8 @@ test('register and create normal component', () => {
   })
   const comp = jComponent.create(id, {list: ['a', 'b'], a: 'test'})
 
-  expect(id.length).toBe(13)
-  expect(comp.dom.tagName.length).toBe(13)
+  expect(id.length).toBe(15)
+  expect(comp.dom.tagName.length).toBe(15)
   expect(comp.dom.innerHTML).toBe('<wx-view><div>0-a</div></wx-view><wx-view><div>1-b</div></wx-view><span>test</span>')
   expect(comp.instance.data.observerArr1).toEqual([['a', 'b'], []])
   expect(comp.instance.data.observerArr2).toEqual(['test', ''])
