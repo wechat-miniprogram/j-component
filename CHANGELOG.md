@@ -2,6 +2,8 @@
 
 ## next version
 
+* toJSON 方法将会在 root 组件上返回 `<main />`
+* 修复 wxml 属性简写导致 diff 后属性重复的问题
 * 修复部分场景 diff 失败问题
 
 ## 1.2.2
