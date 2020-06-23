@@ -92,6 +92,7 @@ class ComponentManager {
         reflectToAttributes: false,
         writeFieldsToNode: false,
         writeIdToDOM: false,
+        virtualHost: options.virtualHost || undefined,
       },
       lifetimes: definition.lifetimes,
       pageLifetimes: definition.pageLifetimes,

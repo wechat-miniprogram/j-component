@@ -815,3 +815,43 @@ test('relations', () => {
   relationNodes = ul.getRelationNodes('./li')
   expect(relationNodes.length).toBe(0)
 })
+
+test('virtual host', () => {
+  const compaId = jComponent.register({
+    template: '<view class="item" wx:for="{{list}}">{{index + \'-\' + item + \'-\' + style}}</view><span><slot/></span>',
+    properties: {
+      list: {
+        type: Array,
+        value: [],
+      },
+      style: {
+        type: String,
+      },
+    },
+    options: {
+      virtualHost: true,
+    },
+  })
+  const comp = jComponent.create(jComponent.register({
+    template: `
+      <view wx:if="{{index !== 0}}">if</view>
+      <view wx:else>else</view>
+      <compa style="a" list="{{list}}">{{index}}</compa>
+    `,
+    usingComponents: {
+      compa: compaId,
+    },
+    data: {
+      index: 0,
+      list: [1, 2],
+    },
+  }))
+
+  expect(comp.dom.innerHTML).toBe('<wx-view><div>else</div></wx-view><wx-view class="item"><div>0-1-a</div></wx-view><wx-view class="item"><div>1-2-a</div></wx-view><span>0</span>')
+
+  comp.setData({
+    index: 1,
+    list: [1, 2, 3],
+  })
+  expect(comp.dom.innerHTML).toBe('<wx-view><div>if</div></wx-view><wx-view class="item"><div>0-1-a</div></wx-view><wx-view class="item"><div>1-2-a</div></wx-view><wx-view class="item"><div>2-3-a</div></wx-view><span>1</span>')
+})

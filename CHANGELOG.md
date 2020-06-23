@@ -1,5 +1,10 @@
 # 更新日志
 
+## 1.3.0
+
+* 更新基础库 exparser 到 2.11.2
+* 支持 virtual host 特性
+
 ## 1.2.3
 
 * toJSON 方法将会在 root 组件上返回 `<main/>`

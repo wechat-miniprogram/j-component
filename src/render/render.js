@@ -18,19 +18,17 @@ function updateAttrs(exparserNode, attrs) {
     if (name === 'id' || name === 'slot' || (isComponentNode && name === 'class')) {
       // 普通属性
       exparserNode[name] = value || ''
-    } else if (isComponentNode && name === 'style') {
+    } else if (isComponentNode && name === 'style' && exparserNode.$$) {
       // style
-      if (exparserNode.$$) {
-        let animationStyle = exparserNode.__animationStyle || {}
+      let animationStyle = exparserNode.__animationStyle || {}
 
-        animationStyle = transitionKeys.map(key => {
-          const styleValue = animationStyle[key.replace('webkitT', 't')]
+      animationStyle = transitionKeys.map(key => {
+        const styleValue = animationStyle[key.replace('webkitT', 't')]
 
-          return styleValue !== undefined ? `${_.camelToDashCase(key)}:${styleValue}` : ''
-        }).filter(item => !!item.trim()).join(';')
+        return styleValue !== undefined ? `${_.camelToDashCase(key)}:${styleValue}` : ''
+      }).filter(item => !!item.trim()).join(';')
 
-        exparserNode.setNodeStyle(_.transformRpx(value || '', true) + animationStyle)
-      }
+      exparserNode.setNodeStyle(_.transformRpx(value || '', true) + animationStyle)
     } else if (isComponentNode && exparser.Component.hasPublicProperty(exparserNode, _.dashToCamelCase(name))) {
       // public 属性，延迟处理
       dataProxy.scheduleReplace([_.dashToCamelCase(name)], value)
