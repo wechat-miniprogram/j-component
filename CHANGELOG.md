@@ -1,6 +1,6 @@
 # 更新日志
 
-## next version
+## 1.3.1
 
 * 随机 id 生成使用 Math.random
 
