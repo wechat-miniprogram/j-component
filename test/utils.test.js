@@ -148,17 +148,17 @@ test('adjustExparserDefinition', () => {
   })).toEqual({
     properties: {
       a: {type: null},
-      b: {type: 'Number'},
-      c: {type: 'String'},
-      d: {type: 'Boolean'},
-      e: {type: 'Array'},
-      f: {type: 'Object'},
+      b: {type: Number},
+      c: {type: String},
+      d: {type: Boolean},
+      e: {type: Array},
+      f: {type: Object},
       g: {
-        type: 'Number',
+        type: Number,
         value: 123,
       },
       h: {
-        type: 'Number',
+        type: Number,
         value: 123,
       },
       i: {
