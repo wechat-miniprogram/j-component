@@ -855,3 +855,57 @@ test('virtual host', () => {
   })
   expect(comp.dom.innerHTML).toBe('<wx-view><div>if</div></wx-view><wx-view class="item"><div>0-1-a</div></wx-view><wx-view class="item"><div>1-2-a</div></wx-view><wx-view class="item"><div>2-3-a</div></wx-view><span>1</span>')
 })
+
+test('definition filter', () => {
+  const defFieldsList = []
+  const definitionFilterArrList = []
+  const behavior1 = jComponent.behavior({
+    data: {is: 'behavior1'},
+    definitionFilter(defFields, definitionFilterArr) {
+      defFieldsList.push(Object.assign({}, defFields.data))
+      definitionFilterArrList.push(definitionFilterArr.length)
+      defFields.data.is = 'behavior1'
+    }
+  })
+  const behavior2 = jComponent.behavior({
+    behaviors: [behavior1],
+    data: {is: 'behavior2'},
+    definitionFilter(defFields, definitionFilterArr) {
+      defFieldsList.push(Object.assign({}, defFields.data))
+      definitionFilterArrList.push(definitionFilterArr.length)
+      defFields.data.is = 'behavior2'
+      definitionFilterArr[0](defFields)
+    }
+  })
+  defFieldsList.push({is: 'split'})
+  definitionFilterArrList.push(-1)
+  const behavior3 = jComponent.behavior({
+    behaviors: [behavior2],
+    data: {is: 'behavior3'},
+    definitionFilter(defFields, definitionFilterArr) {
+      defFieldsList.push(Object.assign({}, defFields.data))
+      definitionFilterArrList.push(definitionFilterArr.length)
+      defFields.data.is = 'behavior3'
+      definitionFilterArr[0](defFields)
+    }
+  })
+  defFieldsList.push({is: 'split'})
+  definitionFilterArrList.push(-1)
+  const comp = jComponent.create(jComponent.register({
+    template: '<view></view>',
+    behaviors: [behavior3],
+    data: {is: 'comp'},
+  }))
+  expect(comp.data.is).toBe('behavior1')
+  expect(defFieldsList).toEqual([
+    {is: 'behavior2'},
+    {is: 'split'},
+    {is: 'behavior3'},
+    {is: 'behavior2'},
+    {is: 'split'},
+    {is: 'comp'},
+    {is: 'behavior3'},
+    {is: 'behavior2'},
+  ])
+  expect(definitionFilterArrList).toEqual([0, -1, 1, 0, -1, 1, 1, 0])
+})
