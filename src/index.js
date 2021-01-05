@@ -24,6 +24,7 @@ module.exports = {
     }
 
     _.adjustExparserDefinition(definition)
+    definition.definitionFilter = exparser.Behavior.callDefinitionFilter(definition)
     exparser.registerBehavior(definition)
 
     return definition.is
