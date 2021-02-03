@@ -1,5 +1,9 @@
 # 更新日志
 
+## 1.4.0
+
+* 更新基础库 exparser 到 2.15.0
+
 ## 1.3.3
 
 * 修复 behavior 创建没有调用 callDefinitionFilter 的问题

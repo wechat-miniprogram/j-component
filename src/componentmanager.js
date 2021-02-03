@@ -100,7 +100,13 @@ class ComponentManager {
       definitionFilter,
       initiator() {
         // 更新方法调用者，即自定义组件中的 this
-        const caller = Object.create(this)
+        const caller = Object.create(this, {
+          data: {
+            get: () => this.data,
+            set: newData => this.data = newData,
+            configurable: true
+          },
+        })
         const originalSetData = caller.setData
         const getSelectComponentResult = selected => {
           const selectedFilter = exparser.Component.getMethod(selected, '__export__')
@@ -113,7 +119,6 @@ class ComponentManager {
         }
 
         caller._exparserNode = this // 存入原本对应的 exparserNode 实例
-        caller.data = this.data
         caller.properties = caller.data
         caller.selectComponent = selector => {
           const exparserNode = this.shadowRoot.querySelector(selector)

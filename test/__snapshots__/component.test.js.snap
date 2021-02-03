@@ -93,7 +93,7 @@ Object {
       "event": Object {
         "longtap": Object {
           "handler": "onCaptureMutatedLongTap",
-          "id": 1,
+          "id": 0,
           "isCapture": true,
           "isCatch": false,
           "isMutated": true,
@@ -101,7 +101,7 @@ Object {
         },
         "tap": Object {
           "handler": "onTap",
-          "id": 1,
+          "id": 0,
           "isCapture": false,
           "isCatch": false,
           "isMutated": false,
@@ -109,7 +109,7 @@ Object {
         },
         "touchend": Object {
           "handler": "onMutatedtouchend",
-          "id": 1,
+          "id": 0,
           "isCapture": false,
           "isCatch": true,
           "isMutated": true,
@@ -117,7 +117,7 @@ Object {
         },
         "touchmove": Object {
           "handler": "onCaptureTouchMove",
-          "id": 1,
+          "id": 0,
           "isCapture": true,
           "isCatch": false,
           "isMutated": false,
@@ -125,7 +125,7 @@ Object {
         },
         "touchstart": Object {
           "handler": "onCatchTouchStart",
-          "id": 1,
+          "id": 0,
           "isCapture": false,
           "isCatch": true,
           "isMutated": false,
