@@ -113,6 +113,11 @@ test('querySelector', () => {
         }
       }
     },
+    methods: {
+      testMethod() {
+        return 'compa'
+      },
+    },
   })
   const comp = jComponent.create(jComponent.register({
     tagName: 'compb',
@@ -154,6 +159,8 @@ test('querySelector', () => {
   const node2 = comp.querySelector('#compa')
   expect(node2.dom.tagName).toBe('COMPA')
   expect(node2.dom.innerHTML).toBe('<wx-view class="item"><div>0-1</div></wx-view><wx-view class="item"><div>1-2</div></wx-view><span>0</span>')
+  expect(node2.instance.testMethod).toBeInstanceOf(Function)
+  expect(node2.instance.testMethod()).toBe('compa')
 
   const firstItem = node2.querySelector('.item')
   const items = node2.querySelectorAll('.item')
