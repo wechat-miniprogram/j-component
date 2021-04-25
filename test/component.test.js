@@ -559,6 +559,12 @@ test('life time', () => {
     detached() {
       callbackCheck.push('detached')
     },
+    pageLifetimes: {
+      show(args) {
+        callbackCheck.push('pageShow')
+        callbackCheck.push(args)
+      },
+    },
   }))
   const parent = document.createElement('div')
 
@@ -566,12 +572,14 @@ test('life time', () => {
   comp.attach(parent)
   comp.triggerLifeTime('moved')
   expect(parent.innerHTML).toBe('<lift-time-comp><child><grand-child><wx-view><div>123</div></wx-view></grand-child></child></lift-time-comp>')
+  comp.triggerPageLifeTime('show', ['page show args'])
   comp.detach()
   expect(parent.innerHTML).toBe('')
   expect(callbackCheck).toEqual([
     'grand-child-created', 'child-created', 'created',
     'attached', 'child-attached', 'grand-child-attached',
     'grand-child-ready', 'child-ready', 'ready', 'moved',
+    'pageShow', ['page show args'],
     'grand-child-detached', 'child-detached', 'detached'
   ])
 })
