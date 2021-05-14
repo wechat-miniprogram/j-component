@@ -159,6 +159,28 @@ comp.dispatchEvent('customevent', {
 })
 ```
 
+##### addEventListener(eventName, handler, useCapture)
+
+用于外部监听组件触发的事件。
+
+```js
+comp.addEventListener('customevent', evt => {
+    console.log(evt)
+})
+```
+
+##### removeEventListener(eventName, handler, useCapture)
+
+用于外部取消监听组件触发的事件。
+
+```js
+const handler = evt => {
+    console.log(evt)
+    comp.removeEventListener('customevent', handler)
+}
+comp.addEventListener('customevent', handler)
+```
+
 ##### triggerLifeTime(lifeTime, args)
 
 触发组件实例的生命周期钩子。

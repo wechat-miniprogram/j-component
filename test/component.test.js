@@ -174,7 +174,7 @@ test('querySelector', () => {
   expect(observerArr).toEqual([[1, 2, 3], [1, 2]])
 })
 
-test('dispatchEvent', async () => {
+test('dispatchEvent/addEventListener/removeEventListener', async () => {
   const eventList = []
   let blurCount = 0
   let touchStartCount = 0
@@ -382,6 +382,34 @@ test('dispatchEvent', async () => {
   comp.dispatchEvent('test')
   await _.sleep(10)
   expect(event.type).toBe('test')
+
+  // 组件事件外部监听
+  const outerEventList = []
+  const onOuterEventListener1 = evt => outerEventList.push(['bubble', evt.detail])
+  const onOuterEventListener2 = evt => outerEventList.push(['capture', evt.detail])
+  comp.addEventListener('outerListener', onOuterEventListener1)
+  comp.addEventListener('outerListener', onOuterEventListener2, true)
+  comp.dispatchEvent('outerListener', {detail: {a: 1}})
+  await _.sleep(10)
+  expect(outerEventList).toEqual([['capture', {a: 1}], ['bubble', {a: 1}]])
+  outerEventList.length = 0
+  comp.instance.triggerEvent('outerListener', {a: 2}, {capturePhase: true})
+  await _.sleep(10)
+  expect(outerEventList).toEqual([['capture', {a: 2}], ['bubble', {a: 2}]])
+  outerEventList.length = 0
+  comp.instance.triggerEvent('outerListener', {a: 3})
+  await _.sleep(10)
+  expect(outerEventList).toEqual([['bubble', {a: 3}]])
+  outerEventList.length = 0
+  comp.removeEventListener('outerListener', onOuterEventListener1)
+  comp.dispatchEvent('outerListener', {detail: {a: 4}})
+  await _.sleep(10)
+  expect(outerEventList).toEqual([['capture', {a: 4}]])
+  outerEventList.length = 0
+  comp.removeEventListener('outerListener', onOuterEventListener2, true)
+  comp.dispatchEvent('outerListener', {detail: {a: 5}})
+  await _.sleep(10)
+  expect(outerEventList).toEqual([])
 })
 
 test('setData', async () => {
