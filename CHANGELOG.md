@@ -1,5 +1,8 @@
 # 更新日志
 
+## 1.4.3
+
+* 支持根组件的 virtual host 模式
 ## 1.4.2
 
 * 支持 addEventListener/removeEventListener 接口

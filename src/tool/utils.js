@@ -261,6 +261,25 @@ function relativeToAbsolute(basePath, relativePath) {
   return pathList.join('/')
 }
 
+/**
+ * 获取 exparser 节点对应的 dom 节点
+ */
+function getDom(exparserNode) {
+  let dom = exparserNode.$$
+  if (!dom) {
+    dom = document.createElement('virtual')
+    const fragment = document.createDocumentFragment()
+    const shadowRoot = exparserNode.shadowRoot
+    const childNodes = shadowRoot && shadowRoot.childNodes
+    if (childNodes && childNodes.length) {
+      childNodes.forEach(child => fragment.appendChild(getDom(child)))
+    }
+    dom.appendChild(fragment)
+  }
+  
+  return dom
+}
+
 module.exports = {
   getId,
   copy,
@@ -277,4 +296,5 @@ module.exports = {
   parseEvent,
   normalizeAbsolute,
   relativeToAbsolute,
+  getDom,
 }

@@ -280,7 +280,7 @@ class RootComponent extends Component {
   }
 
   get dom() {
-    return this._exparserNode.$$
+    return _.getDom(this._exparserNode)
   }
 
   /**

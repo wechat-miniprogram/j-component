@@ -897,6 +897,17 @@ test('virtual host', () => {
     list: [1, 2, 3],
   })
   expect(comp.dom.innerHTML).toBe('<wx-view><div>if</div></wx-view><wx-view class="item"><div>0-1-a</div></wx-view><wx-view class="item"><div>1-2-a</div></wx-view><wx-view class="item"><div>2-3-a</div></wx-view><span>1</span>')
+
+  const comp2 = jComponent.create(jComponent.register({
+    template: `
+      <view>123</view>
+      <view>321</view>
+    `,
+    options: {
+      virtualHost: true,
+    },
+  }))
+  expect(comp2.dom.innerHTML).toBe('<wx-view><div>123</div></wx-view><wx-view><div>321</div></wx-view>')
 })
 
 test('definition filter', () => {
