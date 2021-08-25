@@ -54,6 +54,10 @@ global.wxFormField = module.exports.behavior({
   }
 })
 
+global.wxFormFieldGroup = module.exports.behavior({
+  is: 'wx://form-field-group',
+})
+
 global.wxFormFieldButton = module.exports.behavior({
   is: 'wx://form-field-button',
   listeners: {

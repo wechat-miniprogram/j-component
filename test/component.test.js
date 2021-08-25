@@ -73,6 +73,14 @@ test('register component with default form behavior', () => {
   expect(id).toBe('wx-input')
   expect(comp.instance.data.name).toEqual('idcard')
   expect(comp.instance.data.value).toEqual('123456')
+
+  jComponent.register({
+    id: 'wx-checkbox-group',
+    tagName: 'wx-checkbox-group',
+    template: '<div></div>',
+    behaviors: ['wx://form-field-group'],
+    properties: {}
+  })
 })
 
 test('instance', () => {
