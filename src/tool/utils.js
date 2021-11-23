@@ -276,7 +276,7 @@ function getDom(exparserNode) {
     }
     dom.appendChild(fragment)
   }
-  
+
   return dom
 }
 
