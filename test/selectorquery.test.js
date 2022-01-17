@@ -142,6 +142,15 @@ test('SelectorQuery', async () => {
     scrollLeft: 0,
     scrollTop: 0,
   }]])
+  selectorQuery = new SelectorQuery()
+  selectorQuery.in(comp)
+  res = await new Promise(resolve => {
+    selectorQuery.select('#cba').boundingClientRect()
+      .exec(res => {
+        resolve(res)
+      })
+  })
+  expect(res).toEqual([null])
 
   // selectViewport
   selectorQuery = new SelectorQuery()

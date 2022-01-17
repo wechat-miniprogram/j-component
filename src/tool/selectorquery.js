@@ -117,6 +117,7 @@ class SelectorQuery {
           const itemResList = []
 
           for (const node of nodes) {
+            if (!node) continue
             const itemRes = {}
 
             if (fields.id) {
@@ -166,7 +167,7 @@ class SelectorQuery {
             itemResList.push(itemRes)
           }
 
-          res.push(isSelectSingle ? itemResList[0] : itemResList)
+          res.push(isSelectSingle ? (itemResList[0] || null) : itemResList)
         }
 
         if (typeof this._queueCallback[index] === 'function') this._queueCallback[index].call(this, res[index])
