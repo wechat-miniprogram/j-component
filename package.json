@@ -1,6 +1,6 @@
 {
   "name": "j-component",
-  "version": "1.4.7",
+  "version": "1.4.8",
   "description": "miniprogram custom component framework",
   "main": "index.js",
   "types": "index.d.ts",
@@ -47,6 +47,6 @@
   "dependencies": {
     "expr-parser": "^1.0.0",
     "miniprogram-api-typings": "^3.2.2",
-    "miniprogram-exparser": "2.29.0"
+    "miniprogram-exparser": "latest"
   }
 }
