@@ -899,12 +899,14 @@ test('virtual host', () => {
   }))
 
   expect(comp.dom.innerHTML).toBe('<wx-view><div>else</div></wx-view><wx-view class="item"><div>0-1-a</div></wx-view><wx-view class="item"><div>1-2-a</div></wx-view><span>0</span>')
+  expect(comp.toJSON()).toMatchSnapshot()
 
   comp.setData({
     index: 1,
     list: [1, 2, 3],
   })
   expect(comp.dom.innerHTML).toBe('<wx-view><div>if</div></wx-view><wx-view class="item"><div>0-1-a</div></wx-view><wx-view class="item"><div>1-2-a</div></wx-view><wx-view class="item"><div>2-3-a</div></wx-view><span>1</span>')
+  expect(comp.toJSON()).toMatchSnapshot()
 
   const comp2 = jComponent.create(jComponent.register({
     template: `
@@ -916,6 +918,7 @@ test('virtual host', () => {
     },
   }))
   expect(comp2.dom.innerHTML).toBe('<wx-view><div>123</div></wx-view><wx-view><div>321</div></wx-view>')
+  expect(comp.toJSON()).toMatchSnapshot()
 })
 
 test('definition filter', () => {

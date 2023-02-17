@@ -60,10 +60,10 @@ function exparserTreeToJSON(node) {
     let children = array
     const vt = node._vt
 
-    if (vt) {
-      if (vt.type === CONSTANT.TYPE_TEXT) {
-        array.push(vt.content)
-      } else if (vt.type === CONSTANT.TYPE_NATIVE || vt.type === CONSTANT.TYPE_COMPONENT) {
+    if (node instanceof exparser.TextNode) {
+      array.push(node.textContent)
+    } else if (node instanceof exparser.Element) {
+      if (!node.__virtual) {
         children = []
         const child = {
           tagName: _.getTagName(vt.componentId || vt.tagName) || vt.tagName,
@@ -78,9 +78,8 @@ function exparserTreeToJSON(node) {
         })
         array.push(child)
       }
+      ;(node.__wxSlotChildren || []).forEach(child => _inner(child, children))
     }
-
-    (node.__wxSlotChildren || []).forEach(child => _inner(child, children))
 
     return array
   }

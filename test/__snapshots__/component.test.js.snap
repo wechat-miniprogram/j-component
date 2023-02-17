@@ -160,3 +160,262 @@ Object {
   "tagName": "main",
 }
 `;
+
+exports[`virtual host 1`] = `
+Object {
+  "attrs": Array [],
+  "children": Array [
+    Object {
+      "attrs": Array [],
+      "children": Array [
+        Object {
+          "attrs": Array [],
+          "children": Array [
+            "else",
+          ],
+          "event": Object {},
+          "tagName": "div",
+        },
+      ],
+      "event": Object {},
+      "tagName": "wx-view",
+    },
+    Object {
+      "attrs": Array [
+        Object {
+          "name": "class",
+          "value": "item",
+        },
+      ],
+      "children": Array [
+        Object {
+          "attrs": Array [],
+          "children": Array [
+            "0-1-a",
+          ],
+          "event": Object {},
+          "tagName": "div",
+        },
+      ],
+      "event": Object {},
+      "tagName": "wx-view",
+    },
+    Object {
+      "attrs": Array [
+        Object {
+          "name": "class",
+          "value": "item",
+        },
+      ],
+      "children": Array [
+        Object {
+          "attrs": Array [],
+          "children": Array [
+            "1-2-a",
+          ],
+          "event": Object {},
+          "tagName": "div",
+        },
+      ],
+      "event": Object {},
+      "tagName": "wx-view",
+    },
+    Object {
+      "attrs": Array [],
+      "children": Array [
+        "0",
+      ],
+      "event": Object {},
+      "tagName": "span",
+    },
+  ],
+  "event": Object {},
+  "tagName": "main",
+}
+`;
+
+exports[`virtual host 2`] = `
+Object {
+  "attrs": Array [],
+  "children": Array [
+    Object {
+      "attrs": Array [],
+      "children": Array [
+        Object {
+          "attrs": Array [],
+          "children": Array [
+            "if",
+          ],
+          "event": Object {},
+          "tagName": "div",
+        },
+      ],
+      "event": Object {},
+      "tagName": "wx-view",
+    },
+    Object {
+      "attrs": Array [
+        Object {
+          "name": "class",
+          "value": "item",
+        },
+      ],
+      "children": Array [
+        Object {
+          "attrs": Array [],
+          "children": Array [
+            "0-1-a",
+          ],
+          "event": Object {},
+          "tagName": "div",
+        },
+      ],
+      "event": Object {},
+      "tagName": "wx-view",
+    },
+    Object {
+      "attrs": Array [
+        Object {
+          "name": "class",
+          "value": "item",
+        },
+      ],
+      "children": Array [
+        Object {
+          "attrs": Array [],
+          "children": Array [
+            "1-2-a",
+          ],
+          "event": Object {},
+          "tagName": "div",
+        },
+      ],
+      "event": Object {},
+      "tagName": "wx-view",
+    },
+    Object {
+      "attrs": Array [
+        Object {
+          "name": "class",
+          "value": "item",
+        },
+      ],
+      "children": Array [
+        Object {
+          "attrs": Array [],
+          "children": Array [
+            "2-3-a",
+          ],
+          "event": Object {},
+          "tagName": "div",
+        },
+      ],
+      "event": Object {},
+      "tagName": "wx-view",
+    },
+    Object {
+      "attrs": Array [],
+      "children": Array [
+        "1",
+      ],
+      "event": Object {},
+      "tagName": "span",
+    },
+  ],
+  "event": Object {},
+  "tagName": "main",
+}
+`;
+
+exports[`virtual host 3`] = `
+Object {
+  "attrs": Array [],
+  "children": Array [
+    Object {
+      "attrs": Array [],
+      "children": Array [
+        Object {
+          "attrs": Array [],
+          "children": Array [
+            "if",
+          ],
+          "event": Object {},
+          "tagName": "div",
+        },
+      ],
+      "event": Object {},
+      "tagName": "wx-view",
+    },
+    Object {
+      "attrs": Array [
+        Object {
+          "name": "class",
+          "value": "item",
+        },
+      ],
+      "children": Array [
+        Object {
+          "attrs": Array [],
+          "children": Array [
+            "0-1-a",
+          ],
+          "event": Object {},
+          "tagName": "div",
+        },
+      ],
+      "event": Object {},
+      "tagName": "wx-view",
+    },
+    Object {
+      "attrs": Array [
+        Object {
+          "name": "class",
+          "value": "item",
+        },
+      ],
+      "children": Array [
+        Object {
+          "attrs": Array [],
+          "children": Array [
+            "1-2-a",
+          ],
+          "event": Object {},
+          "tagName": "div",
+        },
+      ],
+      "event": Object {},
+      "tagName": "wx-view",
+    },
+    Object {
+      "attrs": Array [
+        Object {
+          "name": "class",
+          "value": "item",
+        },
+      ],
+      "children": Array [
+        Object {
+          "attrs": Array [],
+          "children": Array [
+            "2-3-a",
+          ],
+          "event": Object {},
+          "tagName": "div",
+        },
+      ],
+      "event": Object {},
+      "tagName": "wx-view",
+    },
+    Object {
+      "attrs": Array [],
+      "children": Array [
+        "1",
+      ],
+      "event": Object {},
+      "tagName": "span",
+    },
+  ],
+  "event": Object {},
+  "tagName": "main",
+}
+`;
