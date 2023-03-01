@@ -128,6 +128,15 @@ class ComponentManager {
           const exparserNodes = this.shadowRoot.querySelectorAll(selector)
           return exparserNodes.map(item => getSelectComponentResult(item))
         }
+        caller.selectOwnerComponent = () => {
+          const ownerShadowRoot = this.ownerShadowRoot
+          if (!(ownerShadowRoot instanceof exparser.ShadowRoot)) return null
+
+          const exparserNode = ownerShadowRoot.getHostNode()
+          if (!exparserNode) return null
+
+          return getSelectComponentResult(exparserNode)
+        } 
         caller.createSelectorQuery = () => new SelectorQuery(caller)
         caller.createIntersectionObserver = options => new IntersectionObserver(caller, options)
         caller.setData = (data, callback) => {

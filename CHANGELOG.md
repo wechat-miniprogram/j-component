@@ -1,5 +1,10 @@
 # 更新日志
 
+## 1.4.9
+
+* 修复开启 virtual host 后 snapshot 中自定义组件根节点仍然存在的问题
+* 支持 selectOwnerComponent
+
 ## 1.4.6
 
 * 修复 selectQuery 找不到节点时会引发报错的问题

@@ -68,3 +68,17 @@ test('this.selectComponent/this.selectAllComponents', () => {
   expect(comp.instance.selectComponent('#abc').$$.innerHTML).toBe('123')
   expect(comp.instance.selectAllComponents('#abc')[0].$$.innerHTML).toBe('123')
 })
+
+test('this.selectOwnerComponent', () => {
+  const compaId = jComponent.register({
+    template: '<div>hello, <slot></slot></div>',
+  })
+  const compb = jComponent.create(jComponent.register({
+    template: '<compa id="abc">june</compa>',
+    usingComponents: {
+      compa: compaId,
+    },
+  }))
+
+  expect(compb.instance.selectComponent('#abc').selectOwnerComponent().$$.innerHTML).toBe('<compa><div>hello,june</div></compa>')
+})

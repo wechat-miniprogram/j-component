@@ -640,6 +640,26 @@ test('wx://component-export', () => {
     },
   }))
   expect(comp.instance.selectComponent('#compa')).toEqual({myField: 'myValue'})
+
+  const compbId = jComponent.register({
+    template: '<view>123</view>',
+  })
+  const comp2 = jComponent.create(jComponent.register({
+    tagName: 'compb',
+    template: `
+      <view>header</view>
+      <compb id="compb"></compb>
+      <view>footer</view>
+    `,
+    behaviors: ['wx://component-export'],
+    export() {
+      return {myField: 'myValue'}
+    },
+    usingComponents: {
+      compb: compbId,
+    },
+  }))
+  expect(comp2.instance.selectComponent('#compb').selectOwnerComponent()).toEqual({myField: 'myValue'})
 })
 
 test('error', () => {
