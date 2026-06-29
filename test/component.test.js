@@ -420,6 +420,62 @@ test('dispatchEvent/addEventListener/removeEventListener', async () => {
   expect(outerEventList).toEqual([])
 })
 
+test('setData in wx:for child custom event handler should not rebind unchanged listeners', () => {
+  const childId = jComponent.register({
+    template: '<view>child {{index}}</view>',
+    properties: {
+      index: {
+        type: Number,
+        value: -1,
+      }
+    },
+    methods: {
+      emitFoo() {
+        this.triggerEvent('foo', {index: this.data.index})
+      },
+    },
+  })
+  const comp = jComponent.create(jComponent.register({
+    data: {
+      showChildren: false,
+      items: [],
+      received: [],
+    },
+    template: `
+      <view wx:if="{{showChildren}}">
+        <child
+          wx:for="{{items}}"
+          wx:for-index="index"
+          wx:key="*this"
+          id="child-{{index}}"
+          index="{{index}}"
+          bindfoo="onFoo"
+        />
+      </view>
+    `,
+    usingComponents: {
+      child: childId,
+    },
+    methods: {
+      onFoo(evt) {
+        this.setData({
+          received: this.data.received.concat(evt.detail),
+        })
+      },
+    },
+  }))
+  const parent = document.createElement('div')
+  comp.attach(parent)
+  comp.setData({
+    showChildren: true,
+    items: [0, 1],
+  })
+
+  comp.querySelector('#child-1').instance.emitFoo()
+
+  expect(comp.instance.data.received).toEqual([{index: 1}])
+})
+
 test('setData', async () => {
   const callbackCheck = []
   const childId = jComponent.register({
