@@ -78,7 +78,7 @@ function exparserTreeToJSON(node) {
         })
         array.push(child)
       }
-      ;(node.__wxSlotChildren || []).forEach(child => _inner(child, children))
+      (node.__wxSlotChildren || []).forEach(child => _inner(child, children))
     }
 
     return array

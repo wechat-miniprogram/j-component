@@ -31,4 +31,4 @@ global.document = window.document
 global.TouchEvent = window.TouchEvent
 global.CustomEvent = window.CustomEvent
 
-require('./render.test.js')
+require('./render.test')

@@ -136,7 +136,7 @@ class ComponentManager {
           if (!exparserNode) return null
 
           return getSelectComponentResult(exparserNode)
-        } 
+        }
         caller.createSelectorQuery = () => new SelectorQuery(caller)
         caller.createIntersectionObserver = options => new IntersectionObserver(caller, options)
         caller.setData = (data, callback) => {
